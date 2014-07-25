@@ -5,7 +5,7 @@
 	<artifactId>${artifactId}</artifactId>
 	<packaging>war</packaging>
 	<version>${version}</version>
-	<name>Vaadin App</name>
+	<name>${artifactId}</name>
 	<url></url>
 	<dependencies>
 		<dependency>
@@ -17,22 +17,27 @@
 		<dependency>
 			<groupId>com.vaadin</groupId>
 			<artifactId>vaadin-server</artifactId>
-			<version>7.4.0.alpha2</version>
+			<version>${vaadin.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.vaadin</groupId>
 			<artifactId>vaadin-client-compiled</artifactId>
-			<version>7.4.0.alpha2</version>
+			<version>${vaadin.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.vaadin</groupId>
 			<artifactId>vaadin-shared</artifactId>
-			<version>7.4.0.alpha2</version>
+			<version>${vaadin.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.vaadin</groupId>
 			<artifactId>vaadin-themes</artifactId>
-			<version>7.4.0.alpha2</version>
+			<version>${vaadin.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.vaadin.addon</groupId>
+			<artifactId>oauthpopup</artifactId>
+			<version>0.0.3</version>
 		</dependency>
 		<dependency>
 			<groupId>javax</groupId>
@@ -73,11 +78,71 @@
 		<dependency>
 			<groupId>com.vaadin</groupId>
 			<artifactId>vaadin-push</artifactId>
-			<version>7.4.0.alpha2</version>
+			<version>${vaadin.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-core</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-test</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-beans</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-aspects</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-aop</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-tx</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-web</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.aspectj</groupId>
+			<artifactId>aspectjrt</artifactId>
+			<version>${aspectj.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-jms</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.activemq</groupId>
+			<artifactId>activemq-broker</artifactId>
+			<version>5.9.1</version>
+		</dependency>
+		<dependency>
+			<groupId>ru.xpoft.vaadin</groupId>
+			<artifactId>spring-vaadin-integration</artifactId>
+			<version>3.0.1</version>
 		</dependency>
 	</dependencies>
 	<build>
-		<finalName>Vaadin App</finalName>
+		<finalName>${artifactId}</finalName>
 		<plugins>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -85,6 +150,70 @@
 				<configuration>
 					<source>1.7</source>
 					<target>1.7</target>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>aspectj-maven-plugin</artifactId>
+				<version>1.5</version>
+				<dependencies>
+					<dependency>
+						<groupId>org.aspectj</groupId>
+						<artifactId>aspectjrt</artifactId>
+						<version>1.7.3</version>
+					</dependency>
+					<dependency>
+						<groupId>org.aspectj</groupId>
+						<artifactId>aspectjtools</artifactId>
+						<version>1.7.3</version>
+					</dependency>
+				</dependencies>
+				<executions>
+					<execution>
+						<goals>
+							<goal>compile</goal>
+							<goal>test-compile</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<aspectLibraries>
+						<aspectLibrary>
+							<groupId>org.springframework</groupId>
+							<artifactId>spring-aspects</artifactId>
+						</aspectLibrary>
+					</aspectLibraries>
+					<source>1.7</source>
+					<target>1.7</target>
+					<complianceLevel>1.7</complianceLevel>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-war-plugin</artifactId>
+				<version>2.4</version>
+				<configuration>
+					<failOnMissingWebXml>false</failOnMissingWebXml>
+					<webResources>
+						<resource>
+							<directory>${project.basedir}/src/main/resources</directory>
+						</resource>
+					</webResources>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.eclipse.jetty</groupId>
+				<artifactId>jetty-maven-plugin</artifactId>
+				<version>9.2.1.v20140609</version>
+				<configuration>
+					<jvmArgs>-Xmx512m -XX:MaxPermSize=512m</jvmArgs>
+					<scanIntervalSeconds>10</scanIntervalSeconds>
+					<systemProperties>
+						<systemProperty>
+							<name>logback.configurationFile</name>
+							<value>${project.basedir}/src/main/resources/logback.xml</value>
+						</systemProperty>
+					</systemProperties>
 				</configuration>
 			</plugin>
 		</plugins>
@@ -95,4 +224,10 @@
 			<url>http://maven.vaadin.com/vaadin-addons</url>
 		</repository>
 	</repositories>
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<spring.version>4.0.5.RELEASE</spring.version>
+		<aspectj.version>1.7.3</aspectj.version>
+		<vaadin.version>7.4.0.alpha2</vaadin.version>
+	</properties>
 </project>
