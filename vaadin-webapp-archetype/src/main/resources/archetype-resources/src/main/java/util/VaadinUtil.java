@@ -13,8 +13,11 @@ public class VaadinUtil
     
     public static void autogenerateMemberComponentIds(Object container)
     {
-        log.debug("VaadinUtil.setIds("+container+")");
+        log.debug("VaadinUtil.autogenerateMemberComponentIds("+container+")");
         for (Field field : container.getClass().getDeclaredFields()) {
+            if (field.getName().startsWith("this$")) { // an inner class' reference to the outer instance
+                continue;
+            }
             if (!Component.class.isAssignableFrom(field.getType())) {
                 continue;
             }
@@ -22,9 +25,18 @@ public class VaadinUtil
             {
                 field.setAccessible(true);
                 Component c = (Component) field.get(container);
-                if (c != null && c.getId() == null) {
-                    c.setId(container.getClass().getCanonicalName()+"."+field.getName());
+                if (c == null) {
+                    log.debug("component-valued field "+field.getName()+" is null");
+                    continue;
                 }
+                if (c.getId() != null) {
+                    log.debug("component-valued field "+field.getName()+" already has id "+c.getId());
+                    continue;
+                }
+                String className = container.getClass().getName().replace('$', '.');
+                String id = className+"."+field.getName();
+                c.setId(id);
+                log.debug("component-valued field "+field.getName()+" assigned id "+id);
             }
             catch (Exception e)
             {

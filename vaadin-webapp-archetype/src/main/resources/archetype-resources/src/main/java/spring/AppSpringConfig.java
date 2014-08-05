@@ -21,7 +21,7 @@ public class AppSpringConfig {
     
     @Bean
     public static ActiveMQConnectionFactory connectionFactory() {
-        return new ActiveMQConnectionFactory("vm://embedded?broker.persistent=false");
+        return new ActiveMQConnectionFactory("vm://embedded?broker.persistent=false&broker.useJmx=false");
     }
     
     @Bean
@@ -39,11 +39,13 @@ public class AppSpringConfig {
     }
     
     @Bean
+    @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
     Receiver receiver() {
         return new Receiver();
     }
 
     @Bean
+    @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
     MessageListenerAdapter adapter(Receiver receiver) {
         MessageListenerAdapter messageListener
                 = new MessageListenerAdapter(receiver);
@@ -52,13 +54,14 @@ public class AppSpringConfig {
     }
 
     @Bean
-    SimpleMessageListenerContainer container(MessageListenerAdapter messageListener,
-                                             ConnectionFactory connectionFactory) {
+    @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
+    SimpleMessageListenerContainer container(MessageListenerAdapter messageListener) {
         SimpleMessageListenerContainer container = new SimpleMessageListenerContainer();
         container.setMessageListener(messageListener);
-        container.setConnectionFactory(connectionFactory);
+        container.setConnectionFactory(cachingConnectionFactory());
         container.setDestinationName(DESTINATION_ALOA);
         container.setPubSubDomain(true);
+        container.start();
         return container;
     }
 

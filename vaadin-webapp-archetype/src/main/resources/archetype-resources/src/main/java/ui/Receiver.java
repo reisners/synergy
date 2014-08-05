@@ -12,13 +12,14 @@ public class Receiver
     
     public void receiveMessage(final String message) {
         log.info("receiveMessage("+message+")");
-        UI ui = UI.getCurrent();
+        final UI ui = UI.getCurrent();
         if (ui != null) {
             ui.access(new Runnable() {
                 @Override
                 public void run()
                 {
-                    Notification.show(message, Notification.Type.TRAY_NOTIFICATION);
+                    Notification notification = new Notification(message, Notification.Type.TRAY_NOTIFICATION);
+                    notification.show(ui.getPage());
                 }
             });
         }

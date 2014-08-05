@@ -3,14 +3,14 @@ package ${package}.ui;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.WebApplicationContext;
 
 import com.vaadin.annotations.Push;
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.VaadinServletConfiguration;
-import com.vaadin.navigator.Navigator;
 import com.vaadin.navigator.ViewChangeListener;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServlet;
@@ -22,11 +22,13 @@ import com.vaadin.ui.UI;
 @Component
 public class AppUI extends UI
 {
+    private static final Logger log = LoggerFactory.getLogger(AppUI.class);
+    
 //    @WebServlet(value = "/*", asyncSupported = true, 
 //            initParams={
 //                @WebInitParam(name = "org.atmosphere.useWebSocketAndServlet3", value = "true"),
 //                @WebInitParam(name = "org.atmosphere.cpr.asyncSupport", value="org.atmosphere.container.Servlet30CometSupport")})
-    @VaadinServletConfiguration(productionMode = false, ui = AppUI.class)
+    @VaadinServletConfiguration(productionMode = false, ui = AppUI.class, widgetset = "AppWidgetSet")
     public static class Servlet extends VaadinServlet
     {
        /**
@@ -44,6 +46,7 @@ public class AppUI extends UI
         public Servlet(WebApplicationContext webApplicationContext)
         {
             this.webApplicationContext = webApplicationContext;
+            log.debug("Servlet instantiated");
         }
 
         public String getServletContextAttributeName() {
@@ -55,6 +58,7 @@ public class AppUI extends UI
         {
             super.init(servletConfig);
             getServletContext().setAttribute(getServletContextAttributeName(), webApplicationContext);
+            log.debug("Servlet initialized");
         }
     }
 
@@ -106,6 +110,20 @@ public class AppUI extends UI
             {
             }
         });
+        log.debug("UI initialized");
+    }
+
+    @Override
+    public void close()
+    {
+        try
+        {
+            super.close();
+        }
+        catch (RuntimeException e)
+        {
+            log.warn("caught while closing", e);
+        }
     }
 
 }
