@@ -26,6 +26,11 @@
 		</dependency>
 		<dependency>
 			<groupId>com.vaadin</groupId>
+			<artifactId>vaadin-client</artifactId>
+			<version>${vaadin.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.vaadin</groupId>
 			<artifactId>vaadin-shared</artifactId>
 			<version>${vaadin.version}</version>
 		</dependency>
@@ -140,6 +145,16 @@
 			<artifactId>spring-vaadin-integration</artifactId>
 			<version>3.0.1</version>
 		</dependency>
+		<dependency>
+			<groupId>com.vaadin</groupId>
+			<artifactId>vaadin-client-compiler</artifactId>
+			<version>${vaadin.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>de.syngenio.vaadin</groupId>
+			<artifactId>myfirstcomponent</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
 	</dependencies>
 	<build>
 		<finalName>${artifactId}</finalName>
@@ -216,7 +231,70 @@
 					</systemProperties>
 				</configuration>
 			</plugin>
+			<plugin>
+				<groupId>com.vaadin</groupId>
+				<artifactId>vaadin-maven-plugin</artifactId>
+				<version>${vaadin.plugin.version}</version>
+				<configuration>
+					<extraJvmArgs>-Xmx512M -Xss1024k</extraJvmArgs>
+					<webappDirectory>${basedir}/src/main/webapp/VAADIN/widgetsets</webappDirectory>
+					<hostedWebapp>${basedir}/src/main/webapp/VAADIN/widgetsets</hostedWebapp>
+					<noServer>true</noServer>
+					<persistentunitcachedir>${basedir}/target/tmp/gwt-unitCache</persistentunitcachedir>
+					<compileReport>true</compileReport>
+					<strict>true</strict>
+					<runTarget>http://localhost:8080/</runTarget>
+				</configuration>
+				<executions>
+					<!-- You are free to mark this as permanently ignored in Eclipse -->
+					<execution>
+						<configuration>
+							<!-- if you don't specify any modules, the plugin will find them -->
+						</configuration>
+						<goals>
+							<goal>resources</goal>
+							<goal>update-widgetset</goal>
+							<goal>compile</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
+		<pluginManagement>
+			<plugins>
+				<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
+				<plugin>
+					<groupId>org.eclipse.m2e</groupId>
+					<artifactId>lifecycle-mapping</artifactId>
+					<version>1.0.0</version>
+					<configuration>
+						<lifecycleMappingMetadata>
+							<pluginExecutions>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>com.vaadin</groupId>
+										<artifactId>vaadin-maven-plugin</artifactId>
+										<versionRange>
+											[${vaadin.plugin.version},)
+										</versionRange>
+										<goals>
+											<goal>resources</goal>
+											<goal>update-widgetset</goal>
+											<goal>compile</goal>
+											<goal>update-theme</goal>
+											<goal>compile-theme</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<ignore></ignore>
+									</action>
+								</pluginExecution>
+							</pluginExecutions>
+						</lifecycleMappingMetadata>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
 	</build>
 	<repositories>
 		<repository>
@@ -229,5 +307,6 @@
 		<spring.version>4.0.5.RELEASE</spring.version>
 		<aspectj.version>1.7.3</aspectj.version>
 		<vaadin.version>7.4.0.alpha2</vaadin.version>
+		<vaadin.plugin.version>${vaadin.version}</vaadin.plugin.version>
 	</properties>
 </project>
