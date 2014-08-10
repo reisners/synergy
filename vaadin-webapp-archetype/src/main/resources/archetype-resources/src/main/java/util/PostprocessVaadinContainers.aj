@@ -9,7 +9,7 @@ public aspect PostprocessVaadinContainers {
     /**
      * Application classes.
      */
-    pointcut myClasses(): within(test.vaadin.try12.ui..*) && within(com.vaadin.ui.Component+);
+    pointcut myClasses(): within(${package}.ui..*) && within(com.vaadin.ui.Component+);
     /**
      * The constructors in those classes.
      */
