@@ -24,6 +24,8 @@ import java.util.UUID;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class is used to record execution paths for later quantitative analysis.
@@ -36,6 +38,8 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
  */
 public class XPS
 {
+    private static final Logger log = LoggerFactory.getLogger(XPS.class);
+    
     private static final ThreadLocal<XPS> threadXPS= new ThreadLocal<XPS>() {
         protected XPS initialValue() {
             return new XPS();
@@ -43,14 +47,19 @@ public class XPS
     };
 
     public static void configure(RecordLogger recordLogger) {
+        init();
         getInstance().setRecordLogger(recordLogger);
+    }
+    private static void init()
+    {
+        threadXPS.remove();
     }
     private static XPS getInstance() {
         return threadXPS.get();
     }
     
     private RecordLogger recordLogger = null;
-
+    
     private void setRecordLogger(RecordLogger recordLogger) {
         this.recordLogger = recordLogger;
     }
@@ -286,6 +295,9 @@ public class XPS
     
     private Checkpoint add(Record record) {
         recordLogger.add(record);
+        if (log.isDebugEnabled()) {
+            log.debug(record.toString());
+        }
         return record.getCheckpoint();
     }
 

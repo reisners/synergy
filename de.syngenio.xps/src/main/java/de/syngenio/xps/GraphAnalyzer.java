@@ -12,6 +12,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -84,14 +86,40 @@ public class GraphAnalyzer implements Closeable
         {
             return super.toString()+"#"+counter.get();
         }
+        
+        public void dump(int indent)
+        {
+            for (java.util.Map.Entry<T, CountingTree<T>> entry : this.entrySet()) {
+                System.out.println(StringUtils.repeat(' ', indent)+entry.getKey()+" : "+entry.getValue().getCounter());
+                entry.getValue().dump(indent+2);
+            }
+        }
+
+        public JSONObject toJSON() throws JSONException
+        {
+            return toJSON(true);
+        }
+        
+        private JSONObject toJSON(boolean topLevel) throws JSONException
+        {
+            JSONObject json = new JSONObject();
+            for (java.util.Map.Entry<T, CountingTree<T>> entry : this.entrySet()) {
+                JSONObject subjson = entry.getValue().toJSON(false);
+                json.put(String.valueOf(entry.getKey()), subjson);
+            }
+            if (!topLevel) {
+                json.put("#", counter);
+            }
+            return json;
+        }
+
     }
     
-    public void analyze() {
+    public CountingTree<String> analyze() {
         buildGraph();
 
         //count paths through which each terminal vertex can be reached
-        CountingTree<String> tree = GremlinUtil.countPaths(graph);
-        dumpCountingTree(tree, 0);
+        return GremlinUtil.countPaths(graph);
     }
 
     private void dumpCountingTree(CountingTree<String> tree, int indent)
@@ -142,10 +170,12 @@ public class GraphAnalyzer implements Closeable
                 }
                 Vertex vertexPredecessor = findNodeVertex(predecessor);
                 if (vertexPredecessor == null) {
-                    throw new AnalysisException("unknown predecessor "+predecessor+" (misplaced done record?)");
+                    throw new AnalysisException("unknown predecessor "+predecessor+" for record "+record.getCheckpoint()+" (misplaced done record?)");
                 } 
                 vertexPredecessor.addEdge(EDGE_LABEL_FOLLOWED_BY, vertex);
-                log.debug("added edge from vertex predecessor="+predecessor+" to current vertex");
+                if (log.isDebugEnabled()) {
+                    log.debug("added edge from vertex predecessor="+predecessor+" to current vertex");
+                }
             }
             ++recordCount;
             if (recordCount % 100 == 0) {

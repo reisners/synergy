@@ -19,16 +19,47 @@
 package de.syngenio.xps;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Writer;
 import java.util.Random;
 
+import org.apache.commons.io.IOUtils;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TestWatcher;
+import org.junit.runner.Description;
 import org.neo4j.visualization.graphviz.Script;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import de.syngenio.xps.GraphAnalyzer.CountingTree;
 import de.syngenio.xps.XPS.Checkpoint;
 
 public class TestExecutionPathStats
 {
+    private final static Logger log = LoggerFactory.getLogger(TestExecutionPathStats.class);
+
+    @Rule
+    public TestWatcher watchman = new TestWatcher() {
+        public void starting(Description description)
+        {
+            log.info("Run Test {}...", description);
+        }
+
+        public void succeeded(Description description)
+        {
+            log.info("Test {} succeeded.", description);
+        }
+
+        public void failed(Throwable e, Description description)
+        {
+            log.error("Test {} failed with {}.", description, e);
+        }
+    };
+
     private final Random random = new Random();
 
     enum ExecutionPoint {
@@ -107,33 +138,37 @@ public class TestExecutionPathStats
     };
 
     @Test
-    public void testSplitJoin() throws IOException {
+    public void testSplitJoin() throws IOException, JSONException
+    {
         RecordLogger recordLogger = new RecordLogger();
         XPS.configure(recordLogger);
 
-        // "input" marks the opening of an input container with six items 
+        // "input" marks the opening of an input container with six items
         Checkpoint input = XPS.point("input"); // keep a reference to this point
-        
+
         // item #1
-        XPS.split(input); // explicitly connect to point "start" (must work even across threads)
+        XPS.split(input); // explicitly connect to point "start" (must work even
+                          // across threads)
         XPS.point("A");
         XPS.point("B");
         XPS.point("C");
         XPS.done(input);
-        // item is now fully processed and has been put into some output container
-        
+        // item is now fully processed and has been put into some output
+        // container
+
         // item #2
         XPS.split(input); // explicitly connect to point "start"
         XPS.point("A");
         XPS.point("B"); // implicitly connects to the previous point
         XPS.point("C");
         XPS.done(input);
-        // item is now fully processed and has been put into some output container
-        
+        // item is now fully processed and has been put into some output
+        // container
+
         // item #3
         XPS.split(input); // make the connection before anything can go wrong
         XPS.point("B");
-        
+
         // here a sub-iteration starts
         Checkpoint d = XPS.point("D");
         XPS.split(d);
@@ -145,45 +180,55 @@ public class TestExecutionPathStats
         // sub-iteration done
         XPS.join(d);
         // this is the common successor of all sub-iteration branches
-        // (even if the join on d never takes place (e.g. because an exception occurred), 
+        // (even if the join on d never takes place (e.g. because an exception
+        // occurred),
         // the structure must stay intact
         XPS.point("C");
         // branch ends abruptly
-//        XPS.done(input);
-        // item is now fully processed and has been put into some output container
-        
+        // XPS.done(input);
+        // item is now fully processed and has been put into some output
+        // container
+
         // item #4
         XPS.split(input);
         XPS.point("A");
         XPS.point("error");
         // item is discarded because of error
-        
+
         // item #5
         XPS.split(input);
         XPS.point("A");
         XPS.point("B");
         XPS.point("C");
         XPS.done(input);
-        
+
         // item #6
         XPS.split(input); // make the connection before anything can go wrong
         XPS.point("error");
         // item might not even have been obtained due to error
-        
-        // the output container that has been filled with several items is now being closed and output
-        XPS.join(input); // all branches originating from startRef are now terminated 
+
+        // the output container that has been filled with several items is now
+        // being closed and output
+        XPS.join(input); // all branches originating from input are now
+                         // terminated
         XPS.point("output");
 
         String analysisPath = "analysis_graph";
-        try (GraphAnalyzer ga = new GraphAnalyzer(recordLogger, analysisPath)) {
-            ga.analyze();
+        try (GraphAnalyzer ga = new GraphAnalyzer(recordLogger, analysisPath))
+        {
+            CountingTree<String> countingTree = ga.analyze();
+            JSONObject json = countingTree.toJSON();
+            System.out.println("json=\n" + json.toString(2));
+            try (Writer output = new FileWriter("testSplitJoin.json")) {
+                IOUtils.write(json.toString(2), output);
+            }
         }
         Script script = Script.initialize(Script.class, analysisPath);
         script.emit(new File("graph.dot"));
     }
-    
+
     @Test
-    public void test() throws IOException
+    public void test() throws IOException, JSONException
     {
         RecordLogger recordLogger = new RecordLogger();
         XPS.configure(recordLogger);
@@ -214,8 +259,13 @@ public class TestExecutionPathStats
         XPS.join(start);
         XPS.point("end");
 
-        try (GraphAnalyzer analyzer = new GraphAnalyzer(recordLogger, "analysis_graph")) {
-            analyzer.analyze();
+        try (GraphAnalyzer analyzer = new GraphAnalyzer(recordLogger, "analysis_graph"))
+        {
+            CountingTree<String> countingTree = analyzer.analyze();
+            countingTree.dump(0);
+
+            JSONObject json = countingTree.toJSON();
+            System.out.println("json=\n" + json.toString());
         }
     }
 
@@ -226,9 +276,12 @@ public class TestExecutionPathStats
         {
             double r = random.nextDouble();
 
-            if (r < 0.95) {
+            if (r < 0.95)
+            {
                 return xp;
-            } else if (r > 0.999) {
+            }
+            else if (r > 0.999)
+            {
                 return ExecutionPoint.error;
             }
             xp = xp.next();
