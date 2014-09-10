@@ -1,0 +1,22 @@
+<?xml version="1.0" standalone="no" ?>
+<!DOCTYPE project PUBLIC "-//audacityproject-1.3.0//DTD//EN" "http://audacity.sourceforge.net/xml/audacityproject-1.3.0.dtd" >
+<project xmlns="http://audacity.sourceforge.net/xml/" projname="ziffernfolgen_data" version="1.3.0" audacityversion="2.0.5" sel0="-0.1300000000" sel1="19.8050000000" vpos="0" h="14.2454421769" zoom="86.1328125000" rate="16000.0">
+	<tags>
+		<tag name="TITLE" value="Auftragsnummer 67011899"/>
+		<tag name="YEAR" value="2014"/>
+		<tag name="ARTIST" value="Dr. Stefan Reisner"/>
+	</tags>
+	<wavetrack name="Tonspur" channel="2" linked="0" mute="0" solo="0" height="150" minimized="0" isSelected="1" rate="16000" gain="1.0" pan="0.0">
+		<waveclip offset="-0.13000000">
+			<sequence maxsamples="262144" sampleformat="262159" numsamples="318960">
+				<waveblock start="0">
+					<simpleblockfile filename="e0000f75.au" len="262144" min="-0.891251" max="0.751794" rms="0.068911"/>
+				</waveblock>
+				<waveblock start="262144">
+					<simpleblockfile filename="e00009b4.au" len="56816" min="-0.395729" max="0.295935" rms="0.024322"/>
+				</waveblock>
+			</sequence>
+			<envelope numpoints="0"/>
+		</waveclip>
+	</wavetrack>
+</project>
