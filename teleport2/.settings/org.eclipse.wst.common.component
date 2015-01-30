@@ -2,7 +2,6 @@
     <wb-module deploy-name="teleport2">
         <wb-resource deploy-path="/" source-path="/WebContent" tag="defaultRootSource"/>
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src"/>
-        <wb-resource deploy-path="/WEB-INF/classes" source-path="/aspects"/>
         <property name="context-root" value="teleport2"/>
         <property name="java-output-path" value="/teleport2/build/classes"/>
     </wb-module>

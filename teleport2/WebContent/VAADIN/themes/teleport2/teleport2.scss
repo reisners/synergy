@@ -28,79 +28,111 @@
 // Example variants can be copy/pasted from https://vaadin.com/wiki/-/wiki/Main/Valo+Examples
 
 $v-focus-color: rgb(147,241,0);
-$synergy-background-color: #50514e;
+$dark-background-color: #50514e;
+
+$v-app-background-color: $dark-background-color;
+
+$margin-size: 6px;
+
+$v-layout-margin-top: $margin-size;
+$v-layout-margin-bottom: $margin-size;
+$v-layout-margin-left: $margin-size;
+$v-layout-margin-right: $margin-size;
 
 @import "../valo/valo.scss";
 
 @mixin teleport2 {
   @include valo;
 
-  // Insert your own theme rules here
-  .v-button-up {
-    @extend .v-button;
-    background: #f00;
-    border-color: $v-focus-color;
-    color: $v-focus-color;
+  .v-label-greenbar {
+  	background-color: $v-selection-color;
   }
-  .v-button-down {
-    @extend .v-button;
-    background: #0f0;
-    border-color: $v-focus-color;
-    color: $v-focus-color;
+  
+  .v-panel-content {
+  	background-color: white;	
   }
-
+  
   .v-layout-synergy {
-  	background: $synergy-background-color;
-  	color: white;
+  	@extend .v-layout;
+  	background-color: $dark-background-color;
   }
   
   .v-horizontallayout-synergy, .v-verticallayout-synergy {
   	@extend .v-layout-synergy;
   }
 
+  // .v-horizontallayout-synergy-h1 {
+  	// @extend .v-horizontallayout-synergy;
+  	// background-color: $dark-background-color;
+  // }
 
-
-.v-button-synergy-unselected {
-    border: 0;
-    margin: 5px;    
-
-    box-shadow: none;
-
-  &:focus:after {
-      box-shadow: none;
+  .v-horizontallayout-synergy-h2 {
+  	@extend .v-horizontallayout-synergy;
+  	background-color: lighten($dark-background-color, 20%);
   }
 
-  	color: valo-font-color(lighten($synergy-background-color, 30%));
-  	background: lighten($synergy-background-color, 30%);
+  .v-horizontallayout-synergy-h3 {
+  	@extend .v-horizontallayout-synergy;
+  	background-color: lighten($dark-background-color, 40%);
+  }
+
+.v-button-synergy-selected, .v-button-synergy-unselected, .v-button-synergy-ancestor-of-selected {
+	border: 0;
+	box-shadow: none;
+	&:focus:after {
+	    box-shadow: none;
+	}
+}
+
+.v-button-synergy-unselected, .v-button-synergy-ancestor-of-selected {
 	&:hover {
 		&:after {
 		  	box-shadow: 0 0 0 2px $v-selection-color;
 		}
 	}
   }
-  .v-button-synergy-selected {
-    border: 0;
-    margin: 5px;    
 
-    box-shadow: none;
-
-  &:focus:after {
-      box-shadow: none;
+.v-image-synergy-unselected, .v-image-synergy-ancestor-of-selected {
+	&:hover {
+	  	box-shadow: 0 0 2px 2px $v-selection-color;
+	}
   }
+
+.v-caption-synergy-unselected, .v-caption-synergy-selected, .v-caption-synergy-ancestor-of-selected, .v-image-synergy-unselected, .v-image-synergy-selected, .v-image-synergy-ancestor-of-selected {
+    left:0px;
+    margin-left: auto;
+    right:0px;
+    margin-right: auto;	
+}
+
+.v-button-synergy-unselected {
+  	color: valo-font-color(lighten($dark-background-color, 30%));
+  	background: lighten($dark-background-color, 30%);
+  }
+  
+.v-button-synergy-selected {
   	color: valo-font-color($v-selection-color);
     background: $v-selection-color;
   }
+  
   .v-button-synergy-ancestor-of-selected {
-    border: 0;
-    margin: 5px;    
-
-    box-shadow: none;
-
-  &:focus:after {
-      box-shadow: none;
-  }
   	color: valo-font-color(lighten($v-selection-color, 30%));
     background: lighten($v-selection-color, 30%);
   }
-
+  
+  .v-image-synergy-unselected, .v-image-synergy-selected, .v-image-synergy-ancestor-of-selected {
+  	border-radius: 5px;
+  	position: absolute;
+  	top: 0px;
+  } 
+  
+  .v-caption-synergy-unselected, .v-caption-synergy-selected, .v-caption-synergy-ancestor-of-selected {
+  	position: absolute;
+  	bottom: 0px;
+  	text-align: center;
+  } 
+  
+  .v-slot-synergy-unselected, .v-slot-synergy-selected, .v-slot-synergy-ancestor-of-selected {
+  	position: relative;
+  } 
 }

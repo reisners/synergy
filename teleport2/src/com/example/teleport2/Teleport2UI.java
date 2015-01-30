@@ -13,17 +13,22 @@ import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServlet;
+import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.CustomComponent;
+import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 
-import de.syngenio.vaadin.synergy.HierarchicalContainerHelper;
+import de.syngenio.vaadin.synergy.AbstractSynergyLayoutFactory;
+import de.syngenio.vaadin.synergy.SynergyBuilder;
 import de.syngenio.vaadin.synergy.HorizontalSynergyLayoutFactory;
 import de.syngenio.vaadin.synergy.SynergyView;
+import de.syngenio.vaadin.synergy.SynergyView.ItemComponentButton;
+import de.syngenio.vaadin.synergy.SynergyView.ItemComponentImage;
 import de.syngenio.vaadin.synergy.VerticalSynergyLayoutFactory;
 
 @SuppressWarnings("serial")
@@ -32,21 +37,8 @@ public class Teleport2UI extends UI {
     private static final Logger log = LoggerFactory.getLogger(Teleport2UI.class);
     
 	@WebServlet(value = "/*", asyncSupported = true)
-	@VaadinServletConfiguration(productionMode = false, ui = Teleport2UI.class, widgetset = "com.example.teleport2.Teleport2Widgetset")
+	@VaadinServletConfiguration(productionMode = false, ui = Teleport2UI.class)
 	public static class Servlet extends VaadinServlet {
-	}
-
-	public class UpDownButton extends Button {
-	    boolean toggleUp = true;
-	    boolean isUp() {return toggleUp;}
-	    void setUp(boolean up) {
-	        toggleUp = up;
-	        setStyleName(toggleUp ? "up": "down");
-	    }
-	    public UpDownButton(String caption, boolean initialUp) {
-	        super(caption);
-	        setUp(initialUp);
-	    }
 	}
 
     private Panel content;
@@ -58,34 +50,45 @@ public class Teleport2UI extends UI {
 	protected void init(VaadinRequest request) {
 	    setId("Teleport2UI");
 		final VerticalLayout layout = new VerticalLayout();
+		layout.setSizeFull();
 		layout.setId("vLayout");
-		layout.setMargin(true);
+//		layout.setMargin(true);
+//		layout.setSpacing(true);
 		setContent(layout);
 
-		final UpDownButton button = buildUpDownButton();
-		button.setId("upDownButton");
-		button.addClickListener(new Button.ClickListener() {
-			public void buttonClick(ClickEvent event) {
-				button.setUp(!button.isUp());
-			}
-		});
-		layout.addComponent(button);
-		
         buildNavigationHierarchy();
 
 //        Tree tree = new Tree("My Tree");
 //        tree.setContainerDataSource(hc);
 //        layout.addComponent(tree);
-        SynergyView navTopLevel = new SynergyView(new HorizontalSynergyLayoutFactory(), hierarchicalContainer);
+        final AbstractSynergyLayoutFactory layoutFactoryTopLevel = new HorizontalSynergyLayoutFactory();
+        layoutFactoryTopLevel.setCompactArrangement(false);
+        layoutFactoryTopLevel.setStyleName("h1");
+        SynergyView navTopLevel = new SynergyView(layoutFactoryTopLevel, hierarchicalContainer);
+        navTopLevel.setWidth("100%");
         layout.addComponent(navTopLevel);
+        layout.setExpandRatio(navTopLevel, 0);
 
-        SynergyView nav2ndLevel = new SynergyView(new HorizontalSynergyLayoutFactory(), navTopLevel);
+        final AbstractSynergyLayoutFactory layoutFactory2ndLevel = new HorizontalSynergyLayoutFactory();
+        layoutFactory2ndLevel.setStyleName("h2");
+        SynergyView nav2ndLevel = new SynergyView(layoutFactory2ndLevel, navTopLevel);
+        nav2ndLevel.setWidth("100%");
         layout.addComponent(nav2ndLevel);
+        layout.setExpandRatio(nav2ndLevel, 0);
 
         navTopLevel.setSubView(nav2ndLevel);
         
+        Label greenBar = new Label();
+        greenBar.setWidth("100%");
+        greenBar.setHeight("3px");
+        greenBar.setStyleName("greenbar");
+        layout.addComponent(greenBar);
+        layout.setExpandRatio(greenBar, 0);
+        layout.setComponentAlignment(greenBar, Alignment.TOP_CENTER);
+        
         com.vaadin.ui.HorizontalSplitPanel hsplit = new com.vaadin.ui.HorizontalSplitPanel();
         layout.addComponent(hsplit);
+        layout.setExpandRatio(hsplit, 1);
         
         SynergyView vsv = new SynergyView(new VerticalSynergyLayoutFactory(), nav2ndLevel);
         vsv.setSizeFull();
@@ -94,42 +97,68 @@ public class Teleport2UI extends UI {
         nav2ndLevel.setSubView(vsv);
         
         content = new Panel();
+        content.setStyleName("content");
         
         hsplit.setSecondComponent(content);
+        hsplit.setSplitPosition(20, Unit.PERCENTAGE);
         
         createAndRegisterViews();
 	}
 
     private void buildNavigationHierarchy()
     {
-        hierarchicalContainer = HierarchicalContainerHelper.createHierarchicalContainer();
+        hierarchicalContainer = SynergyBuilder.createHierarchicalContainer();
+
+        Item hiStammdaten = hierarchicalContainer.addItem("Stammdaten");
+        hiStammdaten.getItemProperty(SynergyBuilder.PROPERTY_ITEM_COMPONENT_CLASS).setValue(ItemComponentImage.class.getName());
+        hiStammdaten.getItemProperty(SynergyBuilder.PROPERTY_ITEM_COMPONENT_WIDTH).setValue("64px");
+        hiStammdaten.getItemProperty(SynergyBuilder.PROPERTY_ITEM_COMPONENT_HEIGHT).setValue("64px");
+        hiStammdaten.getItemProperty(SynergyBuilder.PROPERTY_ITEM_COMPONENT_SOURCE).setValue("img/service_desk.png");
+        hiStammdaten.getItemProperty(SynergyBuilder.PROPERTY_ITEM_COMPONENT_SOURCE_SELECTED).setValue("img/service_desk_selected.png");
+
+        Item hiBudget = hierarchicalContainer.addItem("Budget");
+        hiBudget.getItemProperty(SynergyBuilder.PROPERTY_ITEM_COMPONENT_CLASS).setValue(ItemComponentImage.class.getName());
+        hiBudget.getItemProperty(SynergyBuilder.PROPERTY_ITEM_COMPONENT_WIDTH).setValue("64px");
+        hiBudget.getItemProperty(SynergyBuilder.PROPERTY_ITEM_COMPONENT_HEIGHT).setValue("64px");
+        hiBudget.getItemProperty(SynergyBuilder.PROPERTY_ITEM_COMPONENT_SOURCE).setValue("img/budget.png");
+        hiBudget.getItemProperty(SynergyBuilder.PROPERTY_ITEM_COMPONENT_SOURCE_SELECTED).setValue("img/budget_selected.png");
+
+        Item hiReporting = hierarchicalContainer.addItem("Reporting");
+        hiReporting.getItemProperty(SynergyBuilder.PROPERTY_ITEM_COMPONENT_CLASS).setValue(ItemComponentImage.class.getName());
+        hiReporting.getItemProperty(SynergyBuilder.PROPERTY_ITEM_COMPONENT_WIDTH).setValue("64px");
+        hiReporting.getItemProperty(SynergyBuilder.PROPERTY_ITEM_COMPONENT_HEIGHT).setValue("64px");
+        hiReporting.getItemProperty(SynergyBuilder.PROPERTY_ITEM_COMPONENT_SOURCE).setValue("img/reporting.png");
+        hiReporting.getItemProperty(SynergyBuilder.PROPERTY_ITEM_COMPONENT_SOURCE_SELECTED).setValue("img/reporting_selected.png");
 
         Item hiPerson = hierarchicalContainer.addItem("Person");
-        hierarchicalContainer.setChildrenAllowed("Person", true);
-        hiPerson.getItemProperty(HierarchicalContainerHelper.PROPERTY_TARGET_NAVIGATION_STATE).setValue("view1");
+        hierarchicalContainer.setParent("Person", "Stammdaten");
+        hiPerson.getItemProperty(SynergyBuilder.PROPERTY_TARGET_NAVIGATION_STATE).setValue("view1");
 
         Item hiPersonSuchen = hierarchicalContainer.addItem("Person.Suchen");
+        hiPersonSuchen.getItemProperty(SynergyBuilder.PROPERTY_TARGET_NAVIGATION_STATE).setValue("view2");
+        hiPersonSuchen.getItemProperty(SynergyBuilder.PROPERTY_ITEM_COMPONENT_CAPTION).setValue("Suchen");
         hierarchicalContainer.setParent("Person.Suchen", "Person");
-        hiPersonSuchen.getItemProperty(HierarchicalContainerHelper.PROPERTY_TARGET_NAVIGATION_STATE).setValue("view2");
 
         Item hiPersonAnlegen = hierarchicalContainer.addItem("Person.Anlegen");
+        hiPersonAnlegen.getItemProperty(SynergyBuilder.PROPERTY_TARGET_NAVIGATION_STATE).setValue("view2");
+        hiPersonAnlegen.getItemProperty(SynergyBuilder.PROPERTY_ITEM_COMPONENT_CAPTION).setValue("Anlegen");
         hierarchicalContainer.setParent("Person.Anlegen", "Person");
-        hiPersonAnlegen.getItemProperty(HierarchicalContainerHelper.PROPERTY_TARGET_NAVIGATION_STATE).setValue("view2");
 
         Item hiPersonAnlegenAnschrift = hierarchicalContainer.addItem("Person.Anlegen.Anschrift");
         hierarchicalContainer.setParent("Person.Anlegen.Anschrift", "Person.Anlegen");
-        hiPersonAnlegenAnschrift.getItemProperty(HierarchicalContainerHelper.PROPERTY_TARGET_NAVIGATION_STATE).setValue("view2");
+        hiPersonAnlegenAnschrift.getItemProperty(SynergyBuilder.PROPERTY_TARGET_NAVIGATION_STATE).setValue("view2");
 
         Item hiPersonAnlegenBonitaeten = hierarchicalContainer.addItem("Person.Anlegen.Bonitäten");
         hierarchicalContainer.setParent("Person.Anlegen.Bonitäten", "Person.Anlegen");
-        hiPersonAnlegenBonitaeten.getItemProperty(HierarchicalContainerHelper.PROPERTY_TARGET_NAVIGATION_STATE).setValue("view2");
+        hiPersonAnlegenBonitaeten.getItemProperty(SynergyBuilder.PROPERTY_TARGET_NAVIGATION_STATE).setValue("view2");
 
         Item hiKonto = hierarchicalContainer.addItem("Konto");
-        hierarchicalContainer.setChildrenAllowed("Konto", true);
-        hiKonto.getItemProperty(HierarchicalContainerHelper.PROPERTY_TARGET_NAVIGATION_STATE).setValue("view3");
+        hierarchicalContainer.setParent("Konto", "Stammdaten");
+        hiKonto.getItemProperty(SynergyBuilder.PROPERTY_TARGET_NAVIGATION_STATE).setValue("view3");
         
         hiVerwaltung = hierarchicalContainer.addItem("Verwaltung");
-        hiVerwaltung.getItemProperty(HierarchicalContainerHelper.PROPERTY_TARGET_NAVIGATION_STATE).setValue("view4");
+        hierarchicalContainer.setParent("Verwaltung", "Stammdaten");
+        hiVerwaltung.getItemProperty(SynergyBuilder.PROPERTY_TARGET_NAVIGATION_STATE).setValue("view4");
     }
 	
 	private class MyView extends CustomComponent implements View {
@@ -173,11 +202,6 @@ public class Teleport2UI extends UI {
             MyView view = new MyView(viewName);
             navigator.addView(viewName, view);
         }
-    }
-
-    public UpDownButton buildUpDownButton()
-    {
-        return new UpDownButton("Toggle Me", true);
     }
 
 }
