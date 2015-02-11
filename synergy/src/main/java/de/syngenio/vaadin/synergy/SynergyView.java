@@ -1,12 +1,13 @@
 package de.syngenio.vaadin.synergy;
 
 import java.lang.reflect.Constructor;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.vaadin.data.Container;
 import com.vaadin.data.Container.ItemSetChangeEvent;
@@ -17,13 +18,12 @@ import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.data.util.HierarchicalContainer;
 import com.vaadin.event.MouseEvents;
-import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Resource;
 import com.vaadin.server.ThemeResource;
+import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomComponent;
-import com.vaadin.ui.Embedded;
 import com.vaadin.ui.Image;
 import com.vaadin.ui.UI;
 
@@ -52,6 +52,12 @@ public class SynergyView extends CustomComponent
     private Map<String, ItemComponent> itemComponents = null;
     private SynergyLayoutFactory layoutFactory;
     
+    private final static Logger log = LoggerFactory.getLogger(SynergyView.class);
+
+    public SynergyView(SynergyLayoutFactory layoutFactory)
+    {
+        this(layoutFactory, SynergyBuilder.createHierarchicalContainer());
+    }
 
     public SynergyView(SynergyLayoutFactory layoutFactory, Container dataSource)
     {
@@ -94,43 +100,7 @@ public class SynergyView extends CustomComponent
     }
 
     private Collection<String> getImmediateChildItemIds() {
-        List<String> children = new ArrayList<String>();
-        for (Object objItemId : select.getContainerDataSource().getItemIds()) {
-            String itemId = (String) objItemId;
-            if (isChild(itemId)) {
-                children.add(itemId);
-            }
-        }
-        return children;
-    }
-    
-    private boolean isChild(String itemId)
-    {
-        Container container = select.getContainerDataSource();
-        if (!(container instanceof HierarchicalContainer)) {
-            return true;
-        }
-        HierarchicalContainer hc = (HierarchicalContainer) container;
-        final String itemParentId = (String) hc.getParent(itemId);
-        if (parentId == null) {
-            return itemParentId == null;
-        } else {
-            return parentId.equals(itemParentId);
-        }
-    }
-    
-    /**
-     * If the item identified by itemId has a parent, return that parent's id.
-     * Always returns null if the container is not an instance of HierarchicalContainer.
-     */
-    private String getParentId(String itemId)
-    {
-        Container container = select.getContainerDataSource();
-        if (!(container instanceof HierarchicalContainer)) {
-            return null;
-        }
-        HierarchicalContainer hc = (HierarchicalContainer) container;
-        return (String) hc.getParent(itemId);
+        return SynergyBuilder.getChildIdsOf(select.getContainerDataSource(), parentId);
     }
 
     /**
@@ -216,17 +186,13 @@ public class SynergyView extends CustomComponent
     /**
      * Checks if the item identified by ancestorId is an ancestor of the item identified by itemId
      * @param ancestorId
-     * @param itemId
-     * @return
+     * @param descendantId
+     * @return true if the item identified by ancestorId is an ancestor of the item identified by descendantId
      */
-    private boolean isAncestorOf(String ancestorId, String itemId) {
-        if (ancestorId == null || itemId == null) {
-            return false;
-        }
-        final String itemParentId = getParentId(itemId);
-        return ancestorId.equals(itemParentId) || isAncestorOf(ancestorId, itemParentId); 
+    private boolean isAncestorOf(String ancestorId, String descendantId) {
+        return SynergyBuilder.isAncestorOf(select.getContainerDataSource(), ancestorId, descendantId); 
     }
-   
+
     public interface ItemComponent extends Component {
         enum State { unselected, selected, ancestorOfSelected }; 
         void setup(final SynergySelect ss, final Object itemId);
@@ -341,7 +307,7 @@ public class SynergyView extends CustomComponent
                         ss.select(itemId);
                         String targetNavigationState = (String) ss.getContainerProperty(itemId, SynergyBuilder.PROPERTY_TARGET_NAVIGATION_STATE).getValue();
                         if (targetNavigationState != null) {
-                            UI.getCurrent().getNavigator().navigateTo(targetNavigationState);
+                            getUI().getNavigator().navigateTo(targetNavigationState);
                         }
                     }
                 }
@@ -369,22 +335,16 @@ public class SynergyView extends CustomComponent
     {
         ItemComponent itemComponent = null;
         Item item = select.getItem(itemId);
-        final Property<String> property = item.getItemProperty(SynergyBuilder.PROPERTY_ITEM_COMPONENT_CLASS);
-        String itemComponentClassName = property.getValue();
-        if (itemComponentClassName != null) {
-            try
-            {
-                Class itemComponentClass = Class.forName(itemComponentClassName);
-                Constructor defcon = itemComponentClass.getConstructor();
-                itemComponent = (ItemComponent) defcon.newInstance();
-            }
-            catch (Exception e)
-            {
-                e.printStackTrace();
-            }
+        final Property<Class> property = item.getItemProperty(SynergyBuilder.PROPERTY_ITEM_COMPONENT_CLASS);
+        Class<ItemComponent> itemComponentClass = property.getValue();
+        try
+        {
+            Constructor defcon = itemComponentClass.getConstructor();
+            itemComponent = (ItemComponent) defcon.newInstance();
         }
-        if (itemComponent == null) {
-            itemComponent = new ItemComponentButton();
+        catch (Exception e)
+        {
+            e.printStackTrace();
         }
         itemComponent.setup(select, itemId);
 //        itemComponent.setWidth(100, Unit.PERCENTAGE);
@@ -401,6 +361,7 @@ public class SynergyView extends CustomComponent
             @Override
             public void valueChange(ValueChangeEvent event)
             {
+                log.info("valueChange("+event+") called for "+this+", subView="+subView);
                 for (String itemId : getImmediateChildItemIds()) {
                     updateSelectedVisuals(itemId);
                 }
@@ -411,9 +372,23 @@ public class SynergyView extends CustomComponent
             @Override
             public void containerItemSetChange(ItemSetChangeEvent event)
             {
-                visualizeItems();
+                final VaadinSession session = UI.getCurrent().getSession();
+                if (session != null) {
+                    session.lock();
+                }
+                try {
+                   visualizeItems();
+                } finally {
+                    if (session != null) {
+                        session.unlock();
+                    }
+                }
             }
         });
     }
 
+    public SynergySelect getSelect()
+    {
+        return select;
+    }
 }
