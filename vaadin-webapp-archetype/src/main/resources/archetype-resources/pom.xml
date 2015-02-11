@@ -151,8 +151,13 @@
 			<version>${vaadin.version}</version>
 		</dependency>
 		<dependency>
+			<groupId>org.json</groupId>
+			<artifactId>json</artifactId>
+			<version>20140107</version>
+		</dependency>
+		<dependency>
 			<groupId>de.syngenio.vaadin</groupId>
-			<artifactId>myfirstcomponent</artifactId>
+			<artifactId>synergy</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
@@ -306,7 +311,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<spring.version>4.0.5.RELEASE</spring.version>
 		<aspectj.version>1.7.3</aspectj.version>
-		<vaadin.version>7.4.0.alpha2</vaadin.version>
+		<vaadin.version>7.4.0.beta2</vaadin.version>
 		<vaadin.plugin.version>${vaadin.version}</vaadin.plugin.version>
 	</properties>
 </project>

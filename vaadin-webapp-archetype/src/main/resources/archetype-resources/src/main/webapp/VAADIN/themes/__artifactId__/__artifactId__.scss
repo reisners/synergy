@@ -1,0 +1,138 @@
+// Global variable overrides. Must be declared before importing Valo.
+
+// Defines the plaintext font size, weight and family. Font size affects general component sizing.
+//$v-font-size: 16px;
+//$v-font-weight: 300;
+//$v-font-family: "Open Sans", sans-serif;
+
+// Defines the border used by all components.
+//$v-border: 1px solid (v-shade 0.7);
+//$v-border-radius: 4px;
+
+// Affects the color of some component elements, e.g Button, Panel title, etc
+//$v-background-color: hsl(210, 0%, 98%);
+// Affects the color of content areas, e.g  Panel and Window content, TextField input etc
+//$v-app-background-color: $v-background-color;
+
+// Affects the visual appearance of all components
+//$v-gradient: v-linear 8%;
+//$v-bevel-depth: 30%;
+//$v-shadow-opacity: 5%;
+
+// Defines colors for indicating status (focus, success, failure)
+//$v-focus-color: valo-focus-color(); // Calculates a suitable color automatically
+//$v-friendly-color: #2c9720;
+//$v-error-indicator-color: #ed473b;
+
+// For more information, see: https://vaadin.com/book/-/page/themes.valo.html
+// Example variants can be copy/pasted from https://vaadin.com/wiki/-/wiki/Main/Valo+Examples
+
+$v-focus-color: rgb(147,241,0);
+$dark-background-color: #50514e;
+
+$v-app-background-color: $dark-background-color;
+
+$margin-size: 6px;
+
+$v-layout-margin-top: $margin-size;
+$v-layout-margin-bottom: $margin-size;
+$v-layout-margin-left: $margin-size;
+$v-layout-margin-right: $margin-size;
+
+@import "../valo/valo.scss";
+
+@mixin ${artifactId} {
+  @include valo;
+
+  .v-label-greenbar {
+  	background-color: $v-selection-color;
+  }
+  
+  .v-panel-content {
+  	background-color: white;	
+  }
+  
+  .v-layout-synergy {
+  	@extend .v-layout;
+  	background-color: $dark-background-color;
+  }
+  
+  .v-horizontallayout-synergy, .v-verticallayout-synergy {
+  	@extend .v-layout-synergy;
+  }
+
+  // .v-horizontallayout-synergy-h1 {
+  	// @extend .v-horizontallayout-synergy;
+  	// background-color: $dark-background-color;
+  // }
+
+  .v-horizontallayout-synergy-h2 {
+  	@extend .v-horizontallayout-synergy;
+  	background-color: lighten($dark-background-color, 20%);
+  }
+
+  .v-horizontallayout-synergy-h3 {
+  	@extend .v-horizontallayout-synergy;
+  	background-color: lighten($dark-background-color, 40%);
+  }
+
+.v-button-synergy-selected, .v-button-synergy-unselected, .v-button-synergy-ancestor-of-selected {
+	border: 0;
+	box-shadow: none;
+	&:focus:after {
+	    box-shadow: none;
+	}
+}
+
+.v-button-synergy-unselected, .v-button-synergy-ancestor-of-selected {
+	&:hover {
+		&:after {
+		  	box-shadow: 0 0 0 2px $v-selection-color;
+		}
+	}
+  }
+
+.v-image-synergy-unselected, .v-image-synergy-ancestor-of-selected {
+	&:hover {
+	  	box-shadow: 0 0 2px 2px $v-selection-color;
+	}
+  }
+
+.v-caption-synergy-unselected, .v-caption-synergy-selected, .v-caption-synergy-ancestor-of-selected, .v-image-synergy-unselected, .v-image-synergy-selected, .v-image-synergy-ancestor-of-selected {
+    left:0px;
+    margin-left: auto;
+    right:0px;
+    margin-right: auto;	
+}
+
+.v-button-synergy-unselected {
+  	color: valo-font-color(lighten($dark-background-color, 30%));
+  	background: lighten($dark-background-color, 30%);
+  }
+  
+.v-button-synergy-selected {
+  	color: valo-font-color($v-selection-color);
+    background: $v-selection-color;
+  }
+  
+  .v-button-synergy-ancestor-of-selected {
+  	color: valo-font-color(lighten($v-selection-color, 30%));
+    background: lighten($v-selection-color, 30%);
+  }
+  
+  .v-image-synergy-unselected, .v-image-synergy-selected, .v-image-synergy-ancestor-of-selected {
+  	border-radius: 5px;
+  	position: absolute;
+  	top: 0px;
+  } 
+  
+  .v-caption-synergy-unselected, .v-caption-synergy-selected, .v-caption-synergy-ancestor-of-selected {
+  	position: absolute;
+  	bottom: 0px;
+  	text-align: center;
+  } 
+  
+  .v-slot-synergy-unselected, .v-slot-synergy-selected, .v-slot-synergy-ancestor-of-selected {
+  	position: relative;
+  } 
+}
