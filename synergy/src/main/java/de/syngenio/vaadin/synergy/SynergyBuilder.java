@@ -154,13 +154,13 @@ public class SynergyBuilder
         }
     }
 
-    private static class ItemBuilder {
-        protected String id;
-        protected String caption;
-        protected String targetNavigationState;
-        protected boolean hiddenIfEmpty;
-        protected String imageSource;
-        protected String imageSourceSelected;
+    public static class ItemBuilder {
+        protected final String id;
+        protected String caption = null;
+        protected String targetNavigationState = null;
+        protected boolean hiddenIfEmpty = false;
+        protected String imageSource = null;
+        protected String imageSourceSelected = null;
         protected SynergyBuilder childrenBuilder = null;
 
         protected ItemBuilder(String id, String caption, String imageSource, String imageSourceSelected, String targetNavigationState, boolean hiddenIfEmpty, SynergyBuilder childrenBuilder) {
@@ -173,6 +173,11 @@ public class SynergyBuilder
             this.childrenBuilder = childrenBuilder;
         }
         
+        protected ItemBuilder(String id) {
+            this.id = id;
+            this.caption = id.replaceAll("^.*|(?!.*|)", ""); // default caption to the part of the id after the last pipe (|)
+        }
+        
         protected Item build(HierarchicalContainer hc, String parentItemId) {
             Item item = hc.addItem(id);
             item.getItemProperty(PROPERTY_ITEM_COMPONENT_CAPTION).setValue(caption);
@@ -183,11 +188,53 @@ public class SynergyBuilder
             hc.setParent(id, parentItemId);
             return item;
         }
+        
+        public ItemBuilder withCaption(String id) {
+            this.caption = caption;
+            return this;
+        }
+        
+        public ItemBuilder withImageSource(String imageSource) {
+            this.imageSource = imageSource;
+            return this;
+        }
+        
+        public ItemBuilder withImageSourceSelected(String imageSourceSelected) {
+            this.imageSourceSelected = imageSourceSelected;
+            return this;
+        }
+        
+        public ItemBuilder withTargetNavigationState(String targetNavigationState) {
+            this.targetNavigationState = targetNavigationState;
+            return this;
+        }
+        
+        public ItemBuilder withHiddenIfEmpty() {
+            this.hiddenIfEmpty = true;
+            return this;
+        }
+        
+        public ItemBuilder withChildren(SynergyBuilder childrenBuilder) {
+            this.childrenBuilder = childrenBuilder;
+            return this;
+        }
+        
+        public ItemBuilder withChildren(ItemBuilder... childBuilders) {
+            SynergyBuilder myChildrenBuilder = new SynergyBuilder();
+            for (ItemBuilder childBuilder : childBuilders) {
+                myChildrenBuilder.addItem(childBuilder);
+            }
+            return withChildren(myChildrenBuilder);
+        }
     }
     
     public static class ButtonItemBuilder extends ItemBuilder {
         public ButtonItemBuilder(String id, String caption, String imageSource, String targetNavigationState, boolean hiddenIfEmpty, SynergyBuilder childrenBuilder) {
             super(id, caption, imageSource, null, targetNavigationState, hiddenIfEmpty, childrenBuilder);
+        }
+        
+        public ButtonItemBuilder(String id) {
+            super(id);
         }
         
         protected Item build(HierarchicalContainer hc, String parentItemId) {
@@ -199,6 +246,11 @@ public class SynergyBuilder
     {
         itemBuilders.add(itemBuilder);
         return this;
+    }
+
+    public ItemBuilder button(String id)
+    {
+        return new ButtonItemBuilder(id);
     }
     
 }
