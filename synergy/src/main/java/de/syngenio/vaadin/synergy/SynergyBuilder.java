@@ -11,7 +11,6 @@ import com.vaadin.data.Container;
 import com.vaadin.data.Item;
 import com.vaadin.data.util.HierarchicalContainer;
 
-import de.syngenio.vaadin.synergy.SynergyBuilder.ButtonItemBuilder;
 import de.syngenio.vaadin.synergy.SynergyView.ItemComponentButton;
 
 public class SynergyBuilder
@@ -32,12 +31,35 @@ public class SynergyBuilder
     }
     
     public static final URI PROPERTY_TARGET_NAVIGATION_STATE = URI.create("http://www.syngenio.de/vaadin/syngergy/hierarchicalContainerProperties/targetNavigationState");
+    /**
+     * Fully qualified class name of an implementation of {@code ItemComponent} (optional, defaults to {@code ItemComponentButton}) 
+     */
     public static final URI PROPERTY_ITEM_COMPONENT_CLASS = URI.create("http://www.syngenio.de/vaadin/syngergy/hierarchicalContainerProperties/itemComponentClass");
+    /**
+     * Item caption text (optional)
+     */
     public static final URI PROPERTY_ITEM_COMPONENT_CAPTION = URI.create("http://www.syngenio.de/vaadin/syngergy/hierarchicalContainerProperties/itemComponentCaption");
+    /**
+     * Theme resource URI of image or button icon, respectively (optional)
+     * @see {@code SynergyBuilder#PROPERTY_ITEM_COMPONENT_SOURCE_SELECTED}
+     */
     public static final URI PROPERTY_ITEM_COMPONENT_SOURCE = URI.create("http://www.syngenio.de/vaadin/syngergy/hierarchicalContainerProperties/itemComponentSource");
+    /**
+     * Theme resource URI of selected image or button icon, respectively.
+     * Optional; if provided, replaces {@code SynergyBuilder#PROPERTY_ITEM_COMPONENT_SOURCE} in selected states
+     */
     public static final URI PROPERTY_ITEM_COMPONENT_SOURCE_SELECTED = URI.create("http://www.syngenio.de/vaadin/syngergy/hierarchicalContainerProperties/itemComponentSourceSelected");
+    /**
+     * Image width (optional; only relevant for {@code ItemComponentImage})
+     */
     public static final URI PROPERTY_ITEM_COMPONENT_WIDTH = URI.create("http://www.syngenio.de/vaadin/syngergy/hierarchicalContainerProperties/itemComponentWidth");
+    /**
+     * Image height (optional; only relevant for {@code ItemComponentImage})
+     */
     public static final URI PROPERTY_ITEM_COMPONENT_HEIGHT = URI.create("http://www.syngenio.de/vaadin/syngergy/hierarchicalContainerProperties/itemComponentHeight");
+    /**
+     * Can be used to inform a filter how to deal with items not having children (optional)  
+     */
     public static final URI PROPERTY_ITEM_HIDDEN_IF_EMPTY = URI.create("http://www.syngenio.de/vaadin/syngergy/hierarchicalContainerProperties/itemHiddenIfEmpty");
 
     public static HierarchicalContainer createHierarchicalContainer() {
