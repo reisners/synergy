@@ -175,7 +175,7 @@ public class SynergyBuilder
         
         protected ItemBuilder(String id) {
             this.id = id;
-            this.caption = id.replaceAll("^.*|(?!.*|)", ""); // default caption to the part of the id after the last pipe (|)
+            this.caption = id.replaceAll("^.*\\|(?=[^|]+)", ""); // default caption to the part of the id after the last pipe (|)
         }
         
         protected Item build(HierarchicalContainer hc, String parentItemId) {
