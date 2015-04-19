@@ -40,12 +40,12 @@ public class SynergyBuilder
      */
     public static final URI PROPERTY_ITEM_COMPONENT_CAPTION = URI.create("http://www.syngenio.de/vaadin/syngergy/hierarchicalContainerProperties/itemComponentCaption");
     /**
-     * Theme resource URI of image or button icon, respectively (optional)
+     * Resource URI of image or button icon, respectively (optional)
      * @see {@code SynergyBuilder#PROPERTY_ITEM_COMPONENT_SOURCE_SELECTED}
      */
     public static final URI PROPERTY_ITEM_COMPONENT_SOURCE = URI.create("http://www.syngenio.de/vaadin/syngergy/hierarchicalContainerProperties/itemComponentSource");
     /**
-     * Theme resource URI of selected image or button icon, respectively.
+     * Resource URI of selected image or button icon, respectively.
      * Optional; if provided, replaces {@code SynergyBuilder#PROPERTY_ITEM_COMPONENT_SOURCE} in selected states
      */
     public static final URI PROPERTY_ITEM_COMPONENT_SOURCE_SELECTED = URI.create("http://www.syngenio.de/vaadin/syngergy/hierarchicalContainerProperties/itemComponentSourceSelected");
@@ -173,12 +173,20 @@ public class SynergyBuilder
             this.childrenBuilder = childrenBuilder;
         }
         
-        protected ItemBuilder(String id) {
+        /**
+         * Create a builder for an item with given hierarchical id (|Root|Level|...|Level|Item).
+         * Will set the item's targetNavigationState to the hierarchical id.
+         * Will set the item's caption to the last element of the hierarchical id as a default.
+         * @param id of the item to be created
+         */
+        public ItemBuilder(String id) {
             this.id = id;
             this.caption = id.replaceAll("^.*\\|(?=[^|]+)", ""); // default caption to the part of the id after the last pipe (|)
+            this.targetNavigationState = id;
         }
         
-        protected Item build(HierarchicalContainer hc, String parentItemId) {
+        @SuppressWarnings("unchecked")
+        public Item build(HierarchicalContainer hc, String parentItemId) {
             Item item = hc.addItem(id);
             item.getItemProperty(PROPERTY_ITEM_COMPONENT_CAPTION).setValue(caption);
             item.getItemProperty(PROPERTY_ITEM_COMPONENT_SOURCE).setValue(imageSource);
@@ -189,28 +197,55 @@ public class SynergyBuilder
             return item;
         }
         
-        public ItemBuilder withCaption(String id) {
+        /**
+         * Set the ItemBuilder's caption
+         * @param caption
+         * @return the ItemBuilder
+         */
+        public ItemBuilder withCaption(String caption) {
             this.caption = caption;
             return this;
         }
         
+        /**
+         * Set the ItemBuilder's image source
+         * @param imageSource
+         * @return the ItemBuilder
+         */
         public ItemBuilder withImageSource(String imageSource) {
             this.imageSource = imageSource;
             return this;
         }
         
+        /**
+         * Set the ItemBuilder's image source when in selected state
+         * @param imageSource
+         * @return the ItemBuilder
+         */
         public ItemBuilder withImageSourceSelected(String imageSourceSelected) {
             this.imageSourceSelected = imageSourceSelected;
             return this;
         }
         
+        /**
+         * Sets the ItemBuilder's target navigation state
+         * @param targetNavigationState
+         * @return the ItemBuilder
+         */
         public ItemBuilder withTargetNavigationState(String targetNavigationState) {
             this.targetNavigationState = targetNavigationState;
             return this;
         }
         
-        public ItemBuilder withHiddenIfEmpty() {
+        /**
+         * Marks the item to be created as a grouping item that 
+         * does not have a target navigation state of its own
+         * and that is only visible as long as it has visible child items
+         * @return the ItemBuilder
+         */
+        public ItemBuilder asGroup() {
             this.hiddenIfEmpty = true;
+            this.targetNavigationState = null;
             return this;
         }
         
@@ -237,7 +272,7 @@ public class SynergyBuilder
             super(id);
         }
         
-        protected Item build(HierarchicalContainer hc, String parentItemId) {
+        public Item build(HierarchicalContainer hc, String parentItemId) {
             return super.build(hc, parentItemId);
         }
     }
