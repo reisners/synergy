@@ -18,6 +18,7 @@ import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.data.util.HierarchicalContainer;
 import com.vaadin.event.MouseEvents;
+import com.vaadin.server.ExternalResource;
 import com.vaadin.server.Resource;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.server.VaadinSession;
@@ -89,6 +90,9 @@ public class SynergyView extends CustomComponent
     {
         clear();
         for (String itemId : getImmediateChildItemIds()) {
+            if ("|Tools|Collaboration|Chat".equals(parentId)) {
+                log.info("visualizing SynergyView "+((Object)this).toString()+" item "+itemId);
+            }
             visualizeItem(itemId);
         }
     }
@@ -211,15 +215,15 @@ public class SynergyView extends CustomComponent
         public void setup(final SynergySelect ss, final Object itemId)
         {
             Property<String> propertySource = ss.getContainerProperty(itemId, SynergyBuilder.PROPERTY_ITEM_COMPONENT_SOURCE);
-            String sourceId = propertySource.getValue();
-            if (sourceId != null) {
-                source = new ThemeResource(sourceId);
+            String sourceUri = propertySource.getValue();
+            if (sourceUri != null) {
+                source = createResource(sourceUri);
                 setSource(source);
             }
             Property<String> propertySourceSelected = ss.getContainerProperty(itemId, SynergyBuilder.PROPERTY_ITEM_COMPONENT_SOURCE_SELECTED);
-            String sourceSelectedId = propertySourceSelected.getValue();
-            if (sourceSelectedId != null) {
-                sourceSelected = new ThemeResource(sourceSelectedId);
+            String sourceSelectedUri = propertySourceSelected.getValue();
+            if (sourceSelectedUri != null) {
+                sourceSelected = createResource(sourceSelectedUri);
             }
             Property<String> propertyCaption = ss.getContainerProperty(itemId, SynergyBuilder.PROPERTY_ITEM_COMPONENT_CAPTION);
             String caption = propertyCaption.getValue();
@@ -294,9 +298,9 @@ public class SynergyView extends CustomComponent
             setImmediate(true);
             setSizeUndefined();
             Property<String> propertySource = ss.getContainerProperty(itemId, SynergyBuilder.PROPERTY_ITEM_COMPONENT_SOURCE);
-            String source = propertySource.getValue();
-            if (source != null) {
-                setIcon(new ThemeResource(source));
+            String sourceUri = propertySource.getValue();
+            if (sourceUri != null) {
+                setIcon(createResource(sourceUri));
             }
             addClickListener(new ClickListener() {
                 @Override
@@ -352,6 +356,15 @@ public class SynergyView extends CustomComponent
         return itemComponent;
     }
 
+    public static Resource createResource(String sourceUri)
+    {
+        if (sourceUri.matches("^\\w+://.*")) {
+            return new ExternalResource(sourceUri);
+        } else {
+            return new ThemeResource(sourceUri);
+        }
+    }
+
     protected void setSelect(SynergySelect select)
     {
         this.select = select;
@@ -361,7 +374,7 @@ public class SynergyView extends CustomComponent
             @Override
             public void valueChange(ValueChangeEvent event)
             {
-                log.info("valueChange("+event+") called for "+this+", subView="+subView);
+//                log.info("valueChange("+event+") called for "+((Object)this).toString()+", subView="+((Object)subView).toString());
                 for (String itemId : getImmediateChildItemIds()) {
                     updateSelectedVisuals(itemId);
                 }
