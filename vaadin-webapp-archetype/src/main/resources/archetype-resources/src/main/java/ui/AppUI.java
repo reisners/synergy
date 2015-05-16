@@ -5,48 +5,45 @@ import javax.servlet.ServletException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.WebApplicationContext;
 
+import test.try14.ui.main.MainView;
+
 import com.vaadin.annotations.Push;
 import com.vaadin.annotations.Theme;
+import com.vaadin.annotations.Title;
 import com.vaadin.annotations.VaadinServletConfiguration;
-import com.vaadin.data.Item;
 import com.vaadin.data.util.HierarchicalContainer;
 import com.vaadin.navigator.Navigator;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener;
-import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
+import com.vaadin.navigator.ViewDisplay;
+import com.vaadin.server.ServiceException;
+import com.vaadin.server.SessionInitEvent;
+import com.vaadin.server.SessionInitListener;
+import com.vaadin.server.UIClassSelectionEvent;
+import com.vaadin.server.UICreateEvent;
+import com.vaadin.server.UIProvider;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServlet;
-import com.vaadin.ui.Alignment;
-import com.vaadin.ui.Button;
-import com.vaadin.ui.Button.ClickEvent;
-import com.vaadin.ui.CustomComponent;
-import com.vaadin.ui.Label;
-import com.vaadin.ui.Panel;
 import com.vaadin.ui.UI;
-import com.vaadin.ui.VerticalLayout;
-
-import de.syngenio.vaadin.synergy.AbstractSynergyLayoutFactory;
-import de.syngenio.vaadin.synergy.HorizontalSynergyLayoutFactory;
-import de.syngenio.vaadin.synergy.SynergyBuilder;
-import de.syngenio.vaadin.synergy.SynergyView;
-import de.syngenio.vaadin.synergy.SynergyView.ItemComponentImage;
-import de.syngenio.vaadin.synergy.VerticalSynergyLayoutFactory;
 
 @SuppressWarnings("serial")
-@Theme("${artifactId}")
+@Theme("try14")
+@Title("try14")
 @Push
 @Component
 public class AppUI extends UI
 {
     private static final Logger log = LoggerFactory.getLogger(AppUI.class);
-
-    private Panel content;
-    private HierarchicalContainer hierarchicalContainer;
-    private Item hiVerwaltung;
-    private int iOption = 0;
+    
+    @Autowired
+    private SpringViewCatalogue springViewCatalogue;
+    
+    @Autowired
+    private SpringViewCache springViewCache;
     
 //    @WebServlet(value = "/*", asyncSupported = true, 
 //            initParams={
@@ -73,6 +70,10 @@ public class AppUI extends UI
             log.debug("Servlet instantiated");
         }
 
+        public static Servlet getCurrent() {
+            return (Servlet) VaadinServlet.getCurrent();
+        }
+        
         public String getServletContextAttributeName() {
             return SERVLET_CONTEXT_PREFIX + getServletName();
         }
@@ -84,8 +85,51 @@ public class AppUI extends UI
             getServletContext().setAttribute(getServletContextAttributeName(), webApplicationContext);
             log.debug("Servlet initialized");
         }
+        
+        @Override
+        protected void servletInitialized() throws ServletException
+        {
+            super.servletInitialized();
+            getService().addSessionInitListener(
+                    new SessionInitListener() {
+                @Override
+                public void sessionInit(SessionInitEvent event)
+                        throws ServiceException {
+                    event.getSession().addUIProvider(new UIProvider() {
+                        @Override
+                        public Class< ? extends UI> getUIClass(UIClassSelectionEvent event)
+                        {
+                            return AppUI.class;
+                        }
+
+                        @Override
+                        public UI createInstance(UICreateEvent event)
+                        {
+                            return (UI) webApplicationContext.getBean("ui");
+                        }
+                    });
+                }
+            });
+        }
+
+        @Override
+        public void destroy()
+        {
+            // clean up resources
+            
+            super.destroy();
+        }
+
+        public WebApplicationContext getWebApplicationContext()
+        {
+            return webApplicationContext;
+        }
     }
 
+    public AppUI() {
+        super();
+    }
+    
     @Override
     public void close()
     {
@@ -101,168 +145,39 @@ public class AppUI extends UI
 
     @Override
     protected void init(VaadinRequest request) {
-        getPage().setTitle("${AppName}");
+        setId("try14");
+
+        // keep the navigation hierarchy in the session
+        HierarchicalContainer hierarchicalContainer = new NavigationHierarchyProvider(springViewCatalogue).createHierarchicalContainer();
+        getSession().setAttribute("navigationHierarchy", hierarchicalContainer);
         
         setupAuthentication();
-        setId("${AppName}");
-        final VerticalLayout layout = new VerticalLayout();
-        layout.setSizeFull();
-        layout.setId("vLayout");
-//      layout.setMargin(true);
-//      layout.setSpacing(true);
-        setContent(layout);
-
-        buildNavigationHierarchy();
-
-//        Tree tree = new Tree("My Tree");
-//        tree.setContainerDataSource(hc);
-//        layout.addComponent(tree);
-        final AbstractSynergyLayoutFactory layoutFactoryTopLevel = new HorizontalSynergyLayoutFactory();
-        layoutFactoryTopLevel.setCompactArrangement(false);
-        layoutFactoryTopLevel.setStyleName("h1");
-        SynergyView navTopLevel = new SynergyView(layoutFactoryTopLevel, hierarchicalContainer);
-        navTopLevel.setWidth("100%");
-        layout.addComponent(navTopLevel);
-        layout.setExpandRatio(navTopLevel, 0);
-
-        final AbstractSynergyLayoutFactory layoutFactory2ndLevel = new HorizontalSynergyLayoutFactory();
-        layoutFactory2ndLevel.setStyleName("h2");
-        SynergyView nav2ndLevel = new SynergyView(layoutFactory2ndLevel, navTopLevel);
-        nav2ndLevel.setWidth("100%");
-        layout.addComponent(nav2ndLevel);
-        layout.setExpandRatio(nav2ndLevel, 0);
-
-        navTopLevel.setSubView(nav2ndLevel);
         
-        Label greenBar = new Label();
-        greenBar.setWidth("100%");
-        greenBar.setHeight("3px");
-        greenBar.setStyleName("greenbar");
-        layout.addComponent(greenBar);
-        layout.setExpandRatio(greenBar, 0);
-        layout.setComponentAlignment(greenBar, Alignment.TOP_CENTER);
-        
-        com.vaadin.ui.HorizontalSplitPanel hsplit = new com.vaadin.ui.HorizontalSplitPanel();
-        layout.addComponent(hsplit);
-        layout.setExpandRatio(hsplit, 1);
-        
-        SynergyView vsv = new SynergyView(new VerticalSynergyLayoutFactory(), nav2ndLevel);
-        vsv.setSizeFull();
-        hsplit.setFirstComponent(vsv);
-        
-        nav2ndLevel.setSubView(vsv);
-        
-        content = new Panel();
-        content.setStyleName("content");
-        
-        hsplit.setSecondComponent(content);
-        hsplit.setSplitPosition(20, Unit.PERCENTAGE);
-        
-        createAndRegisterViews();
-        log.debug("UI initialized");
-    }
-
-    private void buildNavigationHierarchy()
-    {
-        hierarchicalContainer = SynergyBuilder.createHierarchicalContainer();
-
-        Item hiStammdaten = hierarchicalContainer.addItem("Stammdaten");
-        hiStammdaten.getItemProperty(SynergyBuilder.PROPERTY_ITEM_COMPONENT_CLASS).setValue(ItemComponentImage.class.getName());
-        hiStammdaten.getItemProperty(SynergyBuilder.PROPERTY_ITEM_COMPONENT_WIDTH).setValue("64px");
-        hiStammdaten.getItemProperty(SynergyBuilder.PROPERTY_ITEM_COMPONENT_HEIGHT).setValue("64px");
-        hiStammdaten.getItemProperty(SynergyBuilder.PROPERTY_ITEM_COMPONENT_SOURCE).setValue("img/service_desk.png");
-        hiStammdaten.getItemProperty(SynergyBuilder.PROPERTY_ITEM_COMPONENT_SOURCE_SELECTED).setValue("img/service_desk_selected.png");
-
-        Item hiBudget = hierarchicalContainer.addItem("Budget");
-        hiBudget.getItemProperty(SynergyBuilder.PROPERTY_ITEM_COMPONENT_CLASS).setValue(ItemComponentImage.class.getName());
-        hiBudget.getItemProperty(SynergyBuilder.PROPERTY_ITEM_COMPONENT_WIDTH).setValue("64px");
-        hiBudget.getItemProperty(SynergyBuilder.PROPERTY_ITEM_COMPONENT_HEIGHT).setValue("64px");
-        hiBudget.getItemProperty(SynergyBuilder.PROPERTY_ITEM_COMPONENT_SOURCE).setValue("img/budget.png");
-        hiBudget.getItemProperty(SynergyBuilder.PROPERTY_ITEM_COMPONENT_SOURCE_SELECTED).setValue("img/budget_selected.png");
-
-        Item hiReporting = hierarchicalContainer.addItem("Reporting");
-        hiReporting.getItemProperty(SynergyBuilder.PROPERTY_ITEM_COMPONENT_CLASS).setValue(ItemComponentImage.class.getName());
-        hiReporting.getItemProperty(SynergyBuilder.PROPERTY_ITEM_COMPONENT_WIDTH).setValue("64px");
-        hiReporting.getItemProperty(SynergyBuilder.PROPERTY_ITEM_COMPONENT_HEIGHT).setValue("64px");
-        hiReporting.getItemProperty(SynergyBuilder.PROPERTY_ITEM_COMPONENT_SOURCE).setValue("img/reporting.png");
-        hiReporting.getItemProperty(SynergyBuilder.PROPERTY_ITEM_COMPONENT_SOURCE_SELECTED).setValue("img/reporting_selected.png");
-
-        Item hiPerson = hierarchicalContainer.addItem("Person");
-        hierarchicalContainer.setParent("Person", "Stammdaten");
-        hiPerson.getItemProperty(SynergyBuilder.PROPERTY_TARGET_NAVIGATION_STATE).setValue("view1");
-
-        Item hiPersonSuchen = hierarchicalContainer.addItem("Person.Suchen");
-        hiPersonSuchen.getItemProperty(SynergyBuilder.PROPERTY_TARGET_NAVIGATION_STATE).setValue("view2");
-        hiPersonSuchen.getItemProperty(SynergyBuilder.PROPERTY_ITEM_COMPONENT_CAPTION).setValue("Suchen");
-        hierarchicalContainer.setParent("Person.Suchen", "Person");
-
-        Item hiPersonAnlegen = hierarchicalContainer.addItem("Person.Anlegen");
-        hiPersonAnlegen.getItemProperty(SynergyBuilder.PROPERTY_TARGET_NAVIGATION_STATE).setValue("view2");
-        hiPersonAnlegen.getItemProperty(SynergyBuilder.PROPERTY_ITEM_COMPONENT_CAPTION).setValue("Anlegen");
-        hierarchicalContainer.setParent("Person.Anlegen", "Person");
-
-        Item hiPersonAnlegenAnschrift = hierarchicalContainer.addItem("Person.Anlegen.Anschrift");
-        hierarchicalContainer.setParent("Person.Anlegen.Anschrift", "Person.Anlegen");
-        hiPersonAnlegenAnschrift.getItemProperty(SynergyBuilder.PROPERTY_TARGET_NAVIGATION_STATE).setValue("view2");
-
-        Item hiPersonAnlegenBonitaeten = hierarchicalContainer.addItem("Person.Anlegen.Bonitäten");
-        hierarchicalContainer.setParent("Person.Anlegen.Bonitäten", "Person.Anlegen");
-        hiPersonAnlegenBonitaeten.getItemProperty(SynergyBuilder.PROPERTY_TARGET_NAVIGATION_STATE).setValue("view2");
-
-        Item hiKonto = hierarchicalContainer.addItem("Konto");
-        hierarchicalContainer.setParent("Konto", "Stammdaten");
-        hiKonto.getItemProperty(SynergyBuilder.PROPERTY_TARGET_NAVIGATION_STATE).setValue("view3");
-        
-        hiVerwaltung = hierarchicalContainer.addItem("Verwaltung");
-        hierarchicalContainer.setParent("Verwaltung", "Stammdaten");
-        hiVerwaltung.getItemProperty(SynergyBuilder.PROPERTY_TARGET_NAVIGATION_STATE).setValue("view4");
+        setSizeFull();
+//        setContent(mainView);
     }
     
-    private class MyView extends CustomComponent implements View {
-
-        private String name;
-        
-        public MyView(String viewName)
-        {
-            name = viewName;
-            VerticalLayout vlayout = new VerticalLayout();
-            vlayout.addComponent(new Label(name));
-            vlayout.setSpacing(true);
-            vlayout.setMargin(true);
-            final String option = "Option"+(++iOption);
-            Button b = new Button("Add "+option );
-            b.addClickListener(new Button.ClickListener() {
-                
-                @Override
-                public void buttonClick(ClickEvent event)
-                {
-                    hierarchicalContainer.addItem(option);
-                }
-            });
-            vlayout.addComponent(b);
-            setCompositionRoot(vlayout);
-        }
-
-        @Override
-        public void enter(ViewChangeEvent event)
-        {
-        }
-    }
- 
     private void setupAuthentication() {
-        getNavigator().addViewChangeListener(new ViewChangeListener() {
+        final ViewDisplay viewDisplay = createViewDisplay();
+        final Navigator navigator = new Navigator(this, viewDisplay);
+        View login = springViewCache.getView(LoginView.NAME);
+        View main = springViewCache.getView(MainView.NAME);
+        log.info("setupAuthentication: ui="+this+" viewDisplay="+viewDisplay+", navigator="+navigator+", springViewCache="+springViewCache+", login="+login+", main="+main);
+        
+        navigator.addProvider(springViewCache);
+        navigator.addViewChangeListener(new ViewChangeListener() {
             @Override
             public boolean beforeViewChange(ViewChangeEvent event)
             {
                 // Check if a user has logged in
-                boolean isLoggedIn = getSession().getAttribute("user") != null;
+                boolean isLoggedIn = getSession().getAttribute("userProfile") != null;
                 boolean isLoginView = event.getNewView() instanceof LoginView;
 
                 if (!isLoggedIn && !isLoginView)
                 {
                     // Redirect to login view always if a user has not yet
                     // logged in
-                    getNavigator().navigateTo(LoginView.NAME);
+                    navigator.navigateTo(LoginView.NAME);
                     return false;
 
                 }
@@ -282,17 +197,24 @@ public class AppUI extends UI
             }
         });
     }
-    
-    private void createAndRegisterViews()
-    {
-        // create and register some views to navigate to
-        Navigator navigator = new Navigator(UI.getCurrent(), content);
-        navigator.addView("", new MyView("view0"));
-        for (int i = 1; i <= 5; ++i) {
-            String viewName = "view"+i;
-            MyView view = new MyView(viewName);
-            navigator.addView(viewName, view);
-        }
-    }
 
+    private ViewDisplay createViewDisplay()
+    {
+        return new ViewDisplay() {
+
+            @Override
+            public void showView(View view)
+            {
+                if (view instanceof MainView 
+                        || view instanceof LoginView) {
+                    AppUI.this.setContent((com.vaadin.ui.Component) view);
+                } else {
+                    MainView mainView = (MainView) springViewCache.getView("");
+                    AppUI.this.setContent(mainView);
+                    mainView.getContentPanel().setContent((com.vaadin.ui.Component) view);
+                }
+            }
+            
+        };
+    }
 }

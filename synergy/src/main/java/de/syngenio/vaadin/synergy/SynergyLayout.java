@@ -45,11 +45,16 @@ public abstract class SynergyLayout extends CustomComponent implements Layout, L
     
     abstract protected AbstractOrderedLayout createLayout();
 
+    /**
+     * Adds a component representing an item to the layout
+     * @param itemComponent
+     */
     protected abstract void addItemComponent(Component itemComponent);
     
     /**
-     * @param subview the subview to be added.
-     * @param index the index of the component position. The components currently in and after the position are shifted forwards.    
+     * Adds a nested SynergyView at the given position to the layout
+     * @param subview subview to be added.
+     * @param index position for insertion. The components currently in and after the position are shifted to higher indices.    
      */
     protected abstract void addSubview(SynergyView subview, int index);
     

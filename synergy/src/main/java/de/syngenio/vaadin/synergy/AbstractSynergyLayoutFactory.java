@@ -36,9 +36,9 @@ public abstract class AbstractSynergyLayoutFactory implements SynergyLayoutFacto
     @Override
     public String generateStyleName() {
         if (styleName != null) {
-            return "synergy-"+styleName;
+            return SynergyView.STYLE_NAME+"-"+styleName;
         } else {
-            return "synergy";
+            return SynergyView.STYLE_NAME;
         }
     }
 }

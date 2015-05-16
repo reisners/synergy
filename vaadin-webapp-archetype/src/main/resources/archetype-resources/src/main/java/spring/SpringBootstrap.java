@@ -9,9 +9,8 @@ import org.springframework.web.WebApplicationInitializer;
 import org.springframework.web.context.ContextLoaderListener;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 
-import ${package}.beans.AloaService;
-import ${package}.ui.AppUI;
-import ${package}.ui.ServletSpringConfig;
+import test.try14.ui.AppUI;
+import test.try14.ui.ServletSpringConfig;
 
 public class SpringBootstrap implements WebApplicationInitializer {
     private static final Logger log = LoggerFactory.getLogger(SpringBootstrap.class);
@@ -51,9 +50,6 @@ public class SpringBootstrap implements WebApplicationInitializer {
         
         // necessary for session support to work
         container.addListener(org.atmosphere.cpr.SessionSupport.class);
-        
-        AloaService aloaService = (AloaService) rootSpringContext.getBean("aloaService");
-        aloaService.sendAloa("initial hello");
     }
 
  }

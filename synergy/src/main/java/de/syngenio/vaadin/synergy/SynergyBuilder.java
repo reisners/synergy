@@ -61,6 +61,10 @@ public class SynergyBuilder
      * Can be used to inform a filter how to deal with items not having children (optional)  
      */
     public static final URI PROPERTY_ITEM_HIDDEN_IF_EMPTY = URI.create("http://www.syngenio.de/vaadin/syngergy/hierarchicalContainerProperties/itemHiddenIfEmpty");
+    /**
+     * Style name to be set on this item's subview (optional)  
+     */
+    public static final URI PROPERTY_ITEM_SUBVIEW_STYLE = URI.create("http://www.syngenio.de/vaadin/syngergy/hierarchicalContainerProperties/subviewStyle");
 
     public static HierarchicalContainer createHierarchicalContainer() {
         final HierarchicalContainer hierarchicalContainer = new HierarchicalContainer();
@@ -72,6 +76,7 @@ public class SynergyBuilder
         hierarchicalContainer.addContainerProperty(PROPERTY_ITEM_COMPONENT_WIDTH, String.class, null);
         hierarchicalContainer.addContainerProperty(PROPERTY_ITEM_COMPONENT_HEIGHT, String.class, null);
         hierarchicalContainer.addContainerProperty(PROPERTY_ITEM_HIDDEN_IF_EMPTY, Boolean.class, Boolean.FALSE);
+        hierarchicalContainer.addContainerProperty(PROPERTY_ITEM_SUBVIEW_STYLE, String.class, null);
         return hierarchicalContainer;
     }
 
@@ -188,12 +193,12 @@ public class SynergyBuilder
         @SuppressWarnings("unchecked")
         public Item build(HierarchicalContainer hc, String parentItemId) {
             Item item = hc.addItem(id);
+            hc.setParent(id, parentItemId);
             item.getItemProperty(PROPERTY_ITEM_COMPONENT_CAPTION).setValue(caption);
             item.getItemProperty(PROPERTY_ITEM_COMPONENT_SOURCE).setValue(imageSource);
             item.getItemProperty(PROPERTY_ITEM_COMPONENT_SOURCE_SELECTED).setValue(imageSourceSelected);
             item.getItemProperty(PROPERTY_TARGET_NAVIGATION_STATE).setValue(targetNavigationState);
             item.getItemProperty(PROPERTY_ITEM_HIDDEN_IF_EMPTY).setValue(hiddenIfEmpty);
-            hc.setParent(id, parentItemId);
             return item;
         }
         

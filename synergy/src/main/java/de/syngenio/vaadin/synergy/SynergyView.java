@@ -3,7 +3,9 @@ package de.syngenio.vaadin.synergy;
 import java.lang.reflect.Constructor;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import org.slf4j.Logger;
@@ -21,7 +23,6 @@ import com.vaadin.event.MouseEvents;
 import com.vaadin.server.ExternalResource;
 import com.vaadin.server.Resource;
 import com.vaadin.server.ThemeResource;
-import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomComponent;
@@ -32,7 +33,7 @@ import de.syngenio.vaadin.synergy.SynergyView.ItemComponent.State;
 
 public class SynergyView extends CustomComponent
 {
-    private static final String STYLE_NAME = "synergy";
+    static final String STYLE_NAME = "synergy";
     private static final String STYLE_NAME_UNSELECTED = STYLE_NAME+"-unselected";
     private static final String STYLE_NAME_ANCESTOR_OF_SELECTED = STYLE_NAME+"-ancestor-of-selected";
     private static final String STYLE_NAME_SELECTED = STYLE_NAME+"-selected";
@@ -63,13 +64,17 @@ public class SynergyView extends CustomComponent
     public SynergyView(SynergyLayoutFactory layoutFactory, Container dataSource)
     {
         this(layoutFactory, (SynergyView)null);
-        setPrimaryStyleName(PRIMARY_STYLE_NAME);
         setSelect(new SynergySelect(dataSource));
         setParentId(null);
     }
     
     public SynergyView(SynergyLayoutFactory layoutFactory, SynergyView parentView)
     {
+        setPrimaryStyleName(PRIMARY_STYLE_NAME);
+        String subviewStyle = getSubviewStyle();
+        if (subviewStyle != null) {
+            addStyleName(subviewStyle);
+        }
         this.layoutFactory = layoutFactory;
         this.parentView = parentView;
         layout = layoutFactory.generateLayout();
@@ -79,6 +84,26 @@ public class SynergyView extends CustomComponent
             setSelect(parentView.select);
         }
     }
+    
+    @Override
+    public void setCaption(String caption)
+    {
+        layout.setCaption(caption);
+    }
+
+    @Override
+    public void setCaptionAsHtml(boolean captionAsHtml)
+    {
+        layout.setCaptionAsHtml(captionAsHtml);
+    }
+
+    private String getSubviewStyle()
+    {
+        if (parentId != null && !parentId.equals(INACTIVE)) {
+            return (String) getSelect().getContainerDataSource().getContainerProperty(parentId, SynergyBuilder.PROPERTY_ITEM_SUBVIEW_STYLE).getValue();
+        }
+        return null;
+    }
 
     private void setParentId(String parentId)
     {
@@ -86,17 +111,22 @@ public class SynergyView extends CustomComponent
         visualizeItems();
     }
 
+    /**
+     * Empties the layout and then calls {@code visualizeItem} on each immediate child item 
+     * Called either when the view has been moved to a new parent
+     * or upon receiving a containerItemSetChange event to update the view's item components.
+     */
     private void visualizeItems()
     {
         clear();
         for (String itemId : getImmediateChildItemIds()) {
-            if ("|Tools|Collaboration|Chat".equals(parentId)) {
-                log.info("visualizing SynergyView "+((Object)this).toString()+" item "+itemId);
-            }
             visualizeItem(itemId);
         }
     }
 
+    /**
+     * Discards all item components
+     */
     private void clear()
     {
         itemComponents = new HashMap<String, ItemComponent>();
@@ -108,8 +138,8 @@ public class SynergyView extends CustomComponent
     }
 
     /**
-     * Fetch the component for visualizing the item identified by itemId.
-     * In addition, if the item has children, creates a nested VerticalSyngergyView
+     * Creates the component for visualizing an immediate child item of this view and adds it to the layout.
+     * Then calls updateSelectedVisuals for the child item
      * @param itemId
      */
     private void visualizeItem(String itemId)
@@ -120,10 +150,16 @@ public class SynergyView extends CustomComponent
         updateSelectedVisuals(itemId);
     }
 
+    /**
+     * Updates the visualization of an item
+     * @param itemId item id
+     */
     private void updateSelectedVisuals(String itemId)
     {
+        log.info("updateSelectedVisuals("+itemId+")");
         ItemComponent itemComponent = itemComponents.get(itemId);
         if (itemComponent == null) {
+            log.info("no item component found for id "+itemId);
             return;
         }
         final String selectedItemId = (String) select.getValue();
@@ -156,8 +192,18 @@ public class SynergyView extends CustomComponent
                 subView.setParentId(itemId);
             }
         } else if (subView.isVisible() && equals(subView.parentId, itemId)) { // anything to do at all?
-            // the subView's parent hasn't changed, so nothing to do
-            return;
+            // the subView's parent hasn't changed
+            // check if the subView's items have changed
+            if (subView.itemComponents != null && asSet(getImmediateChildItemIds()).equals(subView.itemComponents.keySet())) {
+                // nothing to do
+                return;
+            }
+            // rebuild the subView
+            if (hasChildren) {
+                subView.setParentId(itemId);
+            } else {
+                subView.setParentId(INACTIVE);
+            }
         } else {
             // remove subView from its previous place
             layout.removeComponent(subView);
@@ -177,6 +223,11 @@ public class SynergyView extends CustomComponent
         }
     }
     
+    private <T> Set<T> asSet(Collection<T> collection)
+    {
+        return new HashSet<T>(collection);
+    }
+
     private boolean equals(Object itemId1, Object itemId2)
     {
         return itemId1 == null ? itemId2 == null : itemId1.equals(itemId2);
@@ -374,9 +425,18 @@ public class SynergyView extends CustomComponent
             @Override
             public void valueChange(ValueChangeEvent event)
             {
-//                log.info("valueChange("+event+") called for "+((Object)this).toString()+", subView="+((Object)subView).toString());
-                for (String itemId : getImmediateChildItemIds()) {
-                    updateSelectedVisuals(itemId);
+                log.info("parentId="+parentId+" valueChange");
+                final UI ui = getUI();
+                if (ui != null) {
+                    ui.access(new Runnable() {
+                        public void run()
+                        {
+                            for (String itemId : getImmediateChildItemIds()) {
+                                updateSelectedVisuals(itemId);
+                            }
+                            ui.push();
+                        }
+                    });
                 }
             }
         });
@@ -385,16 +445,16 @@ public class SynergyView extends CustomComponent
             @Override
             public void containerItemSetChange(ItemSetChangeEvent event)
             {
-                final VaadinSession session = UI.getCurrent().getSession();
-                if (session != null) {
-                    session.lock();
-                }
-                try {
-                   visualizeItems();
-                } finally {
-                    if (session != null) {
-                        session.unlock();
-                    }
+                log.info("parentId="+parentId+" containerItemSetChange");
+                final UI ui = getUI();
+                if (ui != null) {
+                    ui.access(new Runnable() {
+                        public void run()
+                        {
+                            visualizeItems();
+                            ui.push();
+                        }
+                    });
                 }
             }
         });
