@@ -40,15 +40,16 @@ public class CountingTreePipe<S> extends AbstractPipe<S, S> implements SideEffec
         CountingTree<Object> depth = this.tree;
         for (int i = 0; i < path.size(); i++) {
             Object object = path.get(i);
+            Object key = object;
             if (null != this.branchFunctions) {
-                object = this.branchFunctions.get(this.currentFunction).compute(object);
+                key = this.branchFunctions.get(this.currentFunction).compute(key);
                 this.currentFunction = (this.currentFunction + 1) % this.branchFunctions.size();
             }
 
-            if (!depth.containsKey(object))
-                depth.put(object, new CountingTree<Object>());
+            if (!depth.containsKey(key))
+                depth.put(key, new CountingTree<Object>());
 
-            depth = depth.get(object);
+            depth = depth.get(key);
             depth.getCounter().incrementAndGet();
         }
         return s;

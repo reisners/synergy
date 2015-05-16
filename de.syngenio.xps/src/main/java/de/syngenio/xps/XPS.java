@@ -18,10 +18,16 @@
 
 package de.syngenio.xps;
 
+import java.io.Serializable;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.UUID;
 
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.slf4j.Logger;
@@ -68,7 +74,8 @@ public class XPS
     
     private Checkpoint currentCheckpoint = new Checkpoint();
     
-    public static class Checkpoint {
+    public static class Checkpoint implements Serializable {
+        private static final long serialVersionUID = -7391465469944979631L;
         private UUID threadUUID;
         private long chainNo;
         private long iSeq;
@@ -151,13 +158,31 @@ public class XPS
         return currentCheckpoint;
     }
     
-    public abstract class Record {
-        private transient long timestamp = System.currentTimeMillis();
-        private transient Checkpoint checkpoint;
+    public abstract static class Record {
+        private static final char SERIALIZED_RECORD_FIELD_SEPARATOR = '¶';
+        private static final int FIELD_INDEX_CLASSNAME = 0;
+        private static final int FIELD_INDEX_TIMESTAMP = FIELD_INDEX_CLASSNAME+1;
+        private static final int FIELD_INDEX_CHECKPOINT_THREAD_UUID = FIELD_INDEX_TIMESTAMP+1;
+        private static final int FIELD_INDEX_CHECKPOINT_CHAINNO = FIELD_INDEX_CHECKPOINT_THREAD_UUID+1;
+        private static final int FIELD_INDEX_CHECKPOINT_ISEQ = FIELD_INDEX_CHECKPOINT_THREAD_UUID+2;
+        protected static final int FIELD_INDEX_SUBCLASS_FIELDS_OFFSET = FIELD_INDEX_CHECKPOINT_THREAD_UUID+3;
+        private static final Charset CHARSET_UTF8 = Charset.forName("UTF-8");
+        private long timestamp = System.currentTimeMillis();
+        private Checkpoint checkpoint;
         
         protected Record(Checkpoint node) {
             this.checkpoint = node;
         }
+        
+        protected Record(String[] fields) {
+            timestamp = Long.valueOf(fields[FIELD_INDEX_TIMESTAMP]);
+            checkpoint = new Checkpoint(
+                            UUID.fromString(fields[FIELD_INDEX_CHECKPOINT_THREAD_UUID]), 
+                            Long.valueOf(fields[FIELD_INDEX_CHECKPOINT_CHAINNO]), 
+                            Long.valueOf(fields[FIELD_INDEX_CHECKPOINT_ISEQ])
+                            );
+        }
+        
         public Checkpoint getCheckpoint() {
             return checkpoint;
         }
@@ -174,14 +199,41 @@ public class XPS
         {
             return checkpoint.toString()+"@"+simpleDateFormat.format(new Date(getTimestamp()))+": "+getSignature();
         }
+        
+        public abstract byte[] serialize();
+        
+        protected byte[] serializeFields(String... additionalFields) {
+            String[] internalFields = ArrayUtils.toArray(getClass().getSimpleName(), String.valueOf(timestamp), checkpoint.getThreadUUID().toString(), String.valueOf(checkpoint.getChainNo()), String.valueOf(checkpoint.getiSeq()));
+            return (
+                    StringUtils.join(internalFields, SERIALIZED_RECORD_FIELD_SEPARATOR)+
+                    SERIALIZED_RECORD_FIELD_SEPARATOR+
+                    StringUtils.join(additionalFields, SERIALIZED_RECORD_FIELD_SEPARATOR)
+                    ).getBytes(CHARSET_UTF8);
+        }
+        public static Record deserialize(byte[] recordBytes) throws ClassNotFoundException, NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException
+        {
+            String[] fields = StringUtils.split(new String(recordBytes, CHARSET_UTF8), SERIALIZED_RECORD_FIELD_SEPARATOR);
+            // instantiate concrete subclass
+            String fqcn = Record.class.getName().replaceFirst(Record.class.getSimpleName()+"$", "")+fields[FIELD_INDEX_CLASSNAME];
+            @SuppressWarnings("unchecked")
+            Class<? extends Record> subclass = (Class< ? extends Record>) Class.forName(fqcn);
+            Constructor<? extends Record> declaredConstructor = subclass.getDeclaredConstructor(String[].class);
+            Record record = declaredConstructor.newInstance((Object)fields);
+            return record;
+        }
     }
     
-    class PointRecord extends Record {
+    static class PointRecord extends Record {
         private String pointName;
 
         private PointRecord(Checkpoint node, String pointName) {
             super(node);
             this.pointName = pointName;
+        }
+        
+        protected PointRecord(String[] fields) {
+            super(fields);
+            this.pointName = fields[FIELD_INDEX_SUBCLASS_FIELDS_OFFSET];
         }
 
         protected String getPointName()
@@ -205,14 +257,30 @@ public class XPS
         {
             return EqualsBuilder.reflectionEquals(this, obj, false);
         }
+
+        @Override
+        public byte[] serialize()
+        {
+            return serializeFields(pointName);
+        }
     }
     
-    abstract class ReferenceRecord extends Record {
+    abstract private static class ReferenceRecord extends Record {
+        private static final int FIELD_INDEX_REF_CP_THREAD_UUID = FIELD_INDEX_SUBCLASS_FIELDS_OFFSET;
+        private static final int FIELD_INDEX_REF_CP_CHAINNO = FIELD_INDEX_SUBCLASS_FIELDS_OFFSET+1;
+        private static final int FIELD_INDEX_REF_CP_ISEQ = FIELD_INDEX_SUBCLASS_FIELDS_OFFSET+2;
         private Checkpoint referenceCheckpoint;
 
         private ReferenceRecord(Checkpoint checkpoint, Checkpoint reference) {
             super(checkpoint);
             this.referenceCheckpoint = reference;
+        }
+        protected ReferenceRecord(String[] fields) {
+            super(fields);
+            referenceCheckpoint = new Checkpoint(
+                                    UUID.fromString(fields[FIELD_INDEX_REF_CP_THREAD_UUID]),
+                                    Long.valueOf(fields[FIELD_INDEX_REF_CP_CHAINNO]),
+                                    Long.valueOf(fields[FIELD_INDEX_REF_CP_ISEQ]));
         }
         public Checkpoint getReferenceCheckpoint() {
             return referenceCheckpoint;
@@ -226,16 +294,33 @@ public class XPS
         public boolean equals(Object obj) {
             return EqualsBuilder.reflectionEquals(this, obj, false);
         }
+        @Override
+        public byte[] serialize()
+        {
+            return super.serializeFields(
+                    referenceCheckpoint.getThreadUUID().toString(), 
+                    String.valueOf(referenceCheckpoint.getChainNo()), 
+                    String.valueOf(referenceCheckpoint.getiSeq())
+                    );
+        }
     }
     
-    class KeyValueRecord extends Record {
+    static class KeyValueRecord extends ReferenceRecord {
+        private static final int FIELD_INDEX_KEY = FIELD_INDEX_SUBCLASS_FIELDS_OFFSET;
+        private static final int FIELD_INDEX_VALUE = FIELD_INDEX_SUBCLASS_FIELDS_OFFSET+1;
+
         private String key;
         private Object value;
         
         private KeyValueRecord(Checkpoint checkpoint, Checkpoint origin, String key, Object value) {
-            super(checkpoint);
+            super(checkpoint, origin);
             this.key = key;
             this.value = value;
+        }
+        protected KeyValueRecord(String[] fields) {
+            super(fields);
+            key = fields[FIELD_INDEX_KEY];
+            value = fields[FIELD_INDEX_VALUE];
         }
         @Override
         protected String getLabel() {
@@ -247,29 +332,48 @@ public class XPS
         public Object getValue() {
             return value;
         }
+        @Override
+        public byte[] serialize()
+        {
+            return super.serializeFields(
+                    getReferenceCheckpoint().getThreadUUID().toString(), 
+                    String.valueOf(getReferenceCheckpoint().getChainNo()), 
+                    String.valueOf(getReferenceCheckpoint().getiSeq()),
+                    key, 
+                    String.valueOf(value));
+        }
     }
     
-    class SplitRecord extends ReferenceRecord {
+    static class SplitRecord extends ReferenceRecord {
         private SplitRecord(Checkpoint node, Checkpoint predecessor) {
             super(node, predecessor);
+        }
+        protected SplitRecord(String[] fields) {
+            super(fields);
         }
         protected String getLabel() {
             return "split";
         }
     }
     
-    class DoneRecord extends ReferenceRecord {
+    static class DoneRecord extends ReferenceRecord {
         private DoneRecord(Checkpoint node, Checkpoint origin) {
             super(node, origin);
+        }
+        protected DoneRecord(String[] fields) {
+            super(fields);
         }
         protected String getLabel() {
             return "done";
         }
     }
     
-    class JoinRecord extends ReferenceRecord {
+    static class JoinRecord extends ReferenceRecord {
         private JoinRecord(Checkpoint node, Checkpoint origin) {
             super(node, origin);
+        }
+        protected JoinRecord(String[] fields) {
+            super(fields);
         }
         protected String getLabel() {
             return "join";

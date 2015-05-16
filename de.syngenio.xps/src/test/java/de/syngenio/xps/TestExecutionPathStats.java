@@ -22,11 +22,12 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Random;
 
 import org.apache.commons.io.IOUtils;
+import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestWatcher;
@@ -35,7 +36,10 @@ import org.neo4j.visualization.graphviz.Script;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.tinkerpop.blueprints.impls.neo4j2.Neo4j2Graph;
+
 import de.syngenio.xps.GraphAnalyzer.CountingTree;
+import de.syngenio.xps.GraphAnalyzer.Result;
 import de.syngenio.xps.XPS.Checkpoint;
 
 public class TestExecutionPathStats
@@ -138,9 +142,28 @@ public class TestExecutionPathStats
     };
 
     @Test
-    public void testSplitJoin() throws IOException, JSONException
+    public void testChronicleLogger() throws IOException, JSONException, ClassNotFoundException, NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException
     {
-        RecordLogger recordLogger = new RecordLogger();
+        ChronicleRecordLogger recordLogger = new ChronicleRecordLogger();
+        XPS.configure(recordLogger);
+        XPS.point("input");
+        XPS.point("output");
+        
+//        recordLogger.close();
+        
+        // transfer all records from Chronicle into Neo4J
+        Neo4j2Graph graph = GraphUtil.load(recordLogger, "graphs/graphChronicleLogger");
+        final Result result = GraphAnalyzer.analyze(graph);
+        for (CountingTree<String> countingTree : result.values()) {
+            countingTree.dump(0);
+        }
+        graph.shutdown();
+    }
+    
+    @Test
+    public void testSplitJoin() throws IOException, JSONException, ClassNotFoundException, NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException
+    {
+        ChronicleRecordLogger recordLogger = new ChronicleRecordLogger();
         XPS.configure(recordLogger);
 
         // "input" marks the opening of an input container with six items
@@ -213,24 +236,21 @@ public class TestExecutionPathStats
                          // terminated
         XPS.point("output");
 
-        String analysisPath = "analysis_graph";
-        try (GraphAnalyzer ga = new GraphAnalyzer(recordLogger, analysisPath))
-        {
-            CountingTree<String> countingTree = ga.analyze();
-            JSONObject json = countingTree.toJSON();
-            System.out.println("json=\n" + json.toString(2));
-            try (Writer output = new FileWriter("testSplitJoin.json")) {
-                IOUtils.write(json.toString(2), output);
-            }
-        }
-        Script script = Script.initialize(Script.class, analysisPath);
+        // transfer all records from Chronicle into Neo4J
+        Neo4j2Graph graph = GraphUtil.load(recordLogger, "graphs/graphSplitJoin");
+        Result analysisResult = GraphAnalyzer.analyze(graph);
+        graph.shutdown();
+        
+        analysisResult.toCSV(new File("testSplitJoin.csv"));
+
+        Script script = Script.initialize(Script.class, "graphs/graphSplitJoin");
         script.emit(new File("graph.dot"));
     }
 
     @Test
-    public void test() throws IOException, JSONException
+    public void test() throws IOException, JSONException, ClassNotFoundException, NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException
     {
-        RecordLogger recordLogger = new RecordLogger();
+        ChronicleRecordLogger recordLogger = new ChronicleRecordLogger();
         XPS.configure(recordLogger);
 
         Checkpoint start = XPS.point("start");
@@ -259,14 +279,17 @@ public class TestExecutionPathStats
         XPS.join(start);
         XPS.point("end");
 
-        try (GraphAnalyzer analyzer = new GraphAnalyzer(recordLogger, "analysis_graph"))
-        {
-            CountingTree<String> countingTree = analyzer.analyze();
-            countingTree.dump(0);
+        // transfer all records from Chronicle into Neo4J
+        Neo4j2Graph graph = GraphUtil.load(recordLogger, "graphs/graphTest");
 
-            JSONObject json = countingTree.toJSON();
-            System.out.println("json=\n" + json.toString());
+        final Result result = GraphAnalyzer.analyze(graph);
+        for (CountingTree<String> countingTree : result.values()) {
+            countingTree.dump(0);
         }
+        result.toCSV(new File("test.csv"));
+
+        graph.shutdown();
+
     }
 
     private ExecutionPoint nextExecutionPoint(ExecutionPoint previous)
