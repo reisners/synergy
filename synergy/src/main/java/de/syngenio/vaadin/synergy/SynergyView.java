@@ -26,6 +26,7 @@ import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomComponent;
+import com.vaadin.ui.HasComponents;
 import com.vaadin.ui.Image;
 import com.vaadin.ui.UI;
 
@@ -256,11 +257,13 @@ public class SynergyView extends CustomComponent
 
     
     public static class ItemComponentImage extends Image implements ItemComponent {
+        private static final String PRIMARY_STYLE_NAME = "synergy-image";
         private Resource source;
         private Resource sourceSelected;
         
         public ItemComponentImage() {
             super();
+            setPrimaryStyleName(PRIMARY_STYLE_NAME);
         }
         
         public void setup(final SynergySelect ss, final Object itemId)
@@ -314,19 +317,19 @@ public class SynergyView extends CustomComponent
         {
             switch (state) {
             case selected:
-                setStyleName(STYLE_NAME_SELECTED);
+                addStyleName(STYLE_NAME_SELECTED);
                 if (sourceSelected != null) {
                     setSource(sourceSelected);
                 }
                 break;
             case ancestorOfSelected:
-                setStyleName(STYLE_NAME_ANCESTOR_OF_SELECTED);
+                addStyleName(STYLE_NAME_ANCESTOR_OF_SELECTED);
                 if (sourceSelected != null) {
                     setSource(sourceSelected);
                 }
                 break;
             case unselected:
-                setStyleName(STYLE_NAME_UNSELECTED);
+                addStyleName(STYLE_NAME_UNSELECTED);
                 setSource(source);
                 break;
             }
@@ -334,8 +337,11 @@ public class SynergyView extends CustomComponent
     }
 
     public static class ItemComponentButton extends Button implements ItemComponent {
+        private static final String PRIMARY_STYLE_NAME = "synergy-button";
+
         public ItemComponentButton() {
             super();
+            setPrimaryStyleName(PRIMARY_STYLE_NAME);
         }
         
         public void setup(final SynergySelect ss, final Object itemId)
@@ -372,15 +378,16 @@ public class SynergyView extends CustomComponent
         @Override
         public void setState(State state)
         {
+            removeStyleName(STYLE_NAME_ANCESTOR_OF_SELECTED+" "+STYLE_NAME_SELECTED+" "+STYLE_NAME_UNSELECTED);
             switch (state) {
             case selected:
-                setStyleName(STYLE_NAME_SELECTED);
+                addStyleName(STYLE_NAME_SELECTED);
                 break;
             case ancestorOfSelected:
-                setStyleName(STYLE_NAME_ANCESTOR_OF_SELECTED);
+                addStyleName(STYLE_NAME_ANCESTOR_OF_SELECTED);
                 break;
             case unselected:
-                setStyleName(STYLE_NAME_UNSELECTED);
+                addStyleName(STYLE_NAME_UNSELECTED);
                 break;
             }
         }
@@ -434,8 +441,9 @@ public class SynergyView extends CustomComponent
                             for (String itemId : getImmediateChildItemIds()) {
                                 updateSelectedVisuals(itemId);
                             }
-                            ui.push();
+//                            ui.push();
                         }
+
                     });
                 }
             }
@@ -452,7 +460,7 @@ public class SynergyView extends CustomComponent
                         public void run()
                         {
                             visualizeItems();
-                            ui.push();
+//                            ui.push();
                         }
                     });
                 }

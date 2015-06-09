@@ -33,17 +33,6 @@
 			<version>1.2.17</version>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
-			<groupId>javax</groupId>
-			<artifactId>javaee-api</artifactId>
-			<version>6.0</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.vaadin</groupId>
-			<artifactId>vaadin-themes</artifactId>
-			<version>${vaadin.version}</version>
-		</dependency>
 	</dependencies>
 	<build>
 		<plugins>
@@ -115,7 +104,7 @@
 				<executions>
 					<execution>
 						<goals>
-							<goal>compile-theme</goal>
+							<!-- <goal>compile-theme</goal> -->
 						</goals>
 					</execution>
 				</executions>

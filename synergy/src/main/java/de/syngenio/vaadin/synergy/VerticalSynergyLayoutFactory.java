@@ -44,6 +44,7 @@ public class VerticalSynergyLayoutFactory extends AbstractSynergyLayoutFactory
             protected void addItemComponent(Component itemComponent)
             {
                 itemComponent.setWidth("100%");
+                itemComponent.addStyleName("vertical");
                 addComponent(itemComponent);
                 setComponentAlignment(itemComponent, itemAlignment);
             }
@@ -51,6 +52,11 @@ public class VerticalSynergyLayoutFactory extends AbstractSynergyLayoutFactory
             @Override
             protected void addSubview(SynergyView subview, int index)
             {
+                //FIXME The indentation layout needs to be done differently somehow.
+                //The SynergyView's minimum width does not include the indentations
+                //The indentations shink to nothing if the parent container does not 
+                //provide enough horizontal space. 
+                //Can we use a GridLayout with an empty(?) first column instead?
                 subview.setWidth(80, Unit.PERCENTAGE);
                 subview.setHeightUndefined();
                 addComponent(subview, index);
