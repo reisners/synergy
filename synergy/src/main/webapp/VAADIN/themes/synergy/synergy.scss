@@ -1,0 +1,56 @@
+// Do not actually include valo here; the application's stylesheet does that later 
+@import "../../../VAADIN/themes/synergy/synergy-button.scss";
+
+@mixin synergy(
+	$primary-stylename: synergy, 
+	$background-color: $v-background-color, 
+	$selected-color: $v-focus-color, 
+	$ancestor-of-selected-color: auto, 
+	$unselected-color: $background-color, 
+	$triangle-color: $v-background-color,
+	$triangle-size: 6px) {
+
+	@if $ancestor-of-selected-color == 'auto' {
+		@if is-dark-color($background-color) {
+			$aos-color: darken($v-focus-color, 25%)			
+		} @else {
+			$aos-color: lighten($v-focus-color, 25%)
+		}
+	} @else {
+		$aos-color: $ancestor-of-selected-color;
+	}
+	
+	@include synergy-button($primary-stylename: #{$primary-stylename}-unselected, $background-color: $unselected-color);
+	@include synergy-button($primary-stylename: #{$primary-stylename}-selected, $background-color: $selected-color);
+	@include synergy-button($primary-stylename: #{$primary-stylename}-ancestor-of-selected, $background-color: $aos-color);
+
+	.#{$primary-stylename}-button-vertical {
+		text-align: left;
+		width: 100%;
+	}
+
+    @if $triangle-color != 'none' {
+		.v-slot-#{$primary-stylename}-selected:after {
+			// triangle
+			content: "";
+			position:relative;
+			border-top: $triangle-size solid transparent;
+			border-bottom: $triangle-size solid transparent;
+			border-right: $triangle-size solid $triangle-color;
+			margin-left: -$triangle-size;
+	    }
+	}
+	
+	.#{$primary-stylename}view {
+		background-color: $background-color;
+	}
+	
+	.v-verticallayout-#{$primary-stylename} {
+		.v-slot-#{$primary-stylename}-selected + .v-slot > .v-horizontallayout {
+			background-color: $selected-color;
+		}
+		.v-slot-#{$primary-stylename}-ancestor-of-selected + .v-slot > .v-horizontallayout {
+			background-color: $aos-color;
+		}
+	}
+}

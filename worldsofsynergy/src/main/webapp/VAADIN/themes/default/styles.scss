@@ -1,0 +1,8 @@
+@import "addons.scss";
+@import "../valo/_valo.scss";
+
+/* This file prefixes all rules with the theme name to avoid causing conflicts with other themes. */
+.default {
+  @include synergy;
+  @include valo;
+}

@@ -25,6 +25,7 @@ import com.vaadin.server.Resource;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
+import com.vaadin.ui.ComponentContainer;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.HasComponents;
 import com.vaadin.ui.Image;
@@ -49,6 +50,18 @@ public class SynergyView extends CustomComponent
     
     private final static String PRIMARY_STYLE_NAME = STYLE_NAME+"view";
     
+    private Component wrapper = this; // default: SynergyView has no extra wrapper
+
+    public Component getWrapper()
+    {
+        return wrapper;
+    }
+
+    public void setWrapper(Component wrapper)
+    {
+        this.wrapper = wrapper;
+    }
+
     @SuppressWarnings("unused")
     private SynergyView parentView;
     private SynergyView subView = null;
@@ -206,8 +219,8 @@ public class SynergyView extends CustomComponent
                 subView.setParentId(INACTIVE);
             }
         } else {
-            // remove subView from its previous place
-            layout.removeComponent(subView);
+            // remove (wrapped) subView from its previous place
+            layout.removeComponent(subView.getWrapper());
             subView.replaceSubView(INACTIVE);
             if (hasChildren) {
                 subView.setParentId(itemId);
@@ -353,7 +366,7 @@ public class SynergyView extends CustomComponent
             }
             setCaption(caption);
             setImmediate(true);
-            setSizeUndefined();
+//            setSizeUndefined();
             Property<String> propertySource = ss.getContainerProperty(itemId, SynergyBuilder.PROPERTY_ITEM_COMPONENT_SOURCE);
             String sourceUri = propertySource.getValue();
             if (sourceUri != null) {
