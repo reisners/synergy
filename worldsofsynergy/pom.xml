@@ -2,16 +2,19 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>de.syngenio.vaadin</groupId>
-	<artifactId>worldsofsynergy</artifactId>
+	<artifactId>worlds</artifactId>
 	<packaging>war</packaging>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>WorldsOfSynergy</name>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<java.version>1.8</java.version>
 		<vaadin.version>7.4.5</vaadin.version>
 		<vaadin.plugin.version>${vaadin.version}</vaadin.plugin.version>
+		<selenium.version>0.9.7376</selenium.version>
+		<tomcat.port>8080</tomcat.port>
 	</properties>
 
 	<dependencies>
@@ -56,6 +59,31 @@
 			<artifactId>synergy</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.11</version>
+		</dependency>
+		<dependency>
+			<groupId>org.seleniumhq.selenium</groupId>
+			<artifactId>selenium-firefox-driver</artifactId>
+			<version>2.46.0</version>
+		</dependency>
+		<dependency>
+		    <groupId>com.codeborne</groupId>
+		    <artifactId>phantomjsdriver</artifactId>
+		    <version>1.2.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>1.7.12</version>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-log4j12</artifactId>
+			<version>1.7.12</version>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -65,8 +93,8 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.3</version>
 				<configuration>
-					<source>1.8</source>
-					<target>1.8</target>
+					<source>${java.version}</source>
+					<target>${java.version}</target>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -103,6 +131,61 @@
 							<goal>compile-theme</goal>
 							<goal>update-theme</goal>
 						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-failsafe-plugin</artifactId>
+				<version>2.18.1</version>
+				<executions>
+					<execution>
+						<id>failsafe-integration-tests</id>
+						<phase>integration-test</phase>
+						<goals>
+							<goal>integration-test</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>failsafe-verify</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>verify</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.tomcat.maven</groupId>
+				<artifactId>tomcat7-maven-plugin</artifactId>
+				<version>2.2</version>
+				<configuration>
+					<path>/</path>
+					<contextFile>${basedir}/src/test/resources/tomcat/context.xml</contextFile>
+					<useTestClasspath>true</useTestClasspath>
+				</configuration>
+				<executions>
+					<!-- At pre-integration-test phase, run the war in an embedded Tomcat 
+						server. -->
+					<execution>
+						<id>start-tomcat</id>
+						<goals>
+							<goal>shutdown</goal>
+							<goal>run-war-only</goal>
+						</goals>
+						<phase>pre-integration-test</phase>
+						<configuration>
+							<port>${tomcat.port}</port>
+							<fork>true</fork>
+						</configuration>
+					</execution>
+					<!-- At post-integration-test phase, stop the embedded Tomcat server. -->
+					<execution>
+						<id>stop-tomcat</id>
+						<goals>
+							<goal>shutdown</goal>
+						</goals>
+						<phase>post-integration-test</phase>
 					</execution>
 				</executions>
 			</plugin>

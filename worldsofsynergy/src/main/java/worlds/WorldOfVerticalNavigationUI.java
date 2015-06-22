@@ -1,4 +1,6 @@
-package wos;
+package worlds;
+
+import helpers.WorldHelper;
 
 import javax.servlet.annotation.WebServlet;
 
@@ -7,7 +9,6 @@ import org.slf4j.LoggerFactory;
 
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.VaadinServletConfiguration;
-import com.vaadin.data.util.HierarchicalContainer;
 import com.vaadin.navigator.Navigator;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
@@ -21,7 +22,6 @@ import com.vaadin.ui.Panel;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 
-import de.syngenio.vaadin.synergy.SynergyBuilder;
 import de.syngenio.vaadin.synergy.SynergyView;
 import de.syngenio.vaadin.synergy.VerticalSynergyLayoutFactory;
 
@@ -40,7 +40,7 @@ public class WorldOfVerticalNavigationUI extends UI
     {
         HorizontalLayout hlayout = new HorizontalLayout();
         hlayout.setSizeFull();
-        SynergyView synergyView = new SynergyView(new VerticalSynergyLayoutFactory(false, false, Alignment.MIDDLE_LEFT), getNavigationHierarchy());
+        SynergyView synergyView = new SynergyView(new VerticalSynergyLayoutFactory(false, false, Alignment.MIDDLE_LEFT), WorldHelper.getNavigationHierarchy());
         synergyView.setSizeUndefined();
 //        synergyView.setWidth("30%");
         hlayout.addComponent(synergyView);
@@ -48,16 +48,10 @@ public class WorldOfVerticalNavigationUI extends UI
         
         Panel panel = new Panel();
         panel.setSizeFull();
+        panel.setId("content");
         hlayout.addComponent(panel);
         hlayout.setExpandRatio(panel, 1f);
 
-        Button b1 = new Button("Button with Long Caption");
-        b1.setWidth("100%");
-        Button b2 = new Button("Short");
-        b2.setWidth("100%");
-        VerticalLayout v2 = new VerticalLayout(b1, b2);
-        v2.setSizeUndefined();
-        hlayout.addComponent(v2);
         setContent(hlayout);
         
         setNavigator(new Navigator(this, panel));
@@ -72,20 +66,5 @@ public class WorldOfVerticalNavigationUI extends UI
         {
             setValue(event.getParameters());
         }
-    }
-
-    private HierarchicalContainer getNavigationHierarchy() {
-        return new SynergyBuilder() {{
-            addItem(
-                    button("|Resources").asGroup().withChildren( 
-                            button("|Resources|Assets").asGroup().withChildren(
-                                    button("|Resources|Assets|Machines").withTargetNavigationState("view/Machines"),
-                                    button("|Resources|Assets|Real Estate").withTargetNavigationState("view/Real Estate"),
-                                    button("|Resources|Assets|Patents").withTargetNavigationState("view/Patents")),
-                            button("|Resources|People").withTargetNavigationState("view/People")));
-            addItem(button("|Processes").asGroup().withChildren(
-                    button("|Processes|Core").withTargetNavigationState("view/Core Processes"),
-                    button("|Processes|Auxiliary").withTargetNavigationState("view/Auxiliary Processes")));
-        }}.build();
     }
 }

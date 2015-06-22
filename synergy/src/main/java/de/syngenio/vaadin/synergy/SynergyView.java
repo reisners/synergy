@@ -36,9 +36,9 @@ import de.syngenio.vaadin.synergy.SynergyView.ItemComponent.State;
 public class SynergyView extends CustomComponent
 {
     static final String STYLE_NAME = "synergy";
-    private static final String STYLE_NAME_UNSELECTED = STYLE_NAME+"-unselected";
-    private static final String STYLE_NAME_ANCESTOR_OF_SELECTED = STYLE_NAME+"-ancestor-of-selected";
-    private static final String STYLE_NAME_SELECTED = STYLE_NAME+"-selected";
+    private static final String STYLE_NAME_UNSELECTED = STYLE_NAME+"-"+ItemComponent.State.unselected.getCssClassSuffix();
+    private static final String STYLE_NAME_ANCESTOR_OF_SELECTED = STYLE_NAME+"-"+ItemComponent.State.ancestorOfSelected.getCssClassSuffix();
+    private static final String STYLE_NAME_SELECTED = STYLE_NAME+"-"+ItemComponent.State.selected.getCssClassSuffix();
     private static final long serialVersionUID = 1L;
     private SynergySelect select;
     private SynergyLayout layout;
@@ -263,8 +263,30 @@ public class SynergyView extends CustomComponent
     }
 
     public interface ItemComponent extends Component {
-        enum State { unselected, selected, ancestorOfSelected }; 
-        void setup(final SynergySelect ss, final Object itemId);
+        enum State {
+            unselected, selected, ancestorOfSelected("ancestor-of-selected");
+            public final String cssClassSuffix;
+
+            State()
+            {
+                this.cssClassSuffix = this.name();
+            }
+
+            State(String cssClassSuffix)
+            {
+                this.cssClassSuffix = cssClassSuffix;
+            }
+
+            /**
+             * @return the css class suffix associated with this state
+             */
+            public String getCssClassSuffix()
+            {
+                return cssClassSuffix;
+            }
+        };
+
+        void setup(final SynergySelect ss, final String itemId);
         void setState(State state);
     }
 
@@ -279,7 +301,7 @@ public class SynergyView extends CustomComponent
             setPrimaryStyleName(PRIMARY_STYLE_NAME);
         }
         
-        public void setup(final SynergySelect ss, final Object itemId)
+        public void setup(final SynergySelect ss, final String itemId)
         {
             Property<String> propertySource = ss.getContainerProperty(itemId, SynergyBuilder.PROPERTY_ITEM_COMPONENT_SOURCE);
             String sourceUri = propertySource.getValue();
@@ -295,7 +317,7 @@ public class SynergyView extends CustomComponent
             Property<String> propertyCaption = ss.getContainerProperty(itemId, SynergyBuilder.PROPERTY_ITEM_COMPONENT_CAPTION);
             String caption = propertyCaption.getValue();
             if (caption == null) {
-                caption = itemId.toString();
+                caption = itemId;
             }
             setCaption(caption);
             Property<String> propertyWidth = ss.getContainerProperty(itemId, SynergyBuilder.PROPERTY_ITEM_COMPONENT_WIDTH);
@@ -323,6 +345,8 @@ public class SynergyView extends CustomComponent
                     }
                 }
             });
+            
+            setId((String)itemId); // for test automation
         }
 
         @Override
@@ -357,12 +381,12 @@ public class SynergyView extends CustomComponent
             setPrimaryStyleName(PRIMARY_STYLE_NAME);
         }
         
-        public void setup(final SynergySelect ss, final Object itemId)
+        public void setup(final SynergySelect ss, final String itemId)
         {
             Property<String> propertyCaption = ss.getContainerProperty(itemId, SynergyBuilder.PROPERTY_ITEM_COMPONENT_CAPTION);
             String caption = propertyCaption.getValue();
             if (caption == null) {
-                caption = itemId.toString();
+                caption = itemId;
             }
             setCaption(caption);
             setImmediate(true);
@@ -386,6 +410,8 @@ public class SynergyView extends CustomComponent
                     }
                 }
             });
+
+            setId((String)itemId); // for test automation
         }
 
         @Override
@@ -406,7 +432,7 @@ public class SynergyView extends CustomComponent
         }
     }
     
-    private ItemComponent getItemComponent(final Object itemId)
+    private ItemComponent getItemComponent(final String itemId)
     {
         ItemComponent itemComponent = null;
         Item item = select.getItem(itemId);
