@@ -23,8 +23,8 @@ import org.slf4j.LoggerFactory;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.HierarchicalContainer;
 
-import de.syngenio.vaadin.synergy.SynergyBuilder;
 import de.syngenio.vaadin.synergy.SynergyView.ItemComponent.State;
+import de.syngenio.vaadin.synergy.builder.SynergyBuilder;
 
 public abstract class SynergyTestBase
 {

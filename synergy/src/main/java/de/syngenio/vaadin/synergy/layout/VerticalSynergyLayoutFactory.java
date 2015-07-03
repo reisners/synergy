@@ -1,31 +1,33 @@
-package de.syngenio.vaadin.synergy;
+package de.syngenio.vaadin.synergy.layout;
 
-import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.ui.AbstractOrderedLayout;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Component;
-import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.VerticalLayout;
 
+import de.syngenio.vaadin.synergy.SynergyView;
+
 public class VerticalSynergyLayoutFactory extends AbstractSynergyLayoutFactory
 {
-    private boolean hasSpacing;
-    private boolean hasMargin;
     private Alignment itemAlignment;
     private String indentWidth = "20px";
     
     /**
-     * @param hasSpacing whether to add spacing between item components
-     * @param hasMargin whether to put a margin around the view
-     * @param itemAlignment set this to {@code Alignment.MIDDLE_LEFT} if items form a hierarchy. Otherwise, {@code Alignment.MIDDLE_CENTER} is recommended.
+     * Default constructor
      */
-    public VerticalSynergyLayoutFactory(boolean hasSpacing, boolean hasMargin, Alignment itemAlignment)
+    public VerticalSynergyLayoutFactory()
     {
         super();
-        this.hasSpacing = hasSpacing;
-        this.hasMargin = hasMargin;
+    }
+    
+    /**
+     * @param itemAlignment set this to {@code Alignment.MIDDLE_LEFT} if items form a hierarchy. Otherwise, {@code Alignment.MIDDLE_CENTER} is recommended.
+     */
+    public VerticalSynergyLayoutFactory(Alignment itemAlignment)
+    {
+        super();
         this.itemAlignment = itemAlignment;
     }
 
@@ -44,14 +46,14 @@ public class VerticalSynergyLayoutFactory extends AbstractSynergyLayoutFactory
             {
                 VerticalLayout vlayout = new VerticalLayout();
                 vlayout.setStyleName(generateStyleName());
-                vlayout.setSpacing(hasSpacing);
-                vlayout.setMargin(hasMargin);
+                vlayout.setSpacing(false);
+                vlayout.setMargin(false);
                 vlayout.setWidth("100%");
                 return vlayout;
             }
 
             @Override
-            protected void addItemComponent(Component itemComponent)
+            public void addItemComponent(Component itemComponent)
             {
                 itemComponent.setWidth("100%");
                 itemComponent.addStyleName("vertical");
@@ -60,7 +62,7 @@ public class VerticalSynergyLayoutFactory extends AbstractSynergyLayoutFactory
             }
 
             @Override
-            protected void addSubview(SynergyView subview, int index)
+            public void addSubview(SynergyView subview, int index)
             {
                 // if it has been added to this layout before, remove the subview (along with its wrapper) first 
                 if (subview.getWrapper() != null) {
@@ -70,6 +72,7 @@ public class VerticalSynergyLayoutFactory extends AbstractSynergyLayoutFactory
                 label.setWidth(indentWidth);
                 label.setHeightUndefined();
                 HorizontalLayout wrapper = new HorizontalLayout(label, subview);
+                wrapper.addStyleName("wrapper");
                 wrapper.setWidth("100%");
                 wrapper.setHeightUndefined();
                 wrapper.setComponentAlignment(subview, Alignment.TOP_LEFT);
@@ -77,7 +80,7 @@ public class VerticalSynergyLayoutFactory extends AbstractSynergyLayoutFactory
                 wrapper.setExpandRatio(subview, 1);
                 subview.setWrapper(wrapper);
                 addComponent(wrapper, index);
-                setComponentAlignment(wrapper, Alignment.TOP_LEFT);
+                setComponentAlignment(wrapper, Alignment.TOP_RIGHT);
             }
         };
         layout.setCompactArrangement(isCompactArrangement());

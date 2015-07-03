@@ -8,7 +8,9 @@
 	$ancestor-of-selected-color: auto, 
 	$unselected-color: $background-color, 
 	$triangle-color: $v-background-color,
-	$triangle-size: 6px) {
+	$unit-size: $v-unit-size,
+	$triangle-size: auto,
+	$spacing: auto) {
 
 	@if $ancestor-of-selected-color == 'auto' {
 		@if is-dark-color($background-color) {
@@ -20,36 +22,68 @@
 		$aos-color: $ancestor-of-selected-color;
 	}
 	
-	@include synergy-button($primary-stylename: #{$primary-stylename}-unselected, $background-color: $unselected-color);
-	@include synergy-button($primary-stylename: #{$primary-stylename}-selected, $background-color: $selected-color);
-	@include synergy-button($primary-stylename: #{$primary-stylename}-ancestor-of-selected, $background-color: $aos-color);
+	@if $triangle-size == 'auto' {
+		$triangle-dim: round($unit-size/6);
+	} @else {
+		$triangle-dim: $triangle-size;
+	}
+	
+	@if $spacing == 'auto' {
+		$spacing-dim: round($unit-size/3);
+	} @else {
+		$spacing-dim: $spacing;
+	}
+	
+	@include synergy-button($primary-stylename: #{$primary-stylename}-button-synergy-unselected, $background-color: $unselected-color, $hover-color: $selected-color);
+	@include synergy-button($primary-stylename: #{$primary-stylename}-button-synergy-selected, $background-color: $selected-color);
+	@include synergy-button($primary-stylename: #{$primary-stylename}-button-synergy-ancestor-of-selected, $background-color: $aos-color, $hover-color: $selected-color);
 
 	.#{$primary-stylename}-button-vertical {
 		text-align: left;
 		width: 100%;
+        margin: $spacing-dim 0 0 0;
 	}
 
     @if $triangle-color != 'none' {
-		.v-slot-#{$primary-stylename}-selected:after {
+		.v-slot-vertical.v-slot-synergy-selected:after {
 			// triangle
 			content: "";
 			position:relative;
-			border-top: $triangle-size solid transparent;
-			border-bottom: $triangle-size solid transparent;
-			border-right: $triangle-size solid $triangle-color;
-			margin-left: -$triangle-size;
+			border-top: $triangle-dim solid transparent;
+			border-bottom: $triangle-dim solid transparent;
+			border-right: $triangle-dim solid $triangle-color;
+			margin-left: -$triangle-dim;
+			vertical-align: text-bottom;
+	    }
+	}
+
+	.#{$primary-stylename}-button-horizontal {
+		text-align: center;
+		width: 100%;
+        margin: 0 $spacing-dim;
+	}
+
+    @if $triangle-color != 'none' {
+		.h-slot-horizontal.h-slot-synergy-selected:after {
+			// triangle
+			content: "";
+			position:relative;
+			border-left: $triangle-dim solid transparent;
+			border-bottom: $triangle-dim solid $triangle-color;
+			border-right: $triangle-dim solid transparent;
+			margin-top: -$triangle-dim;
 	    }
 	}
 	
-	.#{$primary-stylename}view {
-		background-color: $background-color;
+	.#{$primary-stylename} {
+		background-color: transparent;
 	}
 	
 	.v-verticallayout-#{$primary-stylename} {
-		.v-slot-#{$primary-stylename}-selected + .v-slot > .v-horizontallayout {
+		.v-slot-wrapper.v-slot-synergy-selected {
 			background-color: $selected-color;
 		}
-		.v-slot-#{$primary-stylename}-ancestor-of-selected + .v-slot > .v-horizontallayout {
+		.v-slot-wrapper.v-slot-synergy-ancestor-of-selected {
 			background-color: $aos-color;
 		}
 	}

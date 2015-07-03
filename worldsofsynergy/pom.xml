@@ -15,6 +15,8 @@
 		<vaadin.plugin.version>${vaadin.version}</vaadin.plugin.version>
 		<selenium.version>0.9.7376</selenium.version>
 		<tomcat.port>8080</tomcat.port>
+		<webdriver.firefox.bin>D:\Programme\Mozilla Firefox\firefox.exe</webdriver.firefox.bin>
+		<webdriver.firefox.profile>WebDriver</webdriver.firefox.profile>
 	</properties>
 
 	<dependencies>
@@ -70,9 +72,9 @@
 			<version>2.46.0</version>
 		</dependency>
 		<dependency>
-		    <groupId>com.codeborne</groupId>
-		    <artifactId>phantomjsdriver</artifactId>
-		    <version>1.2.1</version>
+			<groupId>com.codeborne</groupId>
+			<artifactId>phantomjsdriver</artifactId>
+			<version>1.2.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>
@@ -83,6 +85,11 @@
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-log4j12</artifactId>
 			<version>1.7.12</version>
+		</dependency>
+		<dependency>
+			<groupId>org.reflections</groupId>
+			<artifactId>reflections</artifactId>
+			<version>0.9.10</version>
 		</dependency>
 	</dependencies>
 
@@ -138,6 +145,12 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-failsafe-plugin</artifactId>
 				<version>2.18.1</version>
+				<configuration>
+					<systemPropertyVariables>
+						<webdriver.firefox.bin>${webdriver.firefox.bin}</webdriver.firefox.bin>
+						<webdriver.firefox.profile>${webdriver.firefox.profile}</webdriver.firefox.profile>
+					</systemPropertyVariables>
+				</configuration>
 				<executions>
 					<execution>
 						<id>failsafe-integration-tests</id>

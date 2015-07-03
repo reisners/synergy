@@ -1,4 +1,4 @@
-package de.syngenio.vaadin.synergy;
+package de.syngenio.vaadin.synergy.layout;
 
 import java.util.Iterator;
 
@@ -8,6 +8,8 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.ComponentContainer;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.Layout;
+
+import de.syngenio.vaadin.synergy.SynergyView;
 
 public abstract class SynergyLayout extends CustomComponent implements Layout, Layout.AlignmentHandler
 {
@@ -49,14 +51,14 @@ public abstract class SynergyLayout extends CustomComponent implements Layout, L
      * Adds a component representing an item to the layout
      * @param itemComponent
      */
-    protected abstract void addItemComponent(Component itemComponent);
+    public abstract void addItemComponent(Component itemComponent);
     
     /**
      * Adds a nested SynergyView at the given position to the layout
      * @param subview subview to be added.
      * @param index position for insertion. The components currently in and after the position are shifted to higher indices.    
      */
-    protected abstract void addSubview(SynergyView subview, int index);
+    public abstract void addSubview(SynergyView subview, int index);
     
 
     @Override
@@ -114,25 +116,28 @@ public abstract class SynergyLayout extends CustomComponent implements Layout, L
         updateVisibilityAndLayout(layout);
     }
 
-    @SuppressWarnings("deprecation")
+    @Deprecated
     @Override
     public void addListener(ComponentAttachListener listener)
     {
         layout.addListener(listener);
     }
 
+    @Deprecated
     @Override
     public void removeListener(ComponentAttachListener listener)
     {
         layout.removeListener(listener);
     }
 
+    @Deprecated
     @Override
     public void addListener(ComponentDetachListener listener)
     {
         layout.addListener(listener);
     }
 
+    @Deprecated
     @Override
     public void removeListener(ComponentDetachListener listener)
     {

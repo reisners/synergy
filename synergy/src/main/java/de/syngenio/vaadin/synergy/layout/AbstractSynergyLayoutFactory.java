@@ -1,4 +1,6 @@
-package de.syngenio.vaadin.synergy;
+package de.syngenio.vaadin.synergy.layout;
+
+import de.syngenio.vaadin.synergy.SynergyView;
 
 public abstract class AbstractSynergyLayoutFactory implements SynergyLayoutFactory
 {
@@ -36,9 +38,9 @@ public abstract class AbstractSynergyLayoutFactory implements SynergyLayoutFacto
     @Override
     public String generateStyleName() {
         if (styleName != null) {
-            return SynergyView.STYLE_NAME+"-"+styleName;
+            return SynergyView.DEFAULT_PRIMARY_STYLE_NAME+"-"+styleName;
         } else {
-            return SynergyView.STYLE_NAME;
+            return SynergyView.DEFAULT_PRIMARY_STYLE_NAME;
         }
     }
 }

@@ -1,4 +1,4 @@
-package de.syngenio.vaadin.synergy;
+package de.syngenio.vaadin.synergy.layout;
 
 import java.io.Serializable;
 

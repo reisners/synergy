@@ -9,11 +9,11 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.phantomjs.PhantomJSDriver;
 
-public class ITWorldOfVerticalNavigationUI extends SynergyTestBase
+public class ITWorldOfVerticalHierarchicalNavigationUI extends SynergyTestBase
 {
-    private String baseUrl = "http://localhost:8080/worldsofsynergy";
+    private String baseUrl = "http://localhost:8080/worldsofsynergy/vertical/hierarchical";
     
-    public ITWorldOfVerticalNavigationUI()
+    public ITWorldOfVerticalHierarchicalNavigationUI()
     {
         super();
     }

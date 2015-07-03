@@ -1,9 +1,11 @@
-package de.syngenio.vaadin.synergy;
+package de.syngenio.vaadin.synergy.layout;
 
 import com.vaadin.ui.AbstractOrderedLayout;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.HorizontalLayout;
+
+import de.syngenio.vaadin.synergy.SynergyView;
 
 public class HorizontalSynergyLayoutFactory extends AbstractSynergyLayoutFactory
 {
@@ -26,7 +28,7 @@ public class HorizontalSynergyLayoutFactory extends AbstractSynergyLayoutFactory
             }
 
             @Override
-            protected void addItemComponent(Component itemComponent)
+            public void addItemComponent(Component itemComponent)
             {
 //                itemComponent.setSizeUndefined();
                 addComponent(itemComponent);
@@ -34,7 +36,7 @@ public class HorizontalSynergyLayoutFactory extends AbstractSynergyLayoutFactory
             }
 
             @Override
-            protected void addSubview(SynergyView subview, int index)
+            public void addSubview(SynergyView subview, int index)
             {
                 // do nothing
             }

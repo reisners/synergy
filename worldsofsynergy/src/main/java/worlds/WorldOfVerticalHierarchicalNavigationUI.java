@@ -23,24 +23,24 @@ import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 
 import de.syngenio.vaadin.synergy.SynergyView;
-import de.syngenio.vaadin.synergy.VerticalSynergyLayoutFactory;
+import de.syngenio.vaadin.synergy.layout.VerticalSynergyLayoutFactory;
 
 @Theme("default")
-public class WorldOfVerticalNavigationUI extends UI
+public class WorldOfVerticalHierarchicalNavigationUI extends UI
 {
-    @WebServlet(value = "/*", asyncSupported = true)
-    @VaadinServletConfiguration(productionMode = false, ui = WorldOfVerticalNavigationUI.class)
+    @WebServlet(value = "/vertical/hierarchical/*", asyncSupported = true)
+    @VaadinServletConfiguration(productionMode = false, ui = WorldOfVerticalHierarchicalNavigationUI.class)
     public static class Servlet extends VaadinServlet {
     }
 
-    private static final Logger log = LoggerFactory.getLogger(WorldOfVerticalNavigationUI.class);
+    private static final Logger log = LoggerFactory.getLogger(WorldOfVerticalHierarchicalNavigationUI.class);
     
     @Override
     protected void init(VaadinRequest request)
     {
         HorizontalLayout hlayout = new HorizontalLayout();
         hlayout.setSizeFull();
-        SynergyView synergyView = new SynergyView(new VerticalSynergyLayoutFactory(false, false, Alignment.MIDDLE_LEFT), WorldHelper.getNavigationHierarchy());
+        SynergyView synergyView = new SynergyView(new VerticalSynergyLayoutFactory(Alignment.MIDDLE_LEFT), WorldHelper.getNavigationHierarchy());
         synergyView.setSizeUndefined();
 //        synergyView.setWidth("30%");
         hlayout.addComponent(synergyView);

@@ -18,6 +18,8 @@ import com.vaadin.data.Container.Filter;
 import com.vaadin.data.Item;
 import com.vaadin.data.util.HierarchicalContainer;
 
+import de.syngenio.vaadin.synergy.builder.SynergyBuilder;
+
 public class TestSynergyBuilder
 {
     Logger log = LoggerFactory.getLogger(TestSynergyBuilder.class);
@@ -73,7 +75,7 @@ public class TestSynergyBuilder
 
     @Test
     public void testBuilderCaptionDefaulting() {
-        assertEquals("MappingCases", navigationHierarchy.getItem("|Tools|Specification|MappingCases").getItemProperty(SynergyBuilder.PROPERTY_ITEM_COMPONENT_CAPTION).getValue());
+        assertEquals("MappingCases", navigationHierarchy.getItem("|Tools|Specification|MappingCases").getItemProperty(SynergyBuilder.PROPERTY_ITEM_CAPTION).getValue());
     }
     
     @Test
