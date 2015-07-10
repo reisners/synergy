@@ -45,6 +45,8 @@ public class HubUI extends UI
     @Override
     protected void init(VaadinRequest request)
     {
+        VerticalLayout layout = new VerticalLayout();
+        setContent(layout);
         SynergyView synergyView = new SynergyView(new HorizontalSynergyLayoutFactory(), WorldHelper.getHubNavigation());
         synergyView.setNavigationHandler(synergyView.new NavigationHandler() {
             @Override
@@ -52,11 +54,12 @@ public class HubUI extends UI
             {
                 String targetNavigationState = (String) item.getItemProperty(SynergyBuilder.PROPERTY_TARGET_NAVIGATION_STATE).getValue();
                 if (targetNavigationState != null) {
-                    getPage().setLocation(request.getContextPath()+targetNavigationState);
+                    getPage().setLocation(request.getContextPath()+targetNavigationState); // this results in a NPE sometimes (not always)
                 }
             }
         });
         synergyView.setSizeFull();
-        setContent(synergyView);
+        layout.addComponent(synergyView);
+        layout.addComponent(new Button("Test Button"));
     }
 }

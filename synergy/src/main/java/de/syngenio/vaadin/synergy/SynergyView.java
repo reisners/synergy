@@ -19,16 +19,22 @@ import com.vaadin.data.Property;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.data.util.HierarchicalContainer;
-import com.vaadin.event.MouseEvents;
+import com.vaadin.event.LayoutEvents.LayoutClickEvent;
+import com.vaadin.event.LayoutEvents.LayoutClickListener;
 import com.vaadin.navigator.Navigator;
 import com.vaadin.server.ExternalResource;
+import com.vaadin.server.FontIcon;
 import com.vaadin.server.Resource;
 import com.vaadin.server.ThemeResource;
+import com.vaadin.shared.ui.label.ContentMode;
+import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.Image;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.UI;
+import com.vaadin.ui.VerticalLayout;
 
 import de.syngenio.vaadin.synergy.SynergyView.ItemComponent.State;
 import de.syngenio.vaadin.synergy.builder.SynergyBuilder;
@@ -81,6 +87,14 @@ public class SynergyView extends CustomComponent
         setParentId(null);
     }
     
+    /**
+     * Creates a subview of a parent view.
+     * This causes the parent view to visualize just a single
+     * layer of the navigation hierarchy, while the children of a selected item
+     * will be visualized in this subview.
+     * @param layoutFactory
+     * @param parentView
+     */
     public SynergyView(SynergyLayoutFactory layoutFactory, SynergyView parentView)
     {
         setPrimaryStyleName(DEFAULT_PRIMARY_STYLE_NAME);
@@ -92,9 +106,11 @@ public class SynergyView extends CustomComponent
         this.parentView = parentView;
         layout = layoutFactory.generateLayout();
         setCompositionRoot(layout);
+        addStyleName(this.layoutFactory.getOrientationStyleName());
         
         if (this.parentView != null) {
             setSelect(parentView.select);
+            parentView.setSubView(this);
         }
     }
     
@@ -341,70 +357,109 @@ public class SynergyView extends CustomComponent
     }
 
     
-    public static class ItemComponentImage extends Image implements ItemComponent {
+    
+    /**
+     * Creates a {@code VerticalLayout} of the graphical component and optionally a caption {@code Label}.
+     * Depending on the type of the source {@code Resource}, the graphical component is either an
+     * {@code Image} or a {@code Label}.  
+     */
+    public static class ItemComponentImage extends CustomComponent implements ItemComponent {
         private static final String PRIMARY_STYLE_NAME = "synergy-image";
+        private VerticalLayout layout;
         private Resource source;
         private Resource sourceSelected;
+        private Image image = null;
+        private Label glyph = null;
+        private Label captionLabel;
+        private String glyphSize = null;
         
         public ItemComponentImage() {
             super();
             setPrimaryStyleName(PRIMARY_STYLE_NAME);
         }
         
-        public void setup(final SynergySelect ss, final String itemId)
+        public void setup(final SynergySelect synergySelect, final String itemId)
         {
-            Property<String> propertySource = ss.getContainerProperty(itemId, SynergyBuilder.PROPERTY_ITEM_COMPONENT_SOURCE);
-            String sourceUri = propertySource.getValue();
-            if (sourceUri != null) {
-                source = createResource(sourceUri);
-                setSource(source);
-            }
-            
-            Property<String> propertySourceSelected = ss.getContainerProperty(itemId, SynergyBuilder.PROPERTY_ITEM_COMPONENT_SOURCE_SELECTED);
-            String sourceSelectedUri = propertySourceSelected.getValue();
-            if (sourceSelectedUri != null) {
-                sourceSelected = createResource(sourceSelectedUri);
-            }
-            
-            Property<Resource> propertyIcon = ss.getContainerProperty(itemId, SynergyBuilder.PROPERTY_ITEM_ICON);
-            source = propertyIcon.getValue();
-            setSource(source);
-            Property<Resource> propertyIconSelected = ss.getContainerProperty(itemId, SynergyBuilder.PROPERTY_ITEM_ICON_SELECTED);
-            sourceSelected = propertyIconSelected.getValue();
-            
-            Property<String> propertyCaption = ss.getContainerProperty(itemId, SynergyBuilder.PROPERTY_ITEM_CAPTION);
-            String caption = propertyCaption.getValue();
-            if (caption == null) {
-                caption = itemId;
-            }
-            setCaption(caption);
-            Property<String> propertyWidth = ss.getContainerProperty(itemId, SynergyBuilder.PROPERTY_ITEM_IMAGE_WIDTH);
-            String width = propertyWidth.getValue();
-            if (width != null) {
-                setWidth(width);
-            }
-            Property<String> propertyHeight = ss.getContainerProperty(itemId, SynergyBuilder.PROPERTY_ITEM_IMAGE_HEIGHT);
-            String height = propertyHeight.getValue();
-            if (height != null) {
-                setHeight(height);
-            }
+            layout = new VerticalLayout();
+            setCompositionRoot(layout);
             setImmediate(true);
-            addClickListener(new MouseEvents.ClickListener() {
+//            layout.setMargin(new MarginInfo(true, false, true, false));
+
+            Property<Resource> propertyIcon = synergySelect.getContainerProperty(itemId, SynergyBuilder.PROPERTY_ITEM_ICON);
+            source = propertyIcon.getValue();
+            Property<Resource> propertyIconSelected = synergySelect.getContainerProperty(itemId, SynergyBuilder.PROPERTY_ITEM_ICON_SELECTED);
+            sourceSelected = propertyIconSelected.getValue();
+
+            if (source instanceof FontIcon) {
+                glyph = new Label("", ContentMode.HTML);
+                glyph.setSizeUndefined();
+                layout.addComponent(glyph);
+                layout.setComponentAlignment(glyph, Alignment.MIDDLE_CENTER);
+                Property<String> propertySize = synergySelect.getContainerProperty(itemId, SynergyBuilder.PROPERTY_ITEM_GLYPH_SIZE);
+                glyphSize  = propertySize.getValue();
+            } else {
+                image = new Image();
+                image.setSizeUndefined();
+                layout.addComponent(image);
+                layout.setComponentAlignment(image, Alignment.MIDDLE_CENTER);
+                
+                Property<String> propertyWidth = synergySelect.getContainerProperty(itemId, SynergyBuilder.PROPERTY_ITEM_IMAGE_WIDTH);
+                String width = propertyWidth.getValue();
+                if (width != null) {
+                    image.setWidth(width);
+                }
+                Property<String> propertyHeight = synergySelect.getContainerProperty(itemId, SynergyBuilder.PROPERTY_ITEM_IMAGE_HEIGHT);
+                String height = propertyHeight.getValue();
+                if (height != null) {
+                    image.setHeight(height);
+                }
+            }
+            
+            final LayoutClickListener clickListener = new LayoutClickListener() {
                 @Override
-                public void click(com.vaadin.event.MouseEvents.ClickEvent event)
+                public void layoutClick(LayoutClickEvent event)
                 {
-                    Object selectedItemId = ss.getValue();
+                    Object selectedItemId = synergySelect.getValue();
                     if (!itemId.equals(selectedItemId)) {
-                        ss.select(itemId);
-//                        String targetNavigationState = (String) ss.getContainerProperty(itemId, SynergyBuilder.PROPERTY_TARGET_NAVIGATION_STATE).getValue();
-//                        if (targetNavigationState != null) {
-//                            UI.getCurrent().getNavigator().navigateTo(targetNavigationState);
-//                        }
+                        synergySelect.select(itemId);
                     }
                 }
-            });
+            };
+            
+            setSource(source);
+            
+            Property<String> propertyCaption = synergySelect.getContainerProperty(itemId, SynergyBuilder.PROPERTY_ITEM_CAPTION);
+            String captionText = propertyCaption.getValue();
+            if (captionText != null) {
+                captionLabel = new Label(captionText);
+                captionLabel.setSizeUndefined();
+                layout.addComponent(captionLabel);
+                layout.setComponentAlignment(captionLabel, Alignment.MIDDLE_CENTER);
+            }
+
+            layout.addLayoutClickListener(clickListener);
             
             setId((String)itemId); // for test automation
+        }
+
+        private void setSource(Resource source)
+        {
+            if (image != null) {
+                image.setSource(source);
+            }
+            if (glyph != null) {
+                glyph.setValue(generateGlyphHtml(source));
+            }
+        }
+
+        protected String generateGlyphHtml(Resource source)
+        {
+            String html = ((FontIcon)source).getHtml();
+            // if glyphSize is set, add a font-size style to the HTML string 
+            if (glyphSize != null) {
+                html = html.replaceAll("(?=font-family)", "font-size:"+glyphSize+";");
+            }
+            return html;
         }
 
         @Override
@@ -427,7 +482,8 @@ public class SynergyView extends CustomComponent
             }
         }
     }
-
+    
+    
     public static class ItemComponentButton extends Button implements ItemComponent {
         private static final String PRIMARY_STYLE_NAME = "synergy-button";
 
@@ -446,10 +502,10 @@ public class SynergyView extends CustomComponent
             setCaption(caption);
             setImmediate(true);
 //            setSizeUndefined();
-            Property<String> propertySource = ss.getContainerProperty(itemId, SynergyBuilder.PROPERTY_ITEM_COMPONENT_SOURCE);
-            String sourceUri = propertySource.getValue();
-            if (sourceUri != null) {
-                setIcon(createResource(sourceUri));
+            Property<Resource> propertyIcon = ss.getContainerProperty(itemId, SynergyBuilder.PROPERTY_ITEM_ICON);
+            Resource iconResource = propertyIcon.getValue();
+            if (iconResource != null) {
+                setIcon(iconResource);
             }
             addClickListener(new ClickListener() {
                 @Override
@@ -458,13 +514,6 @@ public class SynergyView extends CustomComponent
                     Object selectedItemId = ss.getValue();
                     if (!itemId.equals(selectedItemId)) {
                         ss.select(itemId);
-//                        String targetNavigationState = (String) ss.getContainerProperty(itemId, SynergyBuilder.PROPERTY_TARGET_NAVIGATION_STATE).getValue();
-//                        if (targetNavigationState != null) {
-//                            Navigator navigator = getUI().getNavigator();
-//                            if (navigator != null) {
-//                                navigator.navigateTo(targetNavigationState);
-//                            }
-//                        }
                     }
                 }
             });

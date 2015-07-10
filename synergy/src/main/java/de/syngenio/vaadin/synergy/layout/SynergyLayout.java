@@ -34,8 +34,8 @@ public abstract class SynergyLayout extends CustomComponent implements Layout, L
 
     private void updateVisibilityAndLayout(AbstractOrderedLayout layout)
     {
-        if (layout.getComponentCount() > 0) {
-            int componentCount = layout.getComponentCount();
+        int componentCount = layout.getComponentCount();
+        if (componentCount > 0) {
             for (int i = 0; i < componentCount; ++i) {
                 layout.setExpandRatio(layout.getComponent(i), (isCompactArrangement() && 0 < i && i == componentCount-1) ? 1 : 0);
             }

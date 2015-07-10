@@ -1,5 +1,6 @@
 // Do not actually include valo here; the application's stylesheet does that later 
 @import "../../../VAADIN/themes/synergy/synergy-button.scss";
+@import "../../../VAADIN/themes/synergy/synergy-image.scss";
 
 @mixin synergy(
 	$primary-stylename: synergy, 
@@ -43,9 +44,17 @@
 		width: 100%;
         margin: $spacing-dim 0 0 0;
 	}
+	
+	@include synergy-image($primary-stylename: #{$primary-stylename}-image-synergy-unselected, $background-color: $unselected-color, $hover-color: $selected-color);
+	@include synergy-image($primary-stylename: #{$primary-stylename}-image-synergy-selected, $background-color: $selected-color);
+	@include synergy-image($primary-stylename: #{$primary-stylename}-image-synergy-ancestor-of-selected, $background-color: $aos-color, $hover-color: $selected-color);
+
+	.#{$primary-stylename}-image-vertical {
+        margin: $spacing-dim 0 0 0;
+	}
 
     @if $triangle-color != 'none' {
-		.v-slot-vertical.v-slot-synergy-selected:after {
+		.#{$primary-stylename}-vertical .v-slot-synergy-selected:after {
 			// triangle
 			content: "";
 			position:relative;
@@ -59,19 +68,20 @@
 
 	.#{$primary-stylename}-button-horizontal {
 		text-align: center;
-		width: 100%;
         margin: 0 $spacing-dim;
 	}
 
     @if $triangle-color != 'none' {
-		.h-slot-horizontal.h-slot-synergy-selected:after {
+		.#{$primary-stylename}-horizontal .v-slot-synergy-selected:after {
 			// triangle
 			content: "";
-			position:relative;
+			position:absolute;
 			border-left: $triangle-dim solid transparent;
 			border-bottom: $triangle-dim solid $triangle-color;
 			border-right: $triangle-dim solid transparent;
-			margin-top: -$triangle-dim;
+			margin-top: $unit-size - $triangle-dim;
+			margin-left: -$triangle-dim;
+			left: 50%;
 	    }
 	}
 	
@@ -79,12 +89,29 @@
 		background-color: transparent;
 	}
 	
-	.v-verticallayout-#{$primary-stylename} {
+	.#{$primary-stylename} .v-verticallayout {
 		.v-slot-wrapper.v-slot-synergy-selected {
 			background-color: $selected-color;
+			padding-bottom: $spacing-dim;
 		}
 		.v-slot-wrapper.v-slot-synergy-ancestor-of-selected {
 			background-color: $aos-color;
+			padding-bottom: $spacing-dim;
 		}
 	}
+	
+	.#{$primary-stylename}-horizontal {
+		.v-horizontallayout {
+			margin: $spacing-dim $spacing-dim 0 $spacing-dim;
+		}
+			
+		.synergy-selected {
+			background-color: $selected-color;
+		}
+		
+		.synergy-ancestor-of-selected {
+			background-color: $aos-color;
+		}
+	}
+	
 }

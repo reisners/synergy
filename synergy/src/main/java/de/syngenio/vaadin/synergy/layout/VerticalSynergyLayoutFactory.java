@@ -11,6 +11,7 @@ import de.syngenio.vaadin.synergy.SynergyView;
 
 public class VerticalSynergyLayoutFactory extends AbstractSynergyLayoutFactory
 {
+    private static final String VERTICAL = "vertical";
     private Alignment itemAlignment;
     private String indentWidth = "20px";
     
@@ -45,7 +46,6 @@ public class VerticalSynergyLayoutFactory extends AbstractSynergyLayoutFactory
             protected AbstractOrderedLayout createLayout()
             {
                 VerticalLayout vlayout = new VerticalLayout();
-                vlayout.setStyleName(generateStyleName());
                 vlayout.setSpacing(false);
                 vlayout.setMargin(false);
                 vlayout.setWidth("100%");
@@ -56,7 +56,12 @@ public class VerticalSynergyLayoutFactory extends AbstractSynergyLayoutFactory
             public void addItemComponent(Component itemComponent)
             {
                 itemComponent.setWidth("100%");
-                itemComponent.addStyleName("vertical");
+                if (isCompactArrangement()) {
+                    itemComponent.setHeightUndefined();
+                } else {
+                    itemComponent.setHeight("100%");
+                }
+                itemComponent.addStyleName(getOrientationStyleName());
                 addComponent(itemComponent);
                 setComponentAlignment(itemComponent, itemAlignment);
             }
@@ -92,6 +97,12 @@ public class VerticalSynergyLayoutFactory extends AbstractSynergyLayoutFactory
     public SynergyLayoutFactory getSubitemLayoutFactory()
     {
         return this;
+    }
+
+    @Override
+    public String getOrientationStyleName()
+    {
+        return VERTICAL;
     }
 
 }

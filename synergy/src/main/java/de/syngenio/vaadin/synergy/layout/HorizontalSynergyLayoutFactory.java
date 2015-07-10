@@ -9,6 +9,8 @@ import de.syngenio.vaadin.synergy.SynergyView;
 
 public class HorizontalSynergyLayoutFactory extends AbstractSynergyLayoutFactory
 {
+    private static final String HORIZONTAL = "horizontal";
+
     @Override
     public SynergyLayout generateLayout()
     {
@@ -19,9 +21,8 @@ public class HorizontalSynergyLayoutFactory extends AbstractSynergyLayoutFactory
             protected AbstractOrderedLayout createLayout()
             {
                 HorizontalLayout hlayout = new HorizontalLayout();
-                hlayout.setStyleName(generateStyleName());
-                hlayout.setSpacing(true);
-                hlayout.setMargin(true);
+//                hlayout.setSpacing(true);
+//                hlayout.setMargin(true);
                 hlayout.setWidth("100%");
                 hlayout.setVisible(false);
                 return hlayout;
@@ -30,7 +31,12 @@ public class HorizontalSynergyLayoutFactory extends AbstractSynergyLayoutFactory
             @Override
             public void addItemComponent(Component itemComponent)
             {
-//                itemComponent.setSizeUndefined();
+                if (isCompactArrangement()) {
+                    itemComponent.setWidthUndefined();
+                } else {
+                    itemComponent.setWidth("100%");
+                }
+                itemComponent.addStyleName(getOrientationStyleName());
                 addComponent(itemComponent);
                 setComponentAlignment(itemComponent, isCompactArrangement() ? Alignment.MIDDLE_LEFT : Alignment.MIDDLE_CENTER);
             }
@@ -43,5 +49,11 @@ public class HorizontalSynergyLayoutFactory extends AbstractSynergyLayoutFactory
         };
         layout.setCompactArrangement(isCompactArrangement());
         return layout;
+    }
+
+    @Override
+    public String getOrientationStyleName()
+    {
+        return HORIZONTAL;
     }
 }

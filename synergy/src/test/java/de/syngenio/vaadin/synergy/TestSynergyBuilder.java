@@ -39,13 +39,13 @@ public class TestSynergyBuilder
         
         navigationHierarchy = new SynergyBuilder() {{
             addItem(
-                    button("|Tools").asGroup().withChildren( 
-                            button("|Tools|Specification").asGroup().withChildren(
-                                    button("|Tools|Specification|MappingCases")),
-                                    button("|Tools|Collaboration").asGroup().withChildren(
-                                            button("|Tools|Collaboration|Chat"))));
-            addItem(button("|Administration").asGroup().withChildren(
-                    button("|Administration|Benutzer").asGroup()));
+                    group("|Tools").withChildren( 
+                            group("|Tools|Specification").withChildren(
+                                    item("|Tools|Specification|MappingCases")),
+                                    group("|Tools|Collaboration").withChildren(
+                                            item("|Tools|Collaboration|Chat"))));
+            addItem(group("|Administration").withChildren(
+                    group("|Administration|Benutzer")));
         }}.build();
         
     }

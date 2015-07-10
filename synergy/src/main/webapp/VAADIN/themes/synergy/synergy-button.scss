@@ -8,7 +8,7 @@
  */
 @mixin synergy-button ($primary-stylename: synergy-button, $background-color: $v-background-color, $hover-color: $background-color) {
   .#{$primary-stylename} {
-    @include synergy-button-style($background-color: $background-color, $hover-color: $hover-color);
+    @include synergy-button-style($background-color: $background-color, $hover-color: $hover-color, $gradient: null, $bevel: null, $shadow: null);
   }
 }
 
@@ -28,7 +28,6 @@
  * @param {list} $gradient ($v-gradient) - Valo specific gradient value. See the documentation for $v-gradient.
  * @param {list} $bevel ($v-bevel) - Box-shadow value according to $v-bevel documentation
  * @param {list} $shadow ($v-shadow) - Box-shadow value according to $v-shadow documentation
- * @param {list} $states (normal hover focus active disabled) - The button states for which to output corresponding styles
  *
  * @group button
  */
@@ -50,6 +49,16 @@
   $bevel            : $v-bevel,
   $shadow           : $v-shadow
 ) {
+
+&:after {
+      content: "";
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      border-radius: inherit;
+}
 
 position: relative;
 text-align: center;
@@ -101,8 +110,6 @@ outline: none;
 /**
  * Outputs the hover state styles for a button. The styles are by default targeted
  * for a pseudo element which is shown on top of the normal state button.
- *
- * @group button
  *
  * @param {color} $background-color ($v-background-color) - The background color of the normal state button
  */

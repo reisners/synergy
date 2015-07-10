@@ -46,17 +46,8 @@ public class SynergyBuilder
      */
     public static final URI PROPERTY_ITEM_CAPTION = URI.create(URI_PREFIX+"/itemCaption");
     /**
-     * Resource URI of image or button icon, respectively (optional)
-     * @see {@code SynergyBuilder#PROPERTY_ITEM_COMPONENT_SOURCE_SELECTED}
-     */
-    public static final URI PROPERTY_ITEM_COMPONENT_SOURCE = URI.create(URI_PREFIX+"/itemComponentSource");
-    /**
-     * Resource URI of selected image or button icon, respectively.
-     * Optional; if provided, replaces {@code SynergyBuilder#PROPERTY_ITEM_COMPONENT_SOURCE} in selected states
-     */
-    public static final URI PROPERTY_ITEM_COMPONENT_SOURCE_SELECTED = URI.create(URI_PREFIX+"/itemComponentSourceSelected");
-    /**
-     * Resource URI of image or button icon, respectively (optional)
+     * Resource for image or button icon (optional).
+     * May be either a {@code FontIcon} (glyph), a {@code ThemeResource}, or a {@code ExternalResource}
      * @see {@code SynergyBuilder#PROPERTY_ITEM_COMPONENT_ICON_SELECTED}
      */
     public static final URI PROPERTY_ITEM_ICON = URI.create(URI_PREFIX+"/itemIcon");
@@ -74,6 +65,10 @@ public class SynergyBuilder
      */
     public static final URI PROPERTY_ITEM_IMAGE_HEIGHT = URI.create(URI_PREFIX+"/itemImageHeight");
     /**
+     * font-size for FontIcon resource (optional; only relevant for {@code ItemComponentImage})
+     */
+    public static final URI PROPERTY_ITEM_GLYPH_SIZE = URI.create(URI_PREFIX+"/itemGlyphSize");
+    /**
      * Can be used to inform a filter how to deal with items not having children (optional)  
      */
     public static final URI PROPERTY_ITEM_HIDDEN_IF_EMPTY = URI.create(URI_PREFIX+"/itemHiddenIfEmpty");
@@ -87,12 +82,11 @@ public class SynergyBuilder
         hierarchicalContainer.addContainerProperty(PROPERTY_TARGET_NAVIGATION_STATE, String.class, null);
         hierarchicalContainer.addContainerProperty(PROPERTY_ITEM_COMPONENT_CLASS, Class.class, ItemComponentButton.class);
         hierarchicalContainer.addContainerProperty(PROPERTY_ITEM_CAPTION, String.class, null);
-        hierarchicalContainer.addContainerProperty(PROPERTY_ITEM_COMPONENT_SOURCE, String.class, null);
-        hierarchicalContainer.addContainerProperty(PROPERTY_ITEM_COMPONENT_SOURCE_SELECTED, String.class, null);
         hierarchicalContainer.addContainerProperty(PROPERTY_ITEM_ICON, Resource.class, null);
         hierarchicalContainer.addContainerProperty(PROPERTY_ITEM_ICON_SELECTED, Resource.class, null);
         hierarchicalContainer.addContainerProperty(PROPERTY_ITEM_IMAGE_WIDTH, String.class, null);
         hierarchicalContainer.addContainerProperty(PROPERTY_ITEM_IMAGE_HEIGHT, String.class, null);
+        hierarchicalContainer.addContainerProperty(PROPERTY_ITEM_GLYPH_SIZE, String.class, null);
         hierarchicalContainer.addContainerProperty(PROPERTY_ITEM_HIDDEN_IF_EMPTY, Boolean.class, Boolean.FALSE);
         hierarchicalContainer.addContainerProperty(PROPERTY_ITEM_SUBVIEW_STYLE, String.class, null);
         return hierarchicalContainer;
@@ -185,14 +179,13 @@ public class SynergyBuilder
         protected String caption = null;
         protected String targetNavigationState = null;
         protected boolean hiddenIfEmpty = false;
-        protected String imageSource = null;
-        protected String imageSourceSelected = null;
         protected SynergyBuilder childrenBuilder = null;
         protected String imageWidth = null;
         protected String imageHeight = null;
         private Resource icon = null;
         private Resource iconSelected = null;
         private Mode mode = null;
+        private String glyphSize = null;
 
         /**
          * Create a builder for an item with given id.
@@ -228,14 +221,13 @@ public class SynergyBuilder
             inferComponentClass();
             item.getItemProperty(PROPERTY_ITEM_COMPONENT_CLASS).setValue(componentClass);
             item.getItemProperty(PROPERTY_ITEM_CAPTION).setValue(caption);
-            item.getItemProperty(PROPERTY_ITEM_COMPONENT_SOURCE).setValue(imageSource);
-            item.getItemProperty(PROPERTY_ITEM_COMPONENT_SOURCE_SELECTED).setValue(imageSourceSelected);
             item.getItemProperty(PROPERTY_ITEM_ICON).setValue(icon);
             item.getItemProperty(PROPERTY_ITEM_ICON_SELECTED).setValue(iconSelected);
             item.getItemProperty(PROPERTY_TARGET_NAVIGATION_STATE).setValue(targetNavigationState);
             item.getItemProperty(PROPERTY_ITEM_HIDDEN_IF_EMPTY).setValue(hiddenIfEmpty);
             item.getItemProperty(PROPERTY_ITEM_IMAGE_WIDTH).setValue(imageWidth);
             item.getItemProperty(PROPERTY_ITEM_IMAGE_HEIGHT).setValue(imageHeight);
+            item.getItemProperty(PROPERTY_ITEM_GLYPH_SIZE).setValue(glyphSize);
             return item;
         }
         
@@ -305,26 +297,6 @@ public class SynergyBuilder
         }
         
         /**
-         * Set the ItemBuilder's image source
-         * @param imageSource
-         * @return the ItemBuilder
-         */
-        public ItemBuilder withImageSource(String imageSource) {
-            this.imageSource = imageSource;
-            return this;
-        }
-        
-        /**
-         * Set the ItemBuilder's image source when in selected state
-         * @param imageSource
-         * @return the ItemBuilder
-         */
-        public ItemBuilder withImageSourceSelected(String imageSourceSelected) {
-            this.imageSourceSelected = imageSourceSelected;
-            return this;
-        }
-        
-        /**
          * Set the ItemBuilder's icon resource
          * @param icon
          * @return the ItemBuilder
@@ -361,6 +333,16 @@ public class SynergyBuilder
          */
         public ItemBuilder withImageHeight(String imageHeight) {
             this.imageHeight = imageHeight;
+            return this;
+        }
+
+        /**
+         * Set the ItemBuilder's glyph size
+         * @param glyphSize
+         * @return the ItemBuilder
+         */
+        public ItemBuilder withGlyphSize(String glyphSize) {
+            this.glyphSize = glyphSize;
             return this;
         }
         
@@ -400,48 +382,10 @@ public class SynergyBuilder
         }
     }
     
-    public static class ButtonItemBuilder extends ItemBuilder {
-        public ButtonItemBuilder(String id) {
-            super(id, SynergyView.ItemComponentButton.class);
-        }
-        
-        public Item build(HierarchicalContainer hc, String parentItemId) {
-            return super.build(hc, parentItemId);
-        }
-    }
-    
-    public static class ImageItemBuilder extends ItemBuilder {
-        public ImageItemBuilder(String id) {
-            super(id, SynergyView.ItemComponentImage.class);
-        }
-        
-        public ItemBuilder withImageSource(String imageSource, String width, String height)
-        {
-            super.withImageSource(imageSource);
-            super.withImageWidth(width);
-            super.withImageHeight(height);
-            return this;
-        }
-
-        public Item build(HierarchicalContainer hc, String parentItemId) {
-            return super.build(hc, parentItemId);
-        }
-    }
-
     public SynergyBuilder addItem(ItemBuilder itemBuilder)
     {
         itemBuilders.add(itemBuilder);
         return this;
-    }
-
-    public ItemBuilder button(String id)
-    {
-        return new ButtonItemBuilder(id);
-    }
-
-    public ItemBuilder image(String id)
-    {
-        return new ImageItemBuilder(id);
     }
 
     /**

@@ -44,8 +44,8 @@ public class WorldOfVerticalImageNavigationUI extends UI
         HorizontalLayout hlayout = new HorizontalLayout();
         hlayout.setSizeFull();
         SynergyView synergyView = new SynergyView(new VerticalSynergyLayoutFactory(Alignment.MIDDLE_CENTER), WorldHelper.getImageNavigation());
-        synergyView.setSizeUndefined();
-//        synergyView.setWidth("30%");
+//        synergyView.setSizeUndefined();
+        synergyView.setWidth("200px");
         hlayout.addComponent(synergyView);
         hlayout.setExpandRatio(synergyView, 0f);
         

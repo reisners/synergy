@@ -1,0 +1,77 @@
+/**
+ * Outputs the selectors and properties for synergy view items rendered as images.
+ *
+ * @param {string} $primary-stylename (v-button) - the primary style name for the selectors
+ * @param {bool} $include-additional-styles - should the mixin output all the different style variations of the component
+ *
+ * @group button
+ */
+@mixin synergy-image ($primary-stylename: synergy-image, $background-color: $v-background-color, $hover-color: $background-color) {
+  .#{$primary-stylename} {
+    @include synergy-image-style($background-color: $background-color, $hover-color: $hover-color);
+  }
+}
+
+/**
+ * Outputs the styles for a image variant.
+ *
+ * @param {size} $unit-size ($v-unit-size) - The sizing of the button, which corresponds its height
+ * @param {size | list} $padding (null) - The padding of the button. Computed from other parameters by default.
+ * @param {color} $font-color (null) - The font color of the button. Computed from the $background-color by default.
+ * @param {number} $font-weight ($v-font-weight + 100) - The font weight of the button
+ * @param {size} $font-size (null) - The font size of the button. Inherited from the parent by default.
+ * @param {string} $cursor (null) - The mouse cursor of the button
+ * @param {color} $background-color ($v-background-color) - The background color of the button
+ * @param {color} $hover-color ($background-color) - The color of the button when hovering
+ * @param {list} $border ($v-border) - The border of the button
+ * @param {size} $border-radius ($v-border-radius) - The border-radius of the button
+ * @param {list} $gradient ($v-gradient) - Valo specific gradient value. See the documentation for $v-gradient.
+ * @param {list} $bevel ($v-bevel) - Box-shadow value according to $v-bevel documentation
+ * @param {list} $shadow ($v-shadow) - Box-shadow value according to $v-shadow documentation
+ * @param {list} $states (normal hover focus active disabled) - The button states for which to output corresponding styles
+ *
+ * @group button
+ */
+@mixin synergy-image-style (
+  $unit-size        : $v-unit-size,
+  $padding          : null,
+
+  $font-color       : null,
+  $font-weight      : $v-font-weight + 100,
+  $font-size        : null, // Inherited by default
+  $cursor           : null,
+
+  $background-color : $v-background-color,
+  $hover-color      : $background-color
+) {
+
+	background-color: $background-color;
+    cursor: $cursor;
+
+	$_font-color: $font-color or valo-font-color($background-color, 0.9);
+
+	.v-label {
+		color: $_font-color;
+	    font-weight: $font-weight;
+	    font-size: $font-size;
+	}
+
+  &:hover:after {
+    @include synergy-image-hover-style($hover-color);
+  }
+}
+
+
+/**
+ * Outputs the hover state styles for an image. The styles are by default targeted
+ * for a pseudo element which is shown on top of the normal state image.
+ *
+ * @param {color} $background-color ($v-background-color) - The background color of the normal state image
+ */
+@mixin synergy-image-hover-style ($background-color: $v-background-color) {
+  $bg: darken($background-color, 25%);
+  @if is-dark-color($background-color) {
+    $bg: lighten($background-color, 15%);
+  }
+  background-color: rgba($bg, .1);
+}
