@@ -2,7 +2,7 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>de.syngenio.vaadin</groupId>
-	<artifactId>worlds</artifactId>
+	<artifactId>worldsofsynergy</artifactId>
 	<packaging>war</packaging>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>WorldsOfSynergy</name>
@@ -169,40 +169,6 @@
 				</executions>
 			</plugin>
 			<plugin>
-				<groupId>org.apache.tomcat.maven</groupId>
-				<artifactId>tomcat7-maven-plugin</artifactId>
-				<version>2.2</version>
-				<configuration>
-					<path>/</path>
-					<contextFile>${basedir}/src/test/resources/tomcat/context.xml</contextFile>
-					<useTestClasspath>true</useTestClasspath>
-				</configuration>
-				<executions>
-					<!-- At pre-integration-test phase, run the war in an embedded Tomcat 
-						server. -->
-					<execution>
-						<id>start-tomcat</id>
-						<goals>
-							<goal>shutdown</goal>
-							<goal>run-war-only</goal>
-						</goals>
-						<phase>pre-integration-test</phase>
-						<configuration>
-							<port>${tomcat.port}</port>
-							<fork>true</fork>
-						</configuration>
-					</execution>
-					<!-- At post-integration-test phase, stop the embedded Tomcat server. -->
-					<execution>
-						<id>stop-tomcat</id>
-						<goals>
-							<goal>shutdown</goal>
-						</goals>
-						<phase>post-integration-test</phase>
-					</execution>
-				</executions>
-			</plugin>
-		<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-antrun-plugin</artifactId>
 				<version>1.1</version>
@@ -216,16 +182,12 @@
 							<tasks>
 								<echo>Displaying values of properties/parameters</echo>
 								<echo>[maven.test.skip] ${maven.test.skip}</echo>
-								<echo>[SkipTests] ${SkipTests}</echo>
-								<echo>[skipTests] ${skipTests}</echo>
-								<echo>[SkipITs] ${SkipITs}</echo>
-								<echo>[skipITs] ${skipITs}</echo>
 							</tasks>
 						</configuration>
 					</execution>
 				</executions>
 			</plugin>
-					</plugins>
+		</plugins>
 		<pluginManagement>
 			<plugins>
 				<!--This plugin's configuration is used to store Eclipse m2e settings 
@@ -269,6 +231,57 @@
 			</resource>
 		</resources>
 	</build>
+
+	<profiles>
+		<profile>
+			<id>tomcat.profile</id>
+			<activation>
+				<!-- activate this profile only if tests are not skipped -->
+				<property>
+					<name>maven.test.skip</name>
+					<value>false</value>
+				</property>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.tomcat.maven</groupId>
+						<artifactId>tomcat7-maven-plugin</artifactId>
+						<version>2.2</version>
+						<configuration>
+							<path>/</path>
+							<contextFile>${basedir}/src/test/resources/tomcat/context.xml</contextFile>
+							<useTestClasspath>true</useTestClasspath>
+						</configuration>
+						<executions>
+							<!-- At pre-integration-test phase, run the war in an embedded Tomcat 
+								server. -->
+							<execution>
+								<id>start-tomcat</id>
+								<goals>
+									<goal>shutdown</goal>
+									<goal>run-war-only</goal>
+								</goals>
+								<phase>pre-integration-test</phase>
+								<configuration>
+									<port>${tomcat.port}</port>
+									<fork>true</fork>
+								</configuration>
+							</execution>
+							<!-- At post-integration-test phase, stop the embedded Tomcat server. -->
+							<execution>
+								<id>stop-tomcat</id>
+								<goals>
+									<goal>shutdown</goal>
+								</goals>
+								<phase>post-integration-test</phase>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 
 	<repositories>
 		<repository>
