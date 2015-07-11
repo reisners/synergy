@@ -5,7 +5,7 @@ import de.syngenio.vaadin.synergy.SynergyView;
 public abstract class AbstractSynergyLayoutFactory implements SynergyLayoutFactory
 {
     private SynergyLayoutFactory subitemLayoutFactory = this;
-    protected boolean compactArrangement = true;
+    protected boolean compactArrangement = false;
 
     public boolean isCompactArrangement()
     {

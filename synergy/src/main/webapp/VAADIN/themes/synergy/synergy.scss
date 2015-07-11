@@ -31,8 +31,12 @@
 	
 	@if $spacing == 'auto' {
 		$spacing-dim: round($unit-size/3);
+		$half-spacing-dim: round($unit-size/6);
+		$quarter-spacing-dim: round($unit-size/12);
 	} @else {
 		$spacing-dim: $spacing;
+		$half-spacing-dim: round($spacing/2);
+		$quarter-spacing-dim: round($spacing/4);
 	}
 	
 	@include synergy-button($primary-stylename: #{$primary-stylename}-button-synergy-unselected, $background-color: $unselected-color, $hover-color: $selected-color);
@@ -68,20 +72,20 @@
 
 	.#{$primary-stylename}-button-horizontal {
 		text-align: center;
-        margin: 0 $spacing-dim;
 	}
 
     @if $triangle-color != 'none' {
-		.#{$primary-stylename}-horizontal .v-slot-synergy-selected:after {
+		.#{$primary-stylename}-horizontal .v-slot-synergy-selected > .horizontal:after {
 			// triangle
 			content: "";
 			position:absolute;
 			border-left: $triangle-dim solid transparent;
 			border-bottom: $triangle-dim solid $triangle-color;
 			border-right: $triangle-dim solid transparent;
-			margin-top: $unit-size - $triangle-dim;
+			margin-top: $unit-size - $quarter-spacing-dim - $triangle-dim;
 			margin-left: -$triangle-dim;
 			left: 50%;
+			width: 0;
 	    }
 	}
 	
@@ -101,17 +105,24 @@
 	}
 	
 	.#{$primary-stylename}-horizontal {
-		.v-horizontallayout {
-			margin: $spacing-dim $spacing-dim 0 $spacing-dim;
-		}
-			
-		.synergy-selected {
-			background-color: $selected-color;
-		}
+		border-bottom: valo-border($v-border);
 		
-		.synergy-ancestor-of-selected {
-			background-color: $aos-color;
+		.v-horizontallayout {
+			.v-slot-horizontal > .horizontal {
+				border-left: transparent solid $half-spacing-dim;
+  				border-right: transparent solid $half-spacing-dim;
+  				background-clip: padding-box;
+			}
 		}
+
+		// .synergy-selected {
+			// background-color: $selected-color;
+		// }
+
+		// .synergy-ancestor-of-selected {
+			// background-color: $aos-color;
+		// }
 	}
-	
+
+	.#{$primany-stylename} .v-slot:focus {}	
 }

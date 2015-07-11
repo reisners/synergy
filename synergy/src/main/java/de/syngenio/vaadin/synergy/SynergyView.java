@@ -68,7 +68,7 @@ public class SynergyView extends CustomComponent
     }
 
     @SuppressWarnings("unused")
-    private SynergyView parentView;
+    private SynergyView parentView = null;
     private SynergyView subView = null;
     private Map<String, ItemComponent> itemComponents = null;
     private SynergyLayoutFactory layoutFactory;
@@ -148,18 +148,21 @@ public class SynergyView extends CustomComponent
     private void visualizeItems()
     {
         clear();
+        boolean isEmpty = true;
         for (String itemId : getImmediateChildItemIds()) {
+            isEmpty = false;
             visualizeItem(itemId);
         }
+        setVisible(!isEmpty);
     }
 
     /**
-     * Discards all item components
+     * Discards all item components and create a fresh {@code SynergyLayout}
      */
     private void clear()
     {
         itemComponents = new HashMap<String, ItemComponent>();
-//        layout.removeAllComponents();
+        // create a fresh SynergyLayout (emptying and reusing the existing layout caused issues)
         layout = layoutFactory.generateLayout();
         setCompositionRoot(layout);
     }
@@ -615,6 +618,8 @@ public class SynergyView extends CustomComponent
                 }
             }
         });
+        
+        visualizeItems();
     }
 
     /**

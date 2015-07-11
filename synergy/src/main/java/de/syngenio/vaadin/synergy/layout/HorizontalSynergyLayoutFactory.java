@@ -21,10 +21,10 @@ public class HorizontalSynergyLayoutFactory extends AbstractSynergyLayoutFactory
             protected AbstractOrderedLayout createLayout()
             {
                 HorizontalLayout hlayout = new HorizontalLayout();
-//                hlayout.setSpacing(true);
-//                hlayout.setMargin(true);
+                hlayout.setSpacing(false);
+                hlayout.setMargin(false);
                 hlayout.setWidth("100%");
-                hlayout.setVisible(false);
+//                hlayout.setVisible(false);
                 return hlayout;
             }
 
