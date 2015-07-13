@@ -58,7 +58,7 @@
 	}
 
     @if $triangle-color != 'none' {
-		.#{$primary-stylename}-vertical .v-slot-synergy-selected:after {
+		.#{$primary-stylename}-vertical .v-verticallayout > .v-slot-synergy-selected:not(.v-slot-wrapper):after {
 			// triangle
 			content: "";
 			position:relative;
@@ -66,7 +66,9 @@
 			border-bottom: $triangle-dim solid transparent;
 			border-right: $triangle-dim solid $triangle-color;
 			margin-left: -$triangle-dim;
-			vertical-align: text-bottom;
+			margin-bottom: -$triangle-dim - $half-spacing-dim;
+			vertical-align: middle;
+			height: 0;
 	    }
 	}
 
@@ -82,9 +84,10 @@
 			border-left: $triangle-dim solid transparent;
 			border-bottom: $triangle-dim solid $triangle-color;
 			border-right: $triangle-dim solid transparent;
-			margin-top: $unit-size - $quarter-spacing-dim - $triangle-dim;
+			margin-top: -$triangle-dim;
 			margin-left: -$triangle-dim;
 			left: 50%;
+			top: 100%;
 			width: 0;
 	    }
 	}
@@ -108,10 +111,32 @@
 		border-bottom: valo-border($v-border);
 		
 		.v-horizontallayout {
-			.v-slot-horizontal > .horizontal {
-				border-left: transparent solid $half-spacing-dim;
-  				border-right: transparent solid $half-spacing-dim;
-  				background-clip: padding-box;
+			.v-expand {
+				display: table;
+				.v-slot-horizontal {
+	  				display: table-cell;
+					
+					& > .horizontal {
+						border-left: transparent solid $half-spacing-dim;
+		  				border-right: transparent solid $half-spacing-dim;
+		  				background-clip: padding-box;
+					}
+					
+					& > .synergy-image {
+						height: 100%;
+						
+						.v-verticallayout {
+							vertical-align: bottom;
+														
+						    @if $triangle-color != 'none' {
+						    	// add space below the label to accommodate the triangle
+								.v-label {
+									margin-bottom: $triangle-dim;
+								}
+							}
+						}
+					}
+				}
 			}
 		}
 

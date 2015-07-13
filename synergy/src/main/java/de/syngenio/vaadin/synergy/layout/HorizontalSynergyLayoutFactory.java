@@ -36,9 +36,10 @@ public class HorizontalSynergyLayoutFactory extends AbstractSynergyLayoutFactory
                 } else {
                     itemComponent.setWidth("100%");
                 }
+                itemComponent.setHeight("100%");
                 itemComponent.addStyleName(getOrientationStyleName());
                 addComponent(itemComponent);
-                setComponentAlignment(itemComponent, isCompactArrangement() ? Alignment.MIDDLE_LEFT : Alignment.MIDDLE_CENTER);
+                setComponentAlignment(itemComponent, Alignment.BOTTOM_CENTER);
             }
 
             @Override

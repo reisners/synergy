@@ -384,9 +384,13 @@ public class SynergyView extends CustomComponent
         public void setup(final SynergySelect synergySelect, final String itemId)
         {
             layout = new VerticalLayout();
-            setCompositionRoot(layout);
-            setImmediate(true);
-//            layout.setMargin(new MarginInfo(true, false, true, false));
+            layout.setSizeFull();
+            //FIXME the following is an ugly hack.
+            // The root cause is the behaviour of HorizontalLayout with undefined height (in a horizontal SynergyView) 
+            // to set the heights of its children to undefined. We set the height of the synergy-image to 100% via CSS,
+            // but it does not seem possible to vertical-align:bottom the wrapped VerticalLayout this way.
+            // By adding the CSS class v-align-bottom however, it works
+            layout.addStyleName("v-align-bottom"); 
 
             Property<Resource> propertyIcon = synergySelect.getContainerProperty(itemId, SynergyBuilder.PROPERTY_ITEM_ICON);
             source = propertyIcon.getValue();
@@ -397,14 +401,16 @@ public class SynergyView extends CustomComponent
                 glyph = new Label("", ContentMode.HTML);
                 glyph.setSizeUndefined();
                 layout.addComponent(glyph);
-                layout.setComponentAlignment(glyph, Alignment.MIDDLE_CENTER);
+                layout.setComponentAlignment(glyph, Alignment.BOTTOM_CENTER);
+                layout.setExpandRatio(glyph, 1);
                 Property<String> propertySize = synergySelect.getContainerProperty(itemId, SynergyBuilder.PROPERTY_ITEM_GLYPH_SIZE);
                 glyphSize  = propertySize.getValue();
             } else {
                 image = new Image();
                 image.setSizeUndefined();
                 layout.addComponent(image);
-                layout.setComponentAlignment(image, Alignment.MIDDLE_CENTER);
+                layout.setComponentAlignment(image, Alignment.BOTTOM_CENTER);
+                layout.setExpandRatio(image, 1);
                 
                 Property<String> propertyWidth = synergySelect.getContainerProperty(itemId, SynergyBuilder.PROPERTY_ITEM_IMAGE_WIDTH);
                 String width = propertyWidth.getValue();
@@ -437,11 +443,15 @@ public class SynergyView extends CustomComponent
                 captionLabel = new Label(captionText);
                 captionLabel.setSizeUndefined();
                 layout.addComponent(captionLabel);
-                layout.setComponentAlignment(captionLabel, Alignment.MIDDLE_CENTER);
+                layout.setComponentAlignment(captionLabel, Alignment.TOP_CENTER);
+                layout.setExpandRatio(captionLabel, 0);
             }
 
             layout.addLayoutClickListener(clickListener);
-            
+
+            setCompositionRoot(layout);
+            setImmediate(true);
+
             setId((String)itemId); // for test automation
         }
 
