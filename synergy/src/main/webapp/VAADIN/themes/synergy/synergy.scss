@@ -61,13 +61,13 @@
 		.#{$primary-stylename}-vertical .v-verticallayout > .v-slot-synergy-selected:not(.v-slot-wrapper):after {
 			// triangle
 			content: "";
-			position:relative;
+			position:absolute;
 			border-top: $triangle-dim solid transparent;
 			border-bottom: $triangle-dim solid transparent;
 			border-right: $triangle-dim solid $triangle-color;
 			margin-left: -$triangle-dim;
 			margin-bottom: -$triangle-dim - $half-spacing-dim;
-			vertical-align: middle;
+			top: 50%;
 			height: 0;
 	    }
 	}
@@ -107,14 +107,16 @@
 		}
 	}
 	
+	.#{$primary-stylename}-vertical .v-slot-vertical {
+		position: relative;
+	}
+	
 	.#{$primary-stylename}-horizontal {
 		border-bottom: valo-border($v-border);
 		
 		.v-horizontallayout {
 			.v-expand {
-				display: table;
 				.v-slot-horizontal {
-	  				display: table-cell;
 					
 					& > .horizontal {
 						border-left: transparent solid $half-spacing-dim;

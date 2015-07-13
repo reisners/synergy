@@ -12,26 +12,20 @@ import de.syngenio.vaadin.synergy.SynergyView;
 public class VerticalSynergyLayoutFactory extends AbstractSynergyLayoutFactory
 {
     private static final String VERTICAL = "vertical";
-    private Alignment itemAlignment;
     private String indentWidth = "20px";
     
-    /**
-     * Default constructor
-     */
-    public VerticalSynergyLayoutFactory()
-    {
+    public VerticalSynergyLayoutFactory() {
         super();
     }
     
     /**
-     * @param itemAlignment set this to {@code Alignment.MIDDLE_LEFT} if items form a hierarchy. Otherwise, {@code Alignment.MIDDLE_CENTER} is recommended.
+     * @param packing 
      */
-    public VerticalSynergyLayoutFactory(Alignment itemAlignment)
+    public VerticalSynergyLayoutFactory(Packing packing)
     {
-        super();
-        this.itemAlignment = itemAlignment;
+        super(packing);
     }
-
+    
     public void setIndentWidth(String indentWidth)
     {
         this.indentWidth = indentWidth;
@@ -56,14 +50,13 @@ public class VerticalSynergyLayoutFactory extends AbstractSynergyLayoutFactory
             public void addItemComponent(Component itemComponent)
             {
                 itemComponent.setWidth("100%");
-                if (isCompactArrangement()) {
-                    itemComponent.setHeightUndefined();
-                } else {
+                if (getPacking() == Packing.EXPAND) {
                     itemComponent.setHeight("100%");
+                } else {
+                    itemComponent.setHeightUndefined();
                 }
                 itemComponent.addStyleName(getOrientationStyleName());
                 addComponent(itemComponent);
-                setComponentAlignment(itemComponent, itemAlignment);
             }
 
             @Override
@@ -87,9 +80,88 @@ public class VerticalSynergyLayoutFactory extends AbstractSynergyLayoutFactory
                 addComponent(wrapper, index);
                 setComponentAlignment(wrapper, Alignment.TOP_RIGHT);
             }
-        };
-        layout.setCompactArrangement(isCompactArrangement());
 
+            @Override
+            public Packing getPacking()
+            {
+                return VerticalSynergyLayoutFactory.this.getPacking();
+            }
+
+            @Override
+            protected void layoutSingularComponent(Component component)
+            {
+                component.setHeightUndefined();
+                setExpandRatio(component, 0);
+                setComponentAlignment(component, Alignment.MIDDLE_RIGHT);
+                switch (getPacking()) {
+                case EXPAND:
+                    component.setHeight("100%");
+                    break;
+                default:
+                    // do nothing
+                    break;
+                }
+            }
+
+            @Override
+            protected void layoutFirstComponent(Component component)
+            {
+                component.setHeightUndefined();
+                setExpandRatio(component, 0);
+                setComponentAlignment(component, Alignment.MIDDLE_RIGHT);
+                switch (getPacking()) {
+                case EXPAND:
+                    component.setHeight("100%");
+                    break;
+                case SPACE_BEFORE:
+                    setExpandRatio(component, 1);
+                    setComponentAlignment(component, Alignment.BOTTOM_CENTER);
+                    break;
+                default:
+                    // do nothing
+                    break;
+                }
+            }
+
+            @Override
+            protected void layoutIntermediateComponent(Component component)
+            {
+                component.setHeightUndefined();
+                setExpandRatio(component, 0);
+                setComponentAlignment(component, Alignment.MIDDLE_RIGHT);
+                switch (getPacking()) {
+                case EXPAND:
+                    component.setHeight("100%");
+                    break;
+                default:
+                    // do nothing
+                    break;
+                }
+            }
+
+            @Override
+            protected void layoutLastComponent(Component component)
+            {
+                component.setHeightUndefined();
+                setExpandRatio(component, 0);
+                setComponentAlignment(component, Alignment.MIDDLE_RIGHT);
+                switch (getPacking()) {
+                case EXPAND:
+                    component.setHeight("100%");
+                    break;
+                case SPACE_AFTER:
+                    setExpandRatio(component, 1);
+                    setComponentAlignment(component, Alignment.TOP_RIGHT);
+                    break;
+                default:
+                    // do nothing
+                    break;
+                }
+            }
+        };
+
+        layout.setSizeFull();
+        
         return layout;
     }
 
