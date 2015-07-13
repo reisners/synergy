@@ -7,15 +7,15 @@ import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.ComponentContainer;
 import com.vaadin.ui.CustomComponent;
-import com.vaadin.ui.HasComponents;
 import com.vaadin.ui.Layout;
 
 import de.syngenio.vaadin.synergy.SynergyView;
+import de.syngenio.vaadin.synergy.SynergyView.ItemComponent;
+import de.syngenio.vaadin.synergy.layout.AbstractSynergyLayoutFactory.Packing;
 
 public abstract class SynergyLayout extends CustomComponent implements Layout, Layout.AlignmentHandler
 {
     private AbstractOrderedLayout layout;
-    private boolean compactArrangement = false;
 
     protected SynergyLayout() {
         super();
@@ -23,25 +23,31 @@ public abstract class SynergyLayout extends CustomComponent implements Layout, L
         setCompositionRoot(layout);
     }
 
-    public boolean isCompactArrangement()
+    public abstract Packing getPacking();
+    
+    private void updateItemLayout()
     {
-        return compactArrangement;
-    }
-
-    public void setCompactArrangement(boolean compactArrangement)
-    {
-        this.compactArrangement = compactArrangement;
-    }
-
-    private void updateVisibilityAndLayout()
-    {
-        int componentCount = layout.getComponentCount();
+        int componentCount = getComponentCount();
         if (componentCount > 0) {
             for (int i = 0; i < componentCount; ++i) {
-                layout.setExpandRatio(layout.getComponent(i), (isCompactArrangement() && 0 < i && i == componentCount-1) ? 1 : 0);
+                final Component itemComponent = getComponent(i);
+                if (componentCount == 1) {
+                    layoutSingularComponent(itemComponent);
+                } else if (i == 0) {
+                    layoutFirstComponent(itemComponent);
+                } else if (i == componentCount - 1) {
+                    layoutLastComponent(itemComponent);
+                } else {
+                    layoutIntermediateComponent(itemComponent);
+                }
             }
         }
     }
+    
+    abstract protected void layoutSingularComponent(Component itemComponent);
+    abstract protected void layoutFirstComponent(Component itemComponent);
+    abstract protected void layoutIntermediateComponent(Component itemComponent);
+    abstract protected void layoutLastComponent(Component itemComponent);
     
     abstract protected AbstractOrderedLayout createLayout();
 
@@ -63,41 +69,41 @@ public abstract class SynergyLayout extends CustomComponent implements Layout, L
     public void addComponent(Component c)
     {
         layout.addComponent(c);
-        updateVisibilityAndLayout();
+        updateItemLayout();
     }
 
     public void addComponent(Component c, int index)
     {
         layout.addComponent(c, index);
-        updateVisibilityAndLayout();
+        updateItemLayout();
     }
 
     @Override
     public void addComponents(Component... components)
     {
         layout.addComponents(components);
-        updateVisibilityAndLayout();
+        updateItemLayout();
     }
 
     @Override
     public void removeComponent(Component c)
     {
         layout.removeComponent(c);
-        updateVisibilityAndLayout();
+        updateItemLayout();
     }
 
     @Override
     public void removeAllComponents()
     {
         layout.removeAllComponents();
-        updateVisibilityAndLayout();
+        updateItemLayout();
     }
 
     @Override
     public void replaceComponent(Component oldComponent, Component newComponent)
     {
         layout.replaceComponent(oldComponent, newComponent);
-        updateVisibilityAndLayout();
+        updateItemLayout();
     }
 
     @SuppressWarnings("deprecation")
@@ -111,7 +117,7 @@ public abstract class SynergyLayout extends CustomComponent implements Layout, L
     public void moveComponentsFrom(ComponentContainer source)
     {
         layout.moveComponentsFrom(source);
-        updateVisibilityAndLayout();
+        updateItemLayout();
     }
 
     @Deprecated
@@ -169,10 +175,28 @@ public abstract class SynergyLayout extends CustomComponent implements Layout, L
     public int getComponentIndex(Component c) {
         return layout.getComponentIndex(c);
     }
+
+    public void setExpandRatio(Component component, float ratio) {
+        layout.setExpandRatio(component, ratio);
+    }
+
+    public float getExpandRatio(Component component) {
+        return layout.getExpandRatio(component);
+    }
     
     @Override
     public void setComponentAlignment(Component childComponent, Alignment alignment) {
         layout.setComponentAlignment(childComponent, alignment);
+    }
+
+    public Component getComponent(int index) {
+        return layout.getComponent(index);
+    }
+    
+    @Override
+    public int getComponentCount()
+    {
+        return layout.getComponentCount();
     }
 
     @Override

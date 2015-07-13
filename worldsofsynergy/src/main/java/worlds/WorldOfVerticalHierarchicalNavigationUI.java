@@ -14,13 +14,10 @@ import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServlet;
-import com.vaadin.ui.Alignment;
-import com.vaadin.ui.Button;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.UI;
-import com.vaadin.ui.VerticalLayout;
 
 import de.syngenio.vaadin.synergy.SynergyView;
 import de.syngenio.vaadin.synergy.layout.VerticalSynergyLayoutFactory;
@@ -40,7 +37,7 @@ public class WorldOfVerticalHierarchicalNavigationUI extends UI
     {
         HorizontalLayout hlayout = new HorizontalLayout();
         hlayout.setSizeFull();
-        SynergyView synergyView = new SynergyView(new VerticalSynergyLayoutFactory(Alignment.MIDDLE_LEFT), WorldHelper.getNavigationHierarchy());
+        SynergyView synergyView = new SynergyView(new VerticalSynergyLayoutFactory(), WorldHelper.getNavigationHierarchy());
         synergyView.setSizeUndefined();
 //        synergyView.setWidth("30%");
         hlayout.addComponent(synergyView);

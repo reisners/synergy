@@ -37,7 +37,7 @@ public class WorldHelper
     public static HierarchicalContainer getImageNavigation()
     {
         return new SynergyBuilder() {{
-            addItem(item().withCaption("Bookmark").stacked().withIcon(FontAwesome.BOOKMARK).withGlyphSize("4em").withIconSelected(FontAwesome.BOOKMARK_O).withTargetNavigationState("view/Bookmark"));
+            addItem(item().withCaption("Bookmark").stacked().withIcon(FontAwesome.BOOKMARK).withGlyphSize("2.3em").withIconSelected(FontAwesome.BOOKMARK_O).withTargetNavigationState("view/Bookmark"));
             addItem(item().withCaption("Bullhorn").withIcon(new ThemeResource("img/bullhorn.png")).withImageWidth("64px").withImageHeight("64px").withIconSelected(new ThemeResource("img/bullhorn_selected.png")).withTargetNavigationState("view/Bullhorn"));
             addItem(item().withCaption("Bullseye").withIcon(new ThemeResource("img/bullseye.png")).withImageWidth("64px").withImageHeight("64px").withIconSelected(new ThemeResource("img/bullseye_selected.png")).withTargetNavigationState("view/Bullseye"));
             addItem(item().withCaption("Credit Card").withIcon(new ThemeResource("img/cc.png")).withImageWidth("64px").withImageHeight("64px").withIconSelected(new ThemeResource("img/cc_selected.png")).withTargetNavigationState("view/Credit Card"));
@@ -50,6 +50,17 @@ public class WorldHelper
             addItem(item().withCaption("Rocket").withIcon(new ThemeResource("img/rocket.png")).withImageWidth("64px").withImageHeight("64px").withIconSelected(new ThemeResource("img/rocket_selected.png")).withTargetNavigationState("view/Rocket"));
             addItem(item().withCaption("Shekel").withIcon(new ThemeResource("img/shekel.png")).withImageWidth("64px").withImageHeight("64px").withIconSelected(new ThemeResource("img/shekel_selected.png")).withTargetNavigationState("view/Shekel"));
             addItem(item().withCaption("Tachometer").withIcon(new ThemeResource("img/tachometer.png")).withImageWidth("64px").withImageHeight("64px").withIconSelected(new ThemeResource("img/tachometer_selected.png")).withTargetNavigationState("view/Tachometer"));
+        }}.build();
+    }
+
+    public static HierarchicalContainer getImageNavigation2()
+    {
+        return new SynergyBuilder() {{
+            addItem(item().withCaption("Bookmark").stacked().withIcon(FontAwesome.BOOKMARK).withGlyphSize("2.3em").withIconSelected(FontAwesome.BOOKMARK_O).withTargetNavigationState("view/Bookmark"));
+            addItem(item().withCaption("Bullhorn").withIcon(new ThemeResource("img/bullhorn.png")).withImageWidth("64px").withImageHeight("64px").withIconSelected(new ThemeResource("img/bullhorn_selected.png")).withTargetNavigationState("view/Bullhorn"));
+            addItem(item().withCaption("Bullseye").withIcon(new ThemeResource("img/bullseye.png")).withImageWidth("64px").withImageHeight("64px").withIconSelected(new ThemeResource("img/bullseye_selected.png")).withTargetNavigationState("view/Bullseye"));
+            addItem(item().withCaption("Credit Card").withIcon(new ThemeResource("img/cc.png")).withImageWidth("64px").withImageHeight("64px").withIconSelected(new ThemeResource("img/cc_selected.png")).withTargetNavigationState("view/Credit Card"));
+            addItem(item().withCaption("Desktop").withIcon(new ThemeResource("img/desktop.png")).withImageWidth("64px").withImageHeight("64px").withIconSelected(new ThemeResource("img/desktop_selected.png")).withTargetNavigationState("view/Desktop"));
         }}.build();
     }
 

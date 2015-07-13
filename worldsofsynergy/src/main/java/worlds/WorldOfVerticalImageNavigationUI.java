@@ -15,8 +15,6 @@ import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServlet;
-import com.vaadin.ui.Alignment;
-import com.vaadin.ui.Button;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Image;
@@ -43,7 +41,7 @@ public class WorldOfVerticalImageNavigationUI extends UI
     {
         HorizontalLayout hlayout = new HorizontalLayout();
         hlayout.setSizeFull();
-        SynergyView synergyView = new SynergyView(new VerticalSynergyLayoutFactory(Alignment.MIDDLE_CENTER), WorldHelper.getImageNavigation());
+        SynergyView synergyView = new SynergyView(new VerticalSynergyLayoutFactory(), WorldHelper.getImageNavigation2());
 //        synergyView.setSizeUndefined();
         synergyView.setWidth("200px");
         hlayout.addComponent(synergyView);

@@ -48,6 +48,10 @@
 	background-color: $background-color;
     cursor: $cursor;
 
+	// we need this to position the triangle correctly
+    position: relative;
+    display: inline-block;
+
 	$_font-color: $font-color or valo-font-color($background-color, 0.9);
 
 	.v-label {

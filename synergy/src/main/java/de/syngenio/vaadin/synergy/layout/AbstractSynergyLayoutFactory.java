@@ -4,17 +4,29 @@ import de.syngenio.vaadin.synergy.SynergyView;
 
 public abstract class AbstractSynergyLayoutFactory implements SynergyLayoutFactory
 {
+    public enum Packing { SPACE_AFTER, SPACE_BEFORE, SPACE_AROUND, EXPAND }
+    
     private SynergyLayoutFactory subitemLayoutFactory = this;
-    protected boolean compactArrangement = false;
+    private Packing packing = Packing.SPACE_AFTER;
 
-    public boolean isCompactArrangement()
+    protected AbstractSynergyLayoutFactory() {} 
+
+    /**
+     * @param packing
+     */
+    protected AbstractSynergyLayoutFactory(Packing packing)
     {
-        return compactArrangement;
+        this.packing = packing;
     }
 
-    public void setCompactArrangement(boolean compactArrangement)
+    public Packing getPacking()
     {
-        this.compactArrangement = compactArrangement;
+        return packing;
+    }
+
+    public void setPacking(Packing packing)
+    {
+        this.packing = packing;
     }
 
     public void setSubitemLayoutFactory(SynergyLayoutFactory subitemLayoutFactory)

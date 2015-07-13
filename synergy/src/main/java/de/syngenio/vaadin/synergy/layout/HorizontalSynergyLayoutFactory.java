@@ -6,16 +6,26 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.HorizontalLayout;
 
 import de.syngenio.vaadin.synergy.SynergyView;
+import de.syngenio.vaadin.synergy.SynergyView.ItemComponent;
 
 public class HorizontalSynergyLayoutFactory extends AbstractSynergyLayoutFactory
 {
     private static final String HORIZONTAL = "horizontal";
 
+    public HorizontalSynergyLayoutFactory()
+    {
+        super();
+    }
+
+    public HorizontalSynergyLayoutFactory(Packing packing)
+    {
+        super(packing);
+    }
+
     @Override
     public SynergyLayout generateLayout()
     {
         SynergyLayout layout = new SynergyLayout() {
-
 
             @Override
             protected AbstractOrderedLayout createLayout()
@@ -31,15 +41,14 @@ public class HorizontalSynergyLayoutFactory extends AbstractSynergyLayoutFactory
             @Override
             public void addItemComponent(Component itemComponent)
             {
-                if (isCompactArrangement()) {
-                    itemComponent.setWidthUndefined();
-                } else {
+                if (getPacking() == Packing.EXPAND) {
                     itemComponent.setWidth("100%");
+                } else {
+                    itemComponent.setWidthUndefined();
                 }
                 itemComponent.setHeight("100%");
                 itemComponent.addStyleName(getOrientationStyleName());
                 addComponent(itemComponent);
-                setComponentAlignment(itemComponent, Alignment.BOTTOM_CENTER);
             }
 
             @Override
@@ -47,8 +56,90 @@ public class HorizontalSynergyLayoutFactory extends AbstractSynergyLayoutFactory
             {
                 // do nothing
             }
+
+            @Override
+            public Packing getPacking()
+            {
+                return HorizontalSynergyLayoutFactory.this.getPacking();
+            }
+
+            @Override
+            protected void layoutSingularComponent(Component itemComponent)
+            {
+                itemComponent.setWidthUndefined();
+                setExpandRatio(itemComponent, 0);
+                setComponentAlignment(itemComponent, Alignment.BOTTOM_CENTER);
+                switch (getPacking()) {
+                case EXPAND:
+                    itemComponent.setWidth("100%");
+                    break;
+                default:
+                    // do nothing
+                    break;
+                }
+            }
+
+            @Override
+            protected void layoutFirstComponent(Component itemComponent)
+            {
+                itemComponent.setWidthUndefined();
+                setExpandRatio(itemComponent, 0);
+                setComponentAlignment(itemComponent, Alignment.BOTTOM_CENTER);
+                switch (getPacking()) {
+                case EXPAND:
+                    itemComponent.setWidth("100%");
+                    break;
+                case SPACE_BEFORE:
+                case SPACE_AROUND:
+                    setExpandRatio(itemComponent, 1);
+                    setComponentAlignment(itemComponent, Alignment.BOTTOM_RIGHT);
+                    break;
+                default:
+                    // do nothing
+                    break;
+                }
+            }
+
+            @Override
+            protected void layoutIntermediateComponent(Component itemComponent)
+            {
+                itemComponent.setWidthUndefined();
+                setExpandRatio(itemComponent, 0);
+                setComponentAlignment(itemComponent, Alignment.BOTTOM_CENTER);
+                switch (getPacking()) {
+                case EXPAND:
+                    itemComponent.setWidth("100%");
+                    break;
+                default:
+                    // do nothing
+                    break;
+                }
+            }
+
+            @Override
+            protected void layoutLastComponent(Component itemComponent)
+            {
+                itemComponent.setWidthUndefined();
+                setExpandRatio(itemComponent, 0);
+                setComponentAlignment(itemComponent, Alignment.BOTTOM_CENTER);
+                switch (getPacking()) {
+                case EXPAND:
+                    itemComponent.setWidth("100%");
+                    break;
+                case SPACE_AROUND:
+                case SPACE_AFTER:
+                    setExpandRatio(itemComponent, 1);
+                    setComponentAlignment(itemComponent, Alignment.BOTTOM_LEFT);
+                    break;
+                default:
+                    // do nothing
+                    break;
+                }
+            }
         };
-        layout.setCompactArrangement(isCompactArrangement());
+        
+        layout.setSizeFull();
+        
         return layout;
     }
 

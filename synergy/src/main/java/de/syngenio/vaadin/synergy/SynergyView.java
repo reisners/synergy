@@ -1,5 +1,6 @@
 package de.syngenio.vaadin.synergy;
 
+import java.io.Serializable;
 import java.lang.reflect.Constructor;
 import java.util.Collection;
 import java.util.HashMap;
@@ -26,6 +27,7 @@ import com.vaadin.server.ExternalResource;
 import com.vaadin.server.FontIcon;
 import com.vaadin.server.Resource;
 import com.vaadin.server.ThemeResource;
+import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
@@ -114,18 +116,6 @@ public class SynergyView extends CustomComponent
         }
     }
     
-    @Override
-    public void setCaption(String caption)
-    {
-        layout.setCaption(caption);
-    }
-
-    @Override
-    public void setCaptionAsHtml(boolean captionAsHtml)
-    {
-        layout.setCaptionAsHtml(captionAsHtml);
-    }
-
     private String getSubviewStyle()
     {
         if (parentId != null && !parentId.equals(INACTIVE)) {
@@ -305,7 +295,7 @@ public class SynergyView extends CustomComponent
         this.navigationHandler = navigationHandler;
     }
 
-    public class NavigationHandler {
+    public class NavigationHandler implements Serializable {
 
         protected void selected(Item item)
         {
@@ -385,6 +375,7 @@ public class SynergyView extends CustomComponent
         {
             layout = new VerticalLayout();
             layout.setSizeFull();
+            layout.setMargin(new MarginInfo(false, true, false, true) );
             //FIXME the following is an ugly hack.
             // The root cause is the behaviour of HorizontalLayout with undefined height (in a horizontal SynergyView) 
             // to set the heights of its children to undefined. We set the height of the synergy-image to 100% via CSS,
