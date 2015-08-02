@@ -15,9 +15,6 @@ import com.vaadin.data.Container;
 import com.vaadin.data.Container.Indexed;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
-import com.vaadin.data.Property.ValueChangeEvent;
-import com.vaadin.data.Property.ValueChangeListener;
-import com.vaadin.data.Property.ValueChangeNotifier;
 import com.vaadin.event.FieldEvents.BlurEvent;
 import com.vaadin.event.FieldEvents.BlurListener;
 import com.vaadin.event.FieldEvents.BlurNotifier;
@@ -28,7 +25,6 @@ import com.vaadin.event.ItemClickEvent;
 import com.vaadin.event.ItemClickEvent.ItemClickListener;
 import com.vaadin.event.LayoutEvents.LayoutClickEvent;
 import com.vaadin.event.LayoutEvents.LayoutClickListener;
-import com.vaadin.event.MouseEvents.ClickEvent;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.spring.annotation.SpringUI;
 import com.vaadin.ui.Component;
@@ -48,6 +44,7 @@ import com.vaadin.ui.VerticalLayout;
 import de.syngenio.collaboration.data.RepositoryService;
 import de.syngenio.collaboration.data.Sheet;
 import de.syngenio.collaboration.data.SheetModel;
+import de.syngenio.collaboration.data.SheetModel.UpdateProcessor;
 import de.syngenio.collaboration.data.SheetRepository;
 
 @SuppressWarnings("serial")
@@ -71,6 +68,8 @@ public class AppUI extends UI
     @Override
     protected void init(VaadinRequest request) {
 
+        repository.getEventBus().register(this); //TODO remove this after debugging
+        
         setSizeFull();
         HorizontalLayout hlayout = new HorizontalLayout();
         hlayout.setSizeFull();
@@ -109,6 +108,15 @@ public class AppUI extends UI
     private Component createTable(RepositoryService repository, String sheetName)
     {
         SheetModel model = createSheetModel(sheetName);
+        
+        // plug in an UpdateProcessor implementation that executes the container update in the UI thread 
+        model.setUpdateProcessor(new UpdateProcessor() {
+            @Override
+            public void processUpdate(Runnable r)
+            {
+                getUI().access(r);
+            }
+        });
         VerticalLayout vlayout = new VerticalLayout();
         vlayout.setSizeFull();
         Indexed container = model.getContainer();
@@ -138,14 +146,7 @@ public class AppUI extends UI
                     {
                         model.thaw();
                         field.stopEditing();
-                    }
-                });
-                field.addValueChangeListener(new ValueChangeListener() {
-                    @Override
-                    public void valueChange(ValueChangeEvent event)
-                    {
-                        model.thaw();
-                        field.stopEditing();
+//                        field.getUI().access(() -> field.getUI().push());
                     }
                 });
                 field.setImmediate(true);
@@ -169,21 +170,32 @@ public class AppUI extends UI
             
             private void editMode() {
                 TextField field = new TextField(getPropertyDataSource());
+                field.setSizeFull();
+                field.addBlurListener(new BlurListener() {
+                    @Override
+                    public void blur(BlurEvent event)
+                    {
+                        for (BlurListener listener : blurListeners) {
+                            listener.blur(new BlurEvent(TableCell.this));
+                        }
+                    }
+                });
                 setCompositionRoot(field);
                 field.focus();
             }
             
             private void readOnlyMode() {
                 CssLayout wrapper = new CssLayout();
+                wrapper.setSizeFull();
                 Label label = new Label(getPropertyDataSource());
+                label.setSizeFull();
                 wrapper.addComponent(label);
                 wrapper.addLayoutClickListener(new LayoutClickListener() {
-                    
                     @Override
                     public void layoutClick(LayoutClickEvent event)
                     {
                         for (FocusListener listener : focusListeners) {
-                            listener.focus(new FocusEvent(label));
+                            listener.focus(new FocusEvent(TableCell.this));
                         }
                     }
                 });

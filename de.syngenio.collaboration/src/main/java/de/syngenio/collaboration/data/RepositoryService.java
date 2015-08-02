@@ -21,8 +21,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.eventbus.EventBus;
 
-import de.syngenio.collaboration.ui.AppUI;
-
 @Component
 public class RepositoryService
 {
@@ -152,13 +150,16 @@ public class RepositoryService
                 @Override
                 public CommitInfo call() throws Exception
                 {
+                    LOG.info("before fetch: sheet.head = "+sheet.getHead());
+                    Sheet fetchedSheet = template.fetch(sheet);
+                    LOG.info("after fetch: sheet.head = "+fetchedSheet.getHead());
                     CommitInfo updateInfo = new CommitInfo(sheet.getHead());
                     Update branchingUpdate = findPersistentUpdateInChain(latestInChain);
 
                     //TODO remove after debugging
                     LOG.info("new updates to be commited:");
                     logChain(latestInChain, branchingUpdate);
-                    LOG.info("since branch point "+branchingUpdate.getId()+" already commited updates:");
+                    LOG.info("since branch point "+branchingUpdate+" already commited updates:");
                     logChain(updateInfo.getHeadBefore(), branchingUpdate);
 
                     processChain(updateInfo, latestInChain, branchingUpdate);
@@ -176,7 +177,7 @@ public class RepositoryService
 
     private void logChain(Update latestInChain, Update terminal)
     {
-        if (latestInChain != null && latestInChain != terminal) {
+        if (latestInChain != null && !latestInChain.equals(terminal)) {
             logChain(latestInChain.getPrevious(), terminal);
             LOG.info(latestInChain.toString());
         }
@@ -198,7 +199,7 @@ public class RepositoryService
 
     private void processChain(CommitInfo updateInfo, Update latestInChain, Update branchingCommit)
     {
-        if (latestInChain == null || latestInChain == branchingCommit) {
+        if (latestInChain == null || latestInChain.equals(branchingCommit)) {
             // nothing to do
             return;
         }

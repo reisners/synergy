@@ -42,6 +42,23 @@ public class SheetModel
 
     private Update frozenHead = null;
 
+    private UpdateProcessor updateProcessor = new UpdateProcessor() {
+        @Override
+        public void processUpdate(Runnable r)
+        {
+            r.run();
+        }
+    };
+
+    public interface UpdateProcessor {
+        void processUpdate(Runnable r);
+    }
+    
+    public void setUpdateProcessor(UpdateProcessor updateProcessor)
+    {
+        this.updateProcessor = updateProcessor;
+    }
+
     @SuppressWarnings("serial")
     class SheetContainer extends AbstractInMemoryContainer<String, Object, Item> implements Container.PropertySetChangeNotifier {
 
@@ -417,13 +434,16 @@ public class SheetModel
     }
 
     @Subscribe
-    public void headUpdated(Sheet sheet) {
+    public void headUpdated(Sheet updatedSheet) {
+        if (!sheet.equals(updatedSheet)) {
+            return;
+        }
         try {
-            Update newHead = sheet.getHead();
+            Update newHead = updatedSheet.getHead();
             if (newHead != null) {
                 LOG.info("headUpdated: id "+newHead.getId()+", oldHead "+oldHead);
                 repository.fetchChain(oldHead, newHead); // completely fetch each of the new Updates 
-                update(newHead);
+                updateProcessor.processUpdate(() -> update(newHead));
                 LOG.info("synchronized");
             }
         } catch (Throwable e) {

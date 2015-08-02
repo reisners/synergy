@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
@@ -334,17 +332,21 @@ public class Update extends GraphEntity
     }
 
     @Override
-    public int hashCode()
-    {
-        return HashCodeBuilder.reflectionHashCode(this, false);
+    public boolean equals(Object other) {
+        if (this == other) return true;
+
+        if (id == null) return false;
+
+        if (! (other instanceof Update)) return false;
+
+        return id.equals(((Update) other).id);
     }
 
     @Override
-    public boolean equals(Object obj)
-    {
-        return EqualsBuilder.reflectionEquals(this, obj, false);
+    public int hashCode() {
+        return id == null ? System.identityHashCode(this) : id.hashCode();
     }
-
+    
     @Override
     public String toString()
     {

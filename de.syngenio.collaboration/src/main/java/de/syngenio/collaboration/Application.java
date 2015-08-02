@@ -27,8 +27,8 @@ import com.vaadin.spring.boot.internal.VaadinServletConfiguration;
 import de.syngenio.collaboration.ui.AppUI;
 
 @SpringBootApplication
-@EnableScheduling
 @EnableTransactionManagement
+//@EnableScheduling
 public class Application
 {
     @Configuration
