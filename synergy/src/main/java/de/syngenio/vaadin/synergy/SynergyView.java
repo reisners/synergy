@@ -74,6 +74,8 @@ public class SynergyView extends CustomComponent
     private SynergyView subView = null;
     private Map<String, ItemComponent> itemComponents = null;
     private SynergyLayoutFactory layoutFactory;
+    private ValueChangeListener viewUpdatingListener;
+    private ValueChangeListener navigatingListener;
     
     private final static Logger log = LoggerFactory.getLogger(SynergyView.class);
 
@@ -85,7 +87,7 @@ public class SynergyView extends CustomComponent
     public SynergyView(SynergyLayoutFactory layoutFactory, Container dataSource)
     {
         this(layoutFactory, (SynergyView)null);
-        setSelect(new SynergySelect(dataSource));
+        attachToSelect(new SynergySelect(dataSource));
         setParentId(null);
     }
     
@@ -110,8 +112,47 @@ public class SynergyView extends CustomComponent
         setCompositionRoot(layout);
         addStyleName(this.layoutFactory.getOrientationStyleName());
         
+        // will be added to the SynergySelect later
+        viewUpdatingListener = new ValueChangeListener() {
+            @Override
+            public void valueChange(ValueChangeEvent event)
+            {
+                log.debug("parentId="+parentId+" valueChange");
+                final UI ui = getUI();
+                if (ui != null) {
+                    ui.access(new Runnable() {
+                        public void run()
+                        {
+                            for (String itemId : getImmediateChildItemIds()) {
+                                updateSelectedVisuals(itemId);
+                            }
+//                            ui.push();
+                        }
+
+                    });
+                }
+            }
+        };
+        // will be added to the SynergySelect later
+        navigatingListener = new ValueChangeListener() {
+            @Override
+            public void valueChange(ValueChangeEvent event)
+            {
+                String itemId = (String) select.getValue();
+                // is it an item that this view visualizes?
+                if (SynergyBuilder.isChildOf(select.getContainerDataSource(), itemId, parentId)) {
+                    Item item = select.getContainerDataSource().getItem(itemId);
+                    UI ui = SynergyView.this.getUI();
+                    if (ui != null && navigationHandler != null) { 
+                        // delegate to the current NavigationHandler
+                        navigationHandler.selected(item, ui);
+                    }
+                }
+            }
+        };
+
         if (this.parentView != null) {
-            setSelect(parentView.select);
+            attachToSelect(parentView.select);
             parentView.setSubView(this);
         }
     }
@@ -180,10 +221,10 @@ public class SynergyView extends CustomComponent
      */
     private void updateSelectedVisuals(String itemId)
     {
-        log.info("updateSelectedVisuals("+itemId+")");
+        log.trace("updateSelectedVisuals("+itemId+")");
         ItemComponent itemComponent = itemComponents.get(itemId);
         if (itemComponent == null) {
-            log.info("no item component found for id "+itemId);
+            log.debug("no item component found for id "+itemId);
             return;
         }
         final String selectedItemId = (String) select.getValue();
@@ -290,18 +331,35 @@ public class SynergyView extends CustomComponent
         return SynergyBuilder.isAncestorOf(select.getContainerDataSource(), ancestorId, descendantId); 
     }
 
+    /**
+     * Sets a different {@code NavigationHandler} to the view.
+     * @param navigationHandler
+     */
     public void setNavigationHandler(NavigationHandler navigationHandler)
     {
         this.navigationHandler = navigationHandler;
     }
 
+    /**
+     * The method {@code selected} of this class or a subclass is called when the user selects an item.
+     * The default behaviour is to fetch the UI's {@code Navigator} and navigate to the selected item's
+     * target navigation state property. 
+     * Install your own behaviour by passing an instance {@code NavigationHandler} 
+     * to {@code SynergyView.setNavigationHandler(NavigationHandler)}.
+     */
     public class NavigationHandler implements Serializable {
 
-        protected void selected(Item item)
+        /**
+         * Gets the given UI's {@code Navigator} and passes the item's targetNavigationState to {@code Navigator.navigateTo()}.
+         * @param item the selected item
+         * @param ui the UI where the event originated (never null)
+         */
+        protected void selected(Item item, UI ui)
         {
             String targetNavigationState = (String) item.getItemProperty(SynergyBuilder.PROPERTY_TARGET_NAVIGATION_STATE).getValue();
+            log.debug("selected item with targetNavigationState="+targetNavigationState);
             if (targetNavigationState != null) {
-                Navigator navigator = SynergyView.this.getUI().getNavigator();
+                Navigator navigator = ui.getNavigator();
                 if (navigator != null) {
                     navigator.navigateTo(targetNavigationState);
                 }
@@ -563,50 +621,19 @@ public class SynergyView extends CustomComponent
         }
     }
 
-    protected void setSelect(SynergySelect s)
+    protected void attachToSelect(SynergySelect s)
     {
         this.select = s;
         // add the ValueChangeListener to handle view updates
-        this.select.addValueChangeListener(new ValueChangeListener() {
-            private static final long serialVersionUID = 1L;
-
-            @Override
-            public void valueChange(ValueChangeEvent event)
-            {
-                log.debug("parentId="+parentId+" valueChange");
-                final UI ui = getUI();
-                if (ui != null) {
-                    ui.access(new Runnable() {
-                        public void run()
-                        {
-                            for (String itemId : getImmediateChildItemIds()) {
-                                updateSelectedVisuals(itemId);
-                            }
-//                            ui.push();
-                        }
-
-                    });
-                }
-            }
-        });
+        this.select.addValueChangeListener(viewUpdatingListener);
         // add the ValueChangeListener to handle navigation
-        this.select.addValueChangeListener(new ValueChangeListener() {
-            
-            @Override
-            public void valueChange(ValueChangeEvent event)
-            {
-                String itemId = (String) select.getValue();
-                Item item = select.getContainerDataSource().getItem(itemId);
-                // delegate to the current NavigationHandler
-                navigationHandler.selected(item);
-            }
-        });
+        this.select.addValueChangeListener(navigatingListener);
         
         this.select.addItemSetChangeListener(new ItemSetChangeListener() {
             @Override
             public void containerItemSetChange(ItemSetChangeEvent event)
             {
-                log.info("parentId="+parentId+" containerItemSetChange");
+                log.debug("parentId="+parentId+" containerItemSetChange");
                 final UI ui = getUI();
                 if (ui != null) {
                     ui.access(new Runnable() {
@@ -623,6 +650,15 @@ public class SynergyView extends CustomComponent
         visualizeItems();
     }
 
+    /**
+     * Removes listeners from the {@code SynergySelect}. 
+     * Call this method before disposing the {@code SynergyView} to avoid memory leaks.
+     */
+    protected void detachFromSelect() {
+        this.select.removeValueChangeListener(navigatingListener);
+        this.select.removeValueChangeListener(viewUpdatingListener);
+    }
+    
     /**
      * @return this {@code SynergyView}'s item container 
      */

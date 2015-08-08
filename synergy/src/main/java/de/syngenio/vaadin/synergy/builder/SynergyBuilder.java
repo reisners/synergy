@@ -156,13 +156,17 @@ public class SynergyBuilder
 
     /**
      * Tests for a parent-child relationship or a root item
-     * @param hc navigation hierarchy
-     * @param itemId id of item in hc
-     * @param parentItemId id of another item "parent" in hc or null
-     * @return true if item is a child of parent, or if parentItemId==null and item is a root item 
+     * @param navigationHierarchy navigation hierarchy
+     * @param itemId id of item in navigationHierarchy
+     * @param parentItemId id of another item "parent" in navigationHierarchy or null
+     * @return true if item is a child of parent, or if parentItemId==null and item is a root item. Returns always false if navigationHierarchy is not a {@code HierarchicalContainer} 
      */
-    public static boolean isChildOf(HierarchicalContainer hc, String itemId, final String parentItemId)
+    public static boolean isChildOf(Container navigationHierarchy, String itemId, final String parentItemId)
     {
+        if (!(navigationHierarchy instanceof HierarchicalContainer)) {
+            return false;
+        }
+        HierarchicalContainer hc = (HierarchicalContainer) navigationHierarchy;
         String itemParentId = (String) hc.getParent(itemId);
         if (parentItemId == null) {
             return itemParentId == null;
