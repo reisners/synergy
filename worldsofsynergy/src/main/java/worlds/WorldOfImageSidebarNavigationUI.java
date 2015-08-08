@@ -24,26 +24,28 @@ import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 
 import de.syngenio.vaadin.synergy.SynergyView;
+import de.syngenio.vaadin.synergy.layout.AbstractSynergyLayoutFactory.Packing;
 import de.syngenio.vaadin.synergy.layout.VerticalSynergyLayoutFactory;
 
 @Theme("default")
-public class WorldOfVerticalImageNavigationUI extends UI
+public class WorldOfImageSidebarNavigationUI extends UI
 {
     @WebServlet(value = "/vertical/images/*", asyncSupported = true)
-    @VaadinServletConfiguration(productionMode = false, ui = WorldOfVerticalImageNavigationUI.class)
+    @VaadinServletConfiguration(productionMode = false, ui = WorldOfImageSidebarNavigationUI.class)
     public static class Servlet extends VaadinServlet {
     }
 
-    private static final Logger log = LoggerFactory.getLogger(WorldOfVerticalImageNavigationUI.class);
+    private static final Logger log = LoggerFactory.getLogger(WorldOfImageSidebarNavigationUI.class);
     
     @Override
     protected void init(VaadinRequest request)
     {
         HorizontalLayout hlayout = new HorizontalLayout();
         hlayout.setSizeFull();
-        SynergyView synergyView = new SynergyView(new VerticalSynergyLayoutFactory(), WorldHelper.getImageNavigation2());
+        SynergyView synergyView = new SynergyView(new VerticalSynergyLayoutFactory(Packing.EXPAND), WorldHelper.getImageNavigation2());
 //        synergyView.setSizeUndefined();
         synergyView.setWidth("200px");
+        synergyView.setHeight("100%");
         hlayout.addComponent(synergyView);
         hlayout.setExpandRatio(synergyView, 0f);
         

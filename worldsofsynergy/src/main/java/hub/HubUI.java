@@ -2,6 +2,7 @@ package hub;
 
 
 import helpers.WorldHelper;
+import helpers.WorldHelper.WorldBean;
 
 import javax.servlet.annotation.WebServlet;
 
@@ -11,26 +12,18 @@ import org.slf4j.LoggerFactory;
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.VaadinServletConfiguration;
 import com.vaadin.data.Item;
-import com.vaadin.navigator.Navigator;
-import com.vaadin.navigator.View;
-import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
-import com.vaadin.server.FontAwesome;
+import com.vaadin.event.SelectionEvent;
+import com.vaadin.event.SelectionEvent.SelectionListener;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServlet;
-import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
-import com.vaadin.ui.CustomComponent;
-import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Image;
-import com.vaadin.ui.Label;
-import com.vaadin.ui.Panel;
+import com.vaadin.ui.Grid;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 
 import de.syngenio.vaadin.synergy.SynergyView;
 import de.syngenio.vaadin.synergy.builder.SynergyBuilder;
 import de.syngenio.vaadin.synergy.layout.HorizontalSynergyLayoutFactory;
-import de.syngenio.vaadin.synergy.layout.VerticalSynergyLayoutFactory;
 
 @Theme("default")
 public class HubUI extends UI
@@ -47,19 +40,20 @@ public class HubUI extends UI
     {
         VerticalLayout layout = new VerticalLayout();
         setContent(layout);
-        SynergyView synergyView = new SynergyView(new HorizontalSynergyLayoutFactory(), WorldHelper.getHubNavigation());
-        synergyView.setNavigationHandler(synergyView.new NavigationHandler() {
+        Grid grid = new Grid("Worlds of Synergy", WorldHelper.getWorlds());
+        grid.addSelectionListener(new SelectionListener() {
+
             @Override
-            protected void selected(Item item)
+            public void select(SelectionEvent event)
             {
-                String targetNavigationState = (String) item.getItemProperty(SynergyBuilder.PROPERTY_TARGET_NAVIGATION_STATE).getValue();
-                if (targetNavigationState != null) {
-                    getPage().setLocation(request.getContextPath()+targetNavigationState); // this results in a NPE sometimes (not always)
+                WorldBean bean = (WorldBean) grid.getSelectedRow();
+                if (bean.getPath() != null) {
+                    String contextPath = VaadinServlet.getCurrent().getServletContext().getContextPath();
+                    getPage().setLocation(contextPath+bean.getPath());
                 }
             }
         });
-        synergyView.setSizeFull();
-        layout.addComponent(synergyView);
-        layout.addComponent(new Button("Test Button"));
+        grid.setSizeFull();
+        layout.addComponent(grid);
     }
 }

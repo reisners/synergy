@@ -1,5 +1,8 @@
 package helpers;
 
+import java.util.Collections;
+import java.util.Set;
+
 import javax.servlet.annotation.WebServlet;
 
 import org.reflections.Reflections;
@@ -7,7 +10,10 @@ import org.reflections.scanners.SubTypesScanner;
 import org.reflections.scanners.TypeAnnotationsScanner;
 
 import com.vaadin.data.Container;
+import com.vaadin.data.Container.Indexed;
+import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.data.util.HierarchicalContainer;
+import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.ThemeResource;
 
@@ -75,6 +81,41 @@ public class WorldHelper
                 addItem(item(path).withCaption(webServletClass.getEnclosingClass().getSimpleName()).withTargetNavigationState(path));
             }
         }}.build();
+    }
+
+    public static class WorldBean {
+        private String name;
+        private String path;
+        private Set<String> tags;
+        public String getName()
+        {
+            return name;
+        }
+        public String getPath()
+        {
+            return path;
+        }
+        public Set<String> getTags()
+        {
+            return tags;
+        }
+    }
+    
+    public static Indexed getWorlds()
+    {
+        BeanItemContainer<WorldBean> indexed = new BeanItemContainer<WorldBean>(WorldBean.class);
+        // find World UIs
+        Reflections reflections = new Reflections(worlds.PackageTag.class.getPackage().getName(), new SubTypesScanner(), new TypeAnnotationsScanner());
+        for (Class webServletClass : reflections.getTypesAnnotatedWith(WebServlet.class)) {
+            WebServlet ws = (WebServlet) webServletClass.getAnnotation(WebServlet.class);
+            String path = ws.value()[0].replaceAll("/\\*$", "");
+            WorldBean bean = new WorldBean();
+            bean.name = webServletClass.getEnclosingClass().getSimpleName();
+            bean.path = path;
+            bean.tags = Collections.emptySet();
+            indexed.addBean(bean);
+        }
+        return indexed;
     }
 
 }
