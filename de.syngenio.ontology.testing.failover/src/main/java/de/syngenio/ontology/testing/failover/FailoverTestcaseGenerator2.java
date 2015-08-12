@@ -75,8 +75,8 @@ public class FailoverTestcaseGenerator2 implements Runnable
 {
     private static final String NS_FAILOVER = "http://www.syngenio.de/ontology/testing/failover#";
     private static final String NS_TESTRESULTS = "http://www.syngenio.de/ontology/testing/failover/testresults#";
-    static final String NS_GMAC = "http://www.opelbank.de/ontology/systemmodel#";
-    private static final String NS_FISK = "http://www.kordoba.de/ontology/components#";
+    static final String NS_EXAMPLE = "http://www.example.de/ontology/systemmodel#";
+    private static final String NS_TECHNOLOGY = "http://www.technology.de/ontology/components#";
     private final static Logger log = LoggerFactory.getLogger(FailoverTestcaseGenerator2.class);
     private String ontologyFilename;
     OntModel ontologyModel;
@@ -111,8 +111,8 @@ public class FailoverTestcaseGenerator2 implements Runnable
     
     private static final Map<String, String> prefixMap = new HashMap<String, String>() {{
        put("failover:", NS_FAILOVER);
-       put("gmac:", NS_GMAC);
-       put("fisk:", NS_FISK);
+       put("gmac:", NS_EXAMPLE);
+       put("fisk:", NS_TECHNOLOGY);
        put("testresults:", NS_TESTRESULTS);
     }};
 
@@ -275,7 +275,7 @@ public class FailoverTestcaseGenerator2 implements Runnable
         // create a copy of the original model that will be augmented in subsequent steps
         testcaseModel = ModelFactory.createOntologyModel(ontologyModel.getSpecification() /*, ontologyModel*/);
         Ontology ontology = testcaseModel.createOntology("http://www.syngenio.de/ontology/testing/failover/testcases");
-        ontology.addImport(testcaseModel.createResource("http://www.opelbank.de/ontology/systemmodel"));
+        ontology.addImport(testcaseModel.createResource("http://www.example.de/ontology/systemmodel"));
         testcaseModel.loadImports();
         for (Entry<String, String> entry : prefixMap.entrySet()) {
             testcaseModel.setNsPrefix(entry.getKey().replaceFirst(":$", ""), entry.getValue());
