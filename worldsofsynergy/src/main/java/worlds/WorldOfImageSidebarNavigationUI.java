@@ -72,8 +72,6 @@ public class WorldOfImageSidebarNavigationUI extends UI
             setCompositionRoot(vlayout);
             label = new Label("(empty)");
             vlayout.addComponent(label);
-            image = new Image("My Icon", FontAwesome.BULLHORN);
-            vlayout.addComponent(image);
         }
         @Override
         public void enter(ViewChangeEvent event)

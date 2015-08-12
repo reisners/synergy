@@ -110,7 +110,7 @@ public class SynergyView extends CustomComponent
         this.parentView = parentView;
         layout = layoutFactory.generateLayout();
         setCompositionRoot(layout);
-        addStyleName(this.layoutFactory.getOrientationStyleName());
+        addStyleName(layout.getOrientationStyleName());
         
         // will be added to the SynergySelect later
         viewUpdatingListener = new ValueChangeListener() {
@@ -432,7 +432,7 @@ public class SynergyView extends CustomComponent
         public void setup(final SynergySelect synergySelect, final String itemId)
         {
             layout = new VerticalLayout();
-            layout.setSizeFull();
+//            layout.setSizeFull();
             layout.setMargin(new MarginInfo(false, true, false, true) );
             //FIXME the following is an ugly hack.
             // The root cause is the behaviour of HorizontalLayout with undefined height (in a horizontal SynergyView) 

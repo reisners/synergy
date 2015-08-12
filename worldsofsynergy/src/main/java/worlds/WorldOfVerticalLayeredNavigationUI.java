@@ -22,6 +22,7 @@ import com.vaadin.ui.UI;
 import de.syngenio.vaadin.synergy.SynergyView;
 import de.syngenio.vaadin.synergy.layout.VerticalFlatSynergyLayoutFactory;
 import de.syngenio.vaadin.synergy.layout.VerticalSynergyLayoutFactory;
+import de.syngenio.vaadin.synergy.layout.AbstractSynergyLayoutFactory.Packing;
 
 @Theme("default")
 public class WorldOfVerticalLayeredNavigationUI extends UI
@@ -38,8 +39,9 @@ public class WorldOfVerticalLayeredNavigationUI extends UI
     {
         HorizontalLayout hlayout = new HorizontalLayout();
         hlayout.setSizeFull();
-        SynergyView synergyViewTop = new SynergyView(new VerticalFlatSynergyLayoutFactory(), WorldHelper.getNavigationHierarchy());
-        synergyViewTop.setSizeUndefined();
+        SynergyView synergyViewTop = new SynergyView(new VerticalFlatSynergyLayoutFactory(Packing.EXPAND), WorldHelper.getNavigationHierarchy());
+        synergyViewTop.setWidthUndefined();
+        synergyViewTop.setHeight("100%");
         hlayout.addComponent(synergyViewTop);
         hlayout.setExpandRatio(synergyViewTop, 0f);
 

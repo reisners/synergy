@@ -58,7 +58,7 @@
 	}
 
     @if $triangle-color != 'none' {
-		.#{$primary-stylename}-vertical .v-verticallayout > .v-slot-synergy-selected:not(.v-slot-wrapper):after {
+		.#{$primary-stylename}-vertical .synergy-selected.vertical.item:after {
 			// triangle
 			content: "";
 			position:absolute;
@@ -77,7 +77,7 @@
 	}
 
     @if $triangle-color != 'none' {
-		.#{$primary-stylename}-horizontal .v-slot-synergy-selected > .horizontal:after {
+		.#{$primary-stylename}-horizontal .synergy-selected.horizontal.item:after {
 			// triangle
 			content: "";
 			position:absolute;

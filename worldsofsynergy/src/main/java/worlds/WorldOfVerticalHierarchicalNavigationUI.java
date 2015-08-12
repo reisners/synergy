@@ -20,6 +20,7 @@ import com.vaadin.ui.Panel;
 import com.vaadin.ui.UI;
 
 import de.syngenio.vaadin.synergy.SynergyView;
+import de.syngenio.vaadin.synergy.layout.AbstractSynergyLayoutFactory.Packing;
 import de.syngenio.vaadin.synergy.layout.VerticalSynergyLayoutFactory;
 
 @Theme("default")
@@ -37,11 +38,37 @@ public class WorldOfVerticalHierarchicalNavigationUI extends UI
     {
         HorizontalLayout hlayout = new HorizontalLayout();
         hlayout.setSizeFull();
-        SynergyView synergyView = new SynergyView(new VerticalSynergyLayoutFactory(), WorldHelper.getNavigationHierarchy());
-        synergyView.setSizeUndefined();
+        SynergyView synergyViewSpaceAfter = new SynergyView(new VerticalSynergyLayoutFactory(Packing.SPACE_AFTER), WorldHelper.getNavigationHierarchy());
+        synergyViewSpaceAfter.setCaption(Packing.SPACE_AFTER.name());
+        synergyViewSpaceAfter.setWidthUndefined();
+        synergyViewSpaceAfter.setHeight("100%");
 //        synergyView.setWidth("30%");
-        hlayout.addComponent(synergyView);
-        hlayout.setExpandRatio(synergyView, 0f);
+        hlayout.addComponent(synergyViewSpaceAfter);
+        hlayout.setExpandRatio(synergyViewSpaceAfter, 0f);
+        
+        SynergyView synergyViewSpaceAround = new SynergyView(new VerticalSynergyLayoutFactory(Packing.SPACE_AROUND), WorldHelper.getNavigationHierarchy());
+        synergyViewSpaceAround.setCaption(Packing.SPACE_AROUND.name());
+        synergyViewSpaceAround.setWidthUndefined();
+        synergyViewSpaceAround.setHeight("100%");
+//        synergyView.setWidth("30%");
+        hlayout.addComponent(synergyViewSpaceAround);
+        hlayout.setExpandRatio(synergyViewSpaceAround, 0f);
+        
+        SynergyView synergyViewSpaceBefore = new SynergyView(new VerticalSynergyLayoutFactory(Packing.SPACE_BEFORE), WorldHelper.getNavigationHierarchy());
+        synergyViewSpaceBefore.setCaption(Packing.SPACE_BEFORE.name());
+        synergyViewSpaceBefore.setWidthUndefined();
+        synergyViewSpaceBefore.setHeight("100%");
+//        synergyView.setWidth("30%");
+        hlayout.addComponent(synergyViewSpaceBefore);
+        hlayout.setExpandRatio(synergyViewSpaceBefore, 0f);
+        
+        SynergyView synergyViewExpand = new SynergyView(new VerticalSynergyLayoutFactory(Packing.EXPAND), WorldHelper.getNavigationHierarchy());
+        synergyViewExpand.setCaption(Packing.EXPAND.name());
+        synergyViewExpand.setWidthUndefined();
+        synergyViewExpand.setHeight("100%");
+//        synergyView.setWidth("30%");
+        hlayout.addComponent(synergyViewExpand);
+        hlayout.setExpandRatio(synergyViewExpand, 0f);
         
         Panel panel = new Panel();
         panel.setSizeFull();

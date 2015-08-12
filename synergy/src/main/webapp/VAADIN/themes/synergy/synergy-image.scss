@@ -6,7 +6,7 @@
  *
  * @group button
  */
-@mixin synergy-image ($primary-stylename: synergy-image, $background-color: $v-background-color, $hover-color: $background-color) {
+@mixin synergy-image ($primary-stylename: synergy-image, $background-color: $v-background-color, $hover-color: null) {
   .#{$primary-stylename} {
     @include synergy-image-style($background-color: $background-color, $hover-color: $hover-color);
   }
@@ -22,7 +22,7 @@
  * @param {size} $font-size (null) - The font size of the button. Inherited from the parent by default.
  * @param {string} $cursor (null) - The mouse cursor of the button
  * @param {color} $background-color ($v-background-color) - The background color of the button
- * @param {color} $hover-color ($background-color) - The color of the button when hovering
+ * @param {color} $hover-color (null) - The color of the button when hovering
  * @param {list} $border ($v-border) - The border of the button
  * @param {size} $border-radius ($v-border-radius) - The border-radius of the button
  * @param {list} $gradient ($v-gradient) - Valo specific gradient value. See the documentation for $v-gradient.
@@ -42,7 +42,7 @@
   $cursor           : null,
 
   $background-color : $v-background-color,
-  $hover-color      : $background-color
+  $hover-color      : null
 ) {
 
 	background-color: $background-color;
@@ -60,9 +60,11 @@
 	    font-size: $font-size;
 	}
 
-  &:hover:after {
-    @include synergy-image-hover-style($hover-color);
-  }
+	@if type-of($hover-color) == color {
+	  &:hover:after {
+	    @include synergy-image-hover-style($hover-color);
+	  }
+	}
 }
 
 

@@ -13,9 +13,4 @@ public interface SynergyLayoutFactory extends Serializable
      * @return the LayoutFactory for the subitems
      */
     SynergyLayoutFactory getSubitemLayoutFactory();
-    
-    /**
-     * @return the style name (CSS class) that indicates the layout orientation. It will be set on the SynergyView
-     */
-    String getOrientationStyleName();
 }
