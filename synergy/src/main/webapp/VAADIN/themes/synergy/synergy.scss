@@ -66,7 +66,7 @@
 			border-bottom: $triangle-dim solid transparent;
 			border-right: $triangle-dim solid $triangle-color;
 			margin-left: -$triangle-dim;
-			margin-bottom: -$triangle-dim - $half-spacing-dim;
+			margin-top: -$triangle-dim;
 			top: 50%;
 			height: 0;
 	    }
