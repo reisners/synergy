@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.BiConsumer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,7 +50,6 @@ public class SynergyView extends CustomComponent
     private static final long serialVersionUID = 1L;
     private SynergySelect select;
     private SynergyLayout layout;
-    private NavigationHandler navigationHandler = new NavigationHandler();
     
     /**
      * signifies that the view is in inactive state
@@ -75,7 +75,7 @@ public class SynergyView extends CustomComponent
     private Map<String, ItemComponent> itemComponents = null;
     private SynergyLayoutFactory layoutFactory;
     private ValueChangeListener viewUpdatingListener;
-    private ValueChangeListener navigatingListener;
+    private ValueChangeListener selectListener;
     
     private final static Logger log = LoggerFactory.getLogger(SynergyView.class);
 
@@ -135,7 +135,7 @@ public class SynergyView extends CustomComponent
             }
         };
         // will be added to the SynergySelect later
-        navigatingListener = new ValueChangeListener() {
+        selectListener = new ValueChangeListener() {
             @Override
             public void valueChange(ValueChangeEvent event)
             {
@@ -144,9 +144,14 @@ public class SynergyView extends CustomComponent
                 if (SynergyBuilder.isChildOf(select.getContainerDataSource(), itemId, parentId)) {
                     Item item = select.getContainerDataSource().getItem(itemId);
                     UI ui = SynergyView.this.getUI();
-                    if (ui != null && navigationHandler != null) { 
-                        // delegate to the current NavigationHandler
-                        navigationHandler.selected(item, ui);
+                    if (ui != null) {
+                        BiConsumer<Item, UI> selectAction = (BiConsumer<Item, UI>) item.getItemProperty(SynergyBuilder.PROPERTY_ITEM_ACTION).getValue();
+                        if (selectAction == null) {
+                            selectAction = defaultSelectAction;
+                        }
+                        if (selectAction != null) {
+                            selectAction.accept(item, ui);
+                        }
                     }
                 }
             }
@@ -332,42 +337,33 @@ public class SynergyView extends CustomComponent
         return SynergyBuilder.isAncestorOf(select.getContainerDataSource(), ancestorId, descendantId); 
     }
 
-    /**
-     * Sets a different {@code NavigationHandler} to the view.
-     * @param navigationHandler
-     */
-    public void setNavigationHandler(NavigationHandler navigationHandler)
-    {
-        this.navigationHandler = navigationHandler;
-    }
-
-    /**
-     * The method {@code selected} of this class or a subclass is called when the user selects an item.
-     * The default behaviour is to fetch the UI's {@code Navigator} and navigate to the selected item's
-     * target navigation state property. 
-     * Install your own behaviour by passing an instance {@code NavigationHandler} 
-     * to {@code SynergyView.setNavigationHandler(NavigationHandler)}.
-     */
-    public class NavigationHandler implements Serializable {
-
-        /**
-         * Gets the given UI's {@code Navigator} and passes the item's targetNavigationState to {@code Navigator.navigateTo()}.
-         * @param item the selected item
-         * @param ui the UI where the event originated (never null)
-         */
-        protected void selected(Item item, UI ui)
-        {
-            String targetNavigationState = (String) item.getItemProperty(SynergyBuilder.PROPERTY_TARGET_NAVIGATION_STATE).getValue();
-            log.debug("selected item with targetNavigationState="+targetNavigationState);
-            if (targetNavigationState != null) {
-                Navigator navigator = ui.getNavigator();
-                if (navigator != null) {
-                    navigator.navigateTo(targetNavigationState);
-                }
+    private BiConsumer<Item, UI> defaultSelectAction = (item, ui) -> {
+        String targetNavigationState = (String) item.getItemProperty(SynergyBuilder.PROPERTY_TARGET_NAVIGATION_STATE).getValue();
+        log.debug("selected item with targetNavigationState="+targetNavigationState);
+        if (targetNavigationState != null) {
+            Navigator navigator = ui.getNavigator();
+            if (navigator != null) {
+                navigator.navigateTo(targetNavigationState);
             }
         }
-    }
+    };
     
+    /**
+     * Installs a new default action to perform when an item is selected (normally by the user clicking on it).
+     * The original default action call {@code Navigator#navigateTo(String)} with the value of the item's 
+     * {@code SynergyBuilder#PROPERTY_TARGET_NAVIGATION_STATE} property (if set).
+     * In case that the selected item has its {@code SynergyBuilder#PROPERTY_ITEM_ACTION} property set, 
+     * that action will be performed instead of the defaultSelectAction.
+     * @param defaultSelectAction the new default select action
+     */
+    public void setDefaultSelectAction(BiConsumer<Item, UI> defaultSelectAction)
+    {
+        this.defaultSelectAction = defaultSelectAction;
+    }
+
+    /**
+     * Interface implemented by {@code Component}s that visualize items in a {@code SynergyView}
+     */
     public interface ItemComponent extends Component {
         enum State {
             unselected, selected, ancestorOfSelected("ancestor-of-selected");
@@ -404,14 +400,22 @@ public class SynergyView extends CustomComponent
             }
         };
 
+        /**
+         * Sets up the component to render a specific item
+         * @param ss the {@code SynergySelect} (providing the item's properties)
+         * @param itemId the item's id
+         */
         void setup(final SynergySelect ss, final String itemId);
+        /**
+         * Render the item in the given state
+         * @param state the item's {@code ItemComponent.State}
+         */
         void setState(State state);
     }
 
-    
-    
     /**
-     * Creates a {@code VerticalLayout} of the graphical component and optionally a caption {@code Label}.
+     * Implementation of {@code ItemComponent} that visualizes items as a graphical component
+     * stacked on top of a caption.
      * Depending on the type of the source {@code Resource}, the graphical component is either an
      * {@code Image} or a {@code Label}.  
      */
@@ -546,7 +550,10 @@ public class SynergyView extends CustomComponent
         }
     }
     
-    
+    /**
+     * Implementation of {@code ItemComponent} that visualizes items as a button with optional
+     * caption and icon
+     */
     public static class ItemComponentButton extends Button implements ItemComponent {
         private static final String PRIMARY_STYLE_NAME = "synergy-button";
 
@@ -628,7 +635,7 @@ public class SynergyView extends CustomComponent
         // add the ValueChangeListener to handle view updates
         this.select.addValueChangeListener(viewUpdatingListener);
         // add the ValueChangeListener to handle navigation
-        this.select.addValueChangeListener(navigatingListener);
+        this.select.addValueChangeListener(selectListener);
         
         this.select.addItemSetChangeListener(new ItemSetChangeListener() {
             @Override
@@ -656,7 +663,7 @@ public class SynergyView extends CustomComponent
      * Call this method before disposing the {@code SynergyView} to avoid memory leaks.
      */
     protected void detachFromSelect() {
-        this.select.removeValueChangeListener(navigatingListener);
+        this.select.removeValueChangeListener(selectListener);
         this.select.removeValueChangeListener(viewUpdatingListener);
     }
     

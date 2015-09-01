@@ -7,6 +7,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 
 import com.vaadin.data.Container;
 import com.vaadin.data.Item;
@@ -22,15 +25,43 @@ public class SynergyBuilder
     private Map<URI, Object> spec = null; // root does not have spec
     private List<ItemBuilder> itemBuilders = new ArrayList<ItemBuilder>();
     
-    private HierarchicalContainer hierarchicalContainer;
     private String parentItemId = null;
+    private HierarchicalContainer container = null;
     
+    /**
+     * Constructs a {@code SynergyBuilder}.
+     * Its methods {@code #addItem(ItemBuilder)}, {@code #item()} (or {@code group()}) to specify items.
+     * <p/>
+     * Finally, call its method {@code #build()} to create and populate a new {@code HierarchicalContainer}.
+     * <p/>
+     * A convenient idiom employs the double-brace syntax:
+     * <pre>
+     * HierarchicalContainer hc = new SynergyBuilder() {{
+     *      addItem(item().withCaption("A"));
+     *      addItem(item().withCaption("B"));
+     *      addItem(item().withCaption("C"));
+     * }}.build();
+     * </pre>
+     */
     public SynergyBuilder() {
-        this(createHierarchicalContainer(), null);
     }
     
-    public SynergyBuilder(HierarchicalContainer hc, String parentItemId) {
-        this.hierarchicalContainer = hc;
+    /**
+     * Constructs a {@code SynergyBuilder} to add subitems to an existing item of an existing {@code HierarchicalContainer}.
+     * <p/>
+     * The double-brace syntax can be used as with the default constructor:
+     * <pre>
+     * HierarchicalContainer hc;
+     * new SynergyBuilder(hc, "idOfA") {{
+     *      addItem(item().withCaption("A.1"));
+     *      addItem(item().withCaption("A.2"));
+     * }}.build();
+     * </pre>
+     * @param container the existing {@code HierarchicalContainer}
+     * @param parentItemId id of the item to add subitems to
+     */
+    public SynergyBuilder(HierarchicalContainer container, String parentItemId) {
+        this.container  = container;
         this.parentItemId = parentItemId;
     }
     
@@ -76,7 +107,15 @@ public class SynergyBuilder
      * Style name to be set on this item's subview (optional)  
      */
     public static final URI PROPERTY_ITEM_SUBVIEW_STYLE = URI.create(URI_PREFIX+"/subviewStyle");
+    /**
+     * Action ({@code BiConsumer<com.vaadin.data.Item, com.vaadin.ui.UI>}) to perform when this item is selected (optional)
+     */
+    public static final URI PROPERTY_ITEM_ACTION = URI.create(URI_PREFIX+"/action");
 
+    /**
+     * Creates a new {@code HierarchicalContainer} with synergy-specific container properties:
+     * @return
+     */
     public static HierarchicalContainer createHierarchicalContainer() {
         final HierarchicalContainer hierarchicalContainer = new HierarchicalContainer();
         hierarchicalContainer.addContainerProperty(PROPERTY_TARGET_NAVIGATION_STATE, String.class, null);
@@ -89,24 +128,27 @@ public class SynergyBuilder
         hierarchicalContainer.addContainerProperty(PROPERTY_ITEM_GLYPH_SIZE, String.class, null);
         hierarchicalContainer.addContainerProperty(PROPERTY_ITEM_HIDDEN_IF_EMPTY, Boolean.class, Boolean.FALSE);
         hierarchicalContainer.addContainerProperty(PROPERTY_ITEM_SUBVIEW_STYLE, String.class, null);
+        hierarchicalContainer.addContainerProperty(PROPERTY_ITEM_ACTION, BiConsumer.class, null);
         return hierarchicalContainer;
     }
 
+    /**
+     * Populates the {@code HierarchicalContainer}, after creating it if necessary.
+     * @return the populated {@code HierarchicalContainer}
+     */
     public HierarchicalContainer build() {
-        return build(hierarchicalContainer, null);
+        if (container == null) {
+            container = createHierarchicalContainer();
+            parentItemId = null;
+        }
+        buildItems(container, parentItemId);
+        return container;
     }
     
-    private HierarchicalContainer build(HierarchicalContainer hc, String parentItemId) {
+    private void buildItems(HierarchicalContainer hc, String parentItemId) {
         for (ItemBuilder itemBuilder : itemBuilders) {
-            itemBuilder.build(hc, null);
-            if (itemBuilder.childrenBuilder != null) {
-                itemBuilder.childrenBuilder.build(hc, itemBuilder.id);
-            }
-            if (parentItemId != null) {
-                hc.setParent(itemBuilder.id, parentItemId);
-            }
+            itemBuilder.build(hc, parentItemId);
         }
-        return hierarchicalContainer;
     }
     
     /**
@@ -178,18 +220,19 @@ public class SynergyBuilder
     public static class ItemBuilder {
         public enum Mode { inline, stacked }
         
-        protected final String id;
-        protected Class<? extends Component> componentClass = null;
-        protected String caption = null;
-        protected String targetNavigationState = null;
-        protected boolean hiddenIfEmpty = false;
-        protected SynergyBuilder childrenBuilder = null;
-        protected String imageWidth = null;
-        protected String imageHeight = null;
+        private final String id;
+        private Class<? extends Component> componentClass = null;
+        private String caption = null;
+        private String targetNavigationState = null;
+        private boolean hiddenIfEmpty = false;
+        private SynergyBuilder childrenBuilder = null;
+        private String imageWidth = null;
+        private String imageHeight = null;
         private Resource icon = null;
         private Resource iconSelected = null;
         private Mode mode = null;
         private String glyphSize = null;
+        private String subviewStyle;
 
         /**
          * Create a builder for an item with given id.
@@ -218,9 +261,11 @@ public class SynergyBuilder
         }
         
         @SuppressWarnings("unchecked")
-        public Item build(HierarchicalContainer hc, String parentItemId) {
+        private void build(HierarchicalContainer hc, String parentItemId) {
             Item item = hc.addItem(id);
-            hc.setParent(id, parentItemId);
+            if (parentItemId != null) {
+                hc.setParent(id, parentItemId);
+            }
             inferMode();
             inferComponentClass();
             item.getItemProperty(PROPERTY_ITEM_COMPONENT_CLASS).setValue(componentClass);
@@ -232,7 +277,10 @@ public class SynergyBuilder
             item.getItemProperty(PROPERTY_ITEM_IMAGE_WIDTH).setValue(imageWidth);
             item.getItemProperty(PROPERTY_ITEM_IMAGE_HEIGHT).setValue(imageHeight);
             item.getItemProperty(PROPERTY_ITEM_GLYPH_SIZE).setValue(glyphSize);
-            return item;
+            item.getItemProperty(PROPERTY_ITEM_SUBVIEW_STYLE).setValue(subviewStyle);
+            if (childrenBuilder != null) {
+                childrenBuilder.buildItems(hc, id);
+            }
         }
         
         /**
@@ -269,6 +317,16 @@ public class SynergyBuilder
          */
         public ItemBuilder withCaption(String caption) {
             this.caption = caption;
+            return this;
+        }
+
+        /**
+         * Set the ItemBuilder's subviewStyle
+         * @param subviewStyle
+         * @return the ItemBuilder
+         */
+        public ItemBuilder withSubviewStyle(String subviewStyle) {
+            this.subviewStyle = subviewStyle;
             return this;
         }
         
