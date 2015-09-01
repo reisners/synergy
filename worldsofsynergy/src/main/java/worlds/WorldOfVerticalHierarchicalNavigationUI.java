@@ -12,6 +12,7 @@ import com.vaadin.annotations.VaadinServletConfiguration;
 import com.vaadin.navigator.Navigator;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
+import com.vaadin.server.FontAwesome;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServlet;
 import com.vaadin.ui.HorizontalLayout;
@@ -24,6 +25,7 @@ import de.syngenio.vaadin.synergy.layout.AbstractSynergyLayoutFactory.Packing;
 import de.syngenio.vaadin.synergy.layout.VerticalSynergyLayoutFactory;
 
 @Theme("default")
+@WorldTags({"vertical", "hierarchical", "inline", "caption", "icon"})
 public class WorldOfVerticalHierarchicalNavigationUI extends UI
 {
     @WebServlet(value = "/vertical/hierarchical/*", asyncSupported = true)
@@ -40,6 +42,7 @@ public class WorldOfVerticalHierarchicalNavigationUI extends UI
         hlayout.setSizeFull();
         SynergyView synergyViewSpaceAfter = new SynergyView(new VerticalSynergyLayoutFactory(Packing.SPACE_AFTER), WorldHelper.getNavigationHierarchy());
         synergyViewSpaceAfter.setCaption(Packing.SPACE_AFTER.name());
+        synergyViewSpaceAfter.setIcon(FontAwesome.ALIGN_LEFT);
         synergyViewSpaceAfter.setWidthUndefined();
         synergyViewSpaceAfter.setHeight("100%");
 //        synergyView.setWidth("30%");
@@ -48,6 +51,7 @@ public class WorldOfVerticalHierarchicalNavigationUI extends UI
         
         SynergyView synergyViewSpaceAround = new SynergyView(new VerticalSynergyLayoutFactory(Packing.SPACE_AROUND), WorldHelper.getNavigationHierarchy());
         synergyViewSpaceAround.setCaption(Packing.SPACE_AROUND.name());
+        synergyViewSpaceAround.setIcon(FontAwesome.ALIGN_CENTER);
         synergyViewSpaceAround.setWidthUndefined();
         synergyViewSpaceAround.setHeight("100%");
 //        synergyView.setWidth("30%");
@@ -56,6 +60,7 @@ public class WorldOfVerticalHierarchicalNavigationUI extends UI
         
         SynergyView synergyViewSpaceBefore = new SynergyView(new VerticalSynergyLayoutFactory(Packing.SPACE_BEFORE), WorldHelper.getNavigationHierarchy());
         synergyViewSpaceBefore.setCaption(Packing.SPACE_BEFORE.name());
+        synergyViewSpaceBefore.setIcon(FontAwesome.ALIGN_RIGHT);
         synergyViewSpaceBefore.setWidthUndefined();
         synergyViewSpaceBefore.setHeight("100%");
 //        synergyView.setWidth("30%");
@@ -64,6 +69,7 @@ public class WorldOfVerticalHierarchicalNavigationUI extends UI
         
         SynergyView synergyViewExpand = new SynergyView(new VerticalSynergyLayoutFactory(Packing.EXPAND), WorldHelper.getNavigationHierarchy());
         synergyViewExpand.setCaption(Packing.EXPAND.name());
+        synergyViewExpand.setIcon(FontAwesome.ALIGN_JUSTIFY);
         synergyViewExpand.setWidthUndefined();
         synergyViewExpand.setHeight("100%");
 //        synergyView.setWidth("30%");

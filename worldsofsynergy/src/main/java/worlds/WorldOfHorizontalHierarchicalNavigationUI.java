@@ -25,6 +25,7 @@ import de.syngenio.vaadin.synergy.layout.HorizontalSynergyLayoutFactory;
 import de.syngenio.vaadin.synergy.layout.VerticalSynergyLayoutFactory;
 
 @Theme("default")
+@WorldTags({"horizontal", "hierarchical", "text"})
 public class WorldOfHorizontalHierarchicalNavigationUI extends UI
 {
     @WebServlet(value = "/horizontal/hierarchical/*", asyncSupported = true)

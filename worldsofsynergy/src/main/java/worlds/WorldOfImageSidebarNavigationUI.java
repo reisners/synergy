@@ -28,6 +28,7 @@ import de.syngenio.vaadin.synergy.layout.AbstractSynergyLayoutFactory.Packing;
 import de.syngenio.vaadin.synergy.layout.VerticalSynergyLayoutFactory;
 
 @Theme("default")
+@WorldTags({"vertical", "stacked"})
 public class WorldOfImageSidebarNavigationUI extends UI
 {
     @WebServlet(value = "/vertical/images/*", asyncSupported = true)

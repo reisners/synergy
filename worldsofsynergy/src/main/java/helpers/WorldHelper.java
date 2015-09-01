@@ -26,17 +26,31 @@ public class WorldHelper
         return new SynergyBuilder() {{
             addItem(item().withCaption("First"));
             addItem(
-                    item().asGroup().withCaption("Resources").withChildren( 
-                            item().asGroup().withCaption("Assets").withChildren(
-                                    item().withCaption("Machines").withTargetNavigationState("view/Machines"),
-                                    item().withCaption("Real Estate").withTargetNavigationState("view/Real Estate"),
-                                    item().withCaption("Patents").withTargetNavigationState("view/Patents")),
-                            item().withCaption("People").withTargetNavigationState("view/People")));
+                    group().withCaption("Resources").withChildren( 
+                            group().withCaption("Assets").withChildren(
+                                    item().withCaption("Machines").withIcon(FontAwesome.COGS).withTargetNavigationState("view/Machines"),
+                                    item().withCaption("Real Estate").withIcon(FontAwesome.HOME).withTargetNavigationState("view/Real Estate"),
+                                    item().withCaption("Patents").withIcon(FontAwesome.SHIELD).withTargetNavigationState("view/Patents")),
+                            item().withCaption("People").withIcon(FontAwesome.USERS).withTargetNavigationState("view/People")));
             addItem(item().withCaption("Something"));
-            addItem(item().asGroup().withCaption("Processes").withChildren(
+            addItem(group().withCaption("Processes").withChildren(
                     item().withCaption("Core").withTargetNavigationState("view/Core Processes"),
                     item().withCaption("Auxiliary").withTargetNavigationState("view/Auxiliary Processes")));
             addItem(item().withCaption("More"));
+        }}.build();
+    }
+
+    public static HierarchicalContainer getNavigationHierarchyWithStyle() {
+        return new SynergyBuilder() {{
+            addItem(group().withCaption("Administration").withChildren(
+                    item().withCaption("Bridge"),
+                    item().withCaption("Quarters")));
+            addItem(group().withCaption("Engineering").withSubviewStyle("engineering").withChildren(
+                    item().withCaption("Reactor"),
+                    item().withCaption("Life Support")));
+            addItem(group().withCaption("Weapons").withSubviewStyle("weapons").withChildren(
+                    item().withCaption("Phasers"),
+                    item().withCaption("Photon Torpedos")));
         }}.build();
     }
 
