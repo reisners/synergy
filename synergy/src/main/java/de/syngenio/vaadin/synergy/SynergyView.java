@@ -102,10 +102,11 @@ public class SynergyView extends CustomComponent
     public SynergyView(SynergyLayoutFactory layoutFactory, SynergyView parentView)
     {
         setPrimaryStyleName(DEFAULT_PRIMARY_STYLE_NAME);
-        String subviewStyle = getSubviewStyle();
-        if (subviewStyle != null) {
-            addStyleName(subviewStyle);
-        }
+        //FIXME: commented code below is ineffective because there can never be a subview style at this stage
+//        String subviewStyle = getSubviewStyle();
+//        if (subviewStyle != null) {
+//            addStyleName(subviewStyle);
+//        }
         this.layoutFactory = layoutFactory;
         this.parentView = parentView;
         layout = layoutFactory.generateLayout();
