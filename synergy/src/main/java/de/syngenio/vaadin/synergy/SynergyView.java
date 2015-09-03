@@ -26,6 +26,7 @@ import com.vaadin.event.LayoutEvents.LayoutClickListener;
 import com.vaadin.navigator.Navigator;
 import com.vaadin.server.ExternalResource;
 import com.vaadin.server.FontIcon;
+import com.vaadin.server.Page;
 import com.vaadin.server.Resource;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.shared.ui.MarginInfo;
@@ -35,6 +36,7 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.Image;
+import com.vaadin.ui.JavaScript;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
@@ -78,6 +80,7 @@ public class SynergyView extends CustomComponent
     private ValueChangeListener selectListener;
     
     private final static Logger log = LoggerFactory.getLogger(SynergyView.class);
+    private static final String HAS_CHILDREN = "children";
 
     public SynergyView(SynergyLayoutFactory layoutFactory)
     {
@@ -243,16 +246,11 @@ public class SynergyView extends CustomComponent
         } else {
             itemComponent.setState(State.unselected);
         }
+        JavaScript.getCurrent().execute("vaadin.forceLayout()");
     }
 
     private void replaceSubView(String itemId, State state) {
-        boolean hasChildren = false;
-        // do we have children? 
-        Container container = select.getContainerDataSource();
-        if (container instanceof HierarchicalContainer) {
-            HierarchicalContainer hc = (HierarchicalContainer) container;
-            hasChildren = hc.hasChildren(itemId);
-        }
+        boolean hasChildren = hasChildren(itemId);
         
         // no subView present
         if (subView == null) {
@@ -286,13 +284,32 @@ public class SynergyView extends CustomComponent
             }
         }
         
+        Component itemComponent = itemComponents.get(itemId);
         if (hasChildren) {
             // add it after itemId's component
-            Component itemComponent = itemComponents.get(itemId);
             int index = layout.getComponentIndex(itemComponent);
             layout.addSubview(subView, index+1);
             subView.setParentState(state);
+            if (itemComponent != null) {
+                itemComponent.addStyleName(HAS_CHILDREN);
+            }
+        } else {
+            if (itemComponent != null) {
+                itemComponent.removeStyleName(HAS_CHILDREN);
+            }
         }
+    }
+
+    private boolean hasChildren(String itemId)
+    {
+        boolean hasChildren = false;
+        // do we have children? 
+        Container container = select.getContainerDataSource();
+        if (container instanceof HierarchicalContainer) {
+            HierarchicalContainer hc = (HierarchicalContainer) container;
+            hasChildren = hc.hasChildren(itemId);
+        }
+        return hasChildren;
     }
     
     private void setParentState(State state)

@@ -26,7 +26,7 @@ public abstract class VerticalSynergyLayout extends SynergyLayout
     protected AbstractOrderedLayout createLayout()
     {
         VerticalLayout vlayout = new VerticalLayout();
-        vlayout.setSpacing(false);
+        vlayout.setSpacing(true);
         vlayout.setMargin(false);
         vlayout.setWidth("100%");
         vlayout.setHeight("100%");
@@ -71,6 +71,7 @@ public abstract class VerticalSynergyLayout extends SynergyLayout
         case EXPAND:
             component.setHeight("100%");
             break;
+        case SPACE_AROUND:
         case SPACE_BEFORE:
             setExpandRatio(component, 1);
             setComponentAlignment(component, Alignment.BOTTOM_RIGHT);
@@ -108,6 +109,7 @@ public abstract class VerticalSynergyLayout extends SynergyLayout
             component.setHeight("100%");
             break;
         case SPACE_AFTER:
+        case SPACE_AROUND:
             setExpandRatio(component, 1);
             setComponentAlignment(component, Alignment.TOP_RIGHT);
             break;

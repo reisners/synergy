@@ -46,7 +46,7 @@
 	.#{$primary-stylename}-button-vertical {
 		text-align: left;
 		width: 100%;
-        margin: $spacing-dim 0 0 0;
+        //margin: $spacing-dim 0 0 0;
 	}
 	
 	@include synergy-image($primary-stylename: #{$primary-stylename}-image-synergy-unselected, $background-color: $unselected-color, $hover-color: $selected-color);
@@ -54,7 +54,7 @@
 	@include synergy-image($primary-stylename: #{$primary-stylename}-image-synergy-ancestor-of-selected, $background-color: $aos-color, $hover-color: $selected-color);
 
 	.#{$primary-stylename}-image-vertical {
-        margin: $spacing-dim 0 0 0;
+        //margin: $spacing-dim 0 0 0;
 	}
 
     @if $triangle-color != 'none' {
@@ -99,12 +99,22 @@
 	.#{$primary-stylename} .v-verticallayout {
 		.v-slot-wrapper.v-slot-synergy-selected {
 			background-color: $selected-color;
-			padding-bottom: $spacing-dim;
+			//padding-bottom: $spacing-dim;
 		}
 		.v-slot-wrapper.v-slot-synergy-ancestor-of-selected {
 			background-color: $aos-color;
-			padding-bottom: $spacing-dim;
+			//padding-bottom: $spacing-dim;
 		}
+
+		.v-slot-synergy-selected.v-slot-children + .v-spacing, .v-slot-synergy-selected.v-slot-wrapper + .v-spacing {
+			background-color: $selected-color;
+			width: 100% !important;
+		}
+		.v-slot-synergy-ancestor-of-selected.v-slot-children + .v-spacing, .v-slot-synergy-ancestor-of-selected.v-slot-wrapper + .v-spacing {
+			background-color: $aos-color;
+			width: 100% !important;
+		}
+
 	}
 	
 	.#{$primary-stylename}-vertical .v-slot-vertical {
