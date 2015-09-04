@@ -24,6 +24,7 @@ import com.vaadin.data.util.HierarchicalContainer;
 import com.vaadin.event.LayoutEvents.LayoutClickEvent;
 import com.vaadin.event.LayoutEvents.LayoutClickListener;
 import com.vaadin.navigator.Navigator;
+import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.server.ExternalResource;
 import com.vaadin.server.FontIcon;
 import com.vaadin.server.Page;
@@ -246,7 +247,7 @@ public class SynergyView extends CustomComponent
         } else {
             itemComponent.setState(State.unselected);
         }
-        JavaScript.getCurrent().execute("vaadin.forceLayout()");
+//        JavaScript.getCurrent().execute("vaadin.forceLayout()");
     }
 
     private void replaceSubView(String itemId, State state) {
@@ -689,5 +690,48 @@ public class SynergyView extends CustomComponent
      */
     public Container getContainer() {
         return select.getContainerDataSource();
+    }
+
+    private BiConsumer<SynergyView, ViewChangeEvent> syncer = SynergyView::defaultSyncer;
+    
+    private void defaultSyncer(ViewChangeEvent event) {
+        String targetNavigationState = extractTargetNavigationState(event);
+        final Container container = select.getContainerDataSource();
+        for (Object itemId : container.getItemIds()) {
+            Property<String> propertyTargetNavigationState = container.getContainerProperty(itemId, SynergyBuilder.PROPERTY_TARGET_NAVIGATION_STATE);
+            if (propertyTargetNavigationState != null && targetNavigationState.equals(propertyTargetNavigationState.getValue())) {
+                select.select(itemId);
+                return;
+            }
+        }
+    }
+
+    private String extractTargetNavigationState(ViewChangeEvent event)
+    {
+        return event.getViewName() + "/" + event.getParameters();
+    }
+    
+    /**
+     * Replaces the syncer.
+     * @see #syncWith(ViewChangeEvent)
+     * @param syncer
+     */
+    public void setSyncer(BiConsumer<SynergyView, ViewChangeEvent> syncer)
+    {
+        this.syncer = syncer;
+    }
+
+    /**
+     * Passes a {@code ViewChangeEvent} to the view's syncer.
+     * The default syncer will look for an item in the view's container with
+     * matching targetNavigationState and select it. 
+     * The default syncer can be replaced using
+     * @param event
+     */
+    public void syncWith(ViewChangeEvent event)
+    {
+        if (syncer != null) {
+            syncer.accept(this, event);
+        }
     }
 }
