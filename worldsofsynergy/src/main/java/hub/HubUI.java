@@ -9,21 +9,26 @@ import javax.servlet.annotation.WebServlet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.collect.Lists;
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.VaadinServletConfiguration;
-import com.vaadin.data.Item;
+import com.vaadin.data.Property.ValueChangeEvent;
+import com.vaadin.data.Property.ValueChangeListener;
+import com.vaadin.data.sort.SortOrder;
+import com.vaadin.data.util.BeanItem;
 import com.vaadin.event.SelectionEvent;
 import com.vaadin.event.SelectionEvent.SelectionListener;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServlet;
-import com.vaadin.ui.Button;
+import com.vaadin.shared.data.sort.SortDirection;
+import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Grid;
+import com.vaadin.ui.Label;
+import com.vaadin.ui.Table;
+import com.vaadin.ui.Table.ColumnGenerator;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
-
-import de.syngenio.vaadin.synergy.SynergyView;
-import de.syngenio.vaadin.synergy.builder.SynergyBuilder;
-import de.syngenio.vaadin.synergy.layout.HorizontalSynergyLayoutFactory;
+import com.vaadin.ui.renderers.HtmlRenderer;
 
 @Theme("default")
 public class HubUI extends UI
@@ -39,21 +44,54 @@ public class HubUI extends UI
     protected void init(VaadinRequest request)
     {
         VerticalLayout layout = new VerticalLayout();
+        layout.setSizeFull();
         setContent(layout);
-        Grid grid = new Grid("Worlds of Synergy", WorldHelper.getWorlds());
-        grid.addSelectionListener(new SelectionListener() {
+        Table table = new Table("Worlds of Synergy", WorldHelper.getWorlds());
+        table.addGeneratedColumn("description", new ColumnGenerator() {
 
             @Override
-            public void select(SelectionEvent event)
+            public Object generateCell(Table source, Object itemId, Object columnId)
             {
-                WorldBean bean = (WorldBean) grid.getSelectedRow();
-                if (bean.getPath() != null) {
-                    String contextPath = VaadinServlet.getCurrent().getServletContext().getContextPath();
-                    getPage().setLocation(contextPath+bean.getPath());
-                }
+                String text = (String) source.getContainerDataSource().getItem(itemId).getItemProperty("description").getValue();
+                return new Label(text, ContentMode.HTML);
             }
+            
         });
-        grid.setSizeFull();
-        layout.addComponent(grid);
+        table.setVisibleColumns("name", "description");
+        table.setSelectable(true);
+        table.setImmediate(true);
+        table.addValueChangeListener(new ValueChangeListener() {
+        @Override
+        public void valueChange(ValueChangeEvent event)
+        {
+            WorldBean bean = ((BeanItem<WorldBean>)table.getItem(event.getProperty().getValue())).getBean();
+            if (bean.getPath() != null) {
+                String contextPath = VaadinServlet.getCurrent().getServletContext().getContextPath();
+                getPage().setLocation(contextPath+bean.getPath());
+            }
+        }
+        });
+        table.sort(new Object[] {"name"}, new boolean[] {true});
+        layout.addComponent(table);
+        
+//        Grid grid = new Grid("Worlds of Synergy", WorldHelper.getWorlds());
+//        grid.setColumnOrder("name", "description");
+//        grid.setSortOrder(Lists.asList(new SortOrder("name", SortDirection.ASCENDING), new SortOrder[] {}));
+//        grid.getColumn("description").setRenderer(new HtmlRenderer());
+//        grid.getColumn("description").setExpandRatio(1);
+//        grid.addSelectionListener(new SelectionListener() {
+//
+//            @Override
+//            public void select(SelectionEvent event)
+//            {
+//                WorldBean bean = (WorldBean) grid.getSelectedRow();
+//                if (bean.getPath() != null) {
+//                    String contextPath = VaadinServlet.getCurrent().getServletContext().getContextPath();
+//                    getPage().setLocation(contextPath+bean.getPath());
+//                }
+//            }
+//        });
+//        grid.setSizeFull();
+//        layout.addComponent(grid);
     }
 }

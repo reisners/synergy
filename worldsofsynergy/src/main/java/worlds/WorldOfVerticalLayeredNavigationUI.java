@@ -25,6 +25,7 @@ import de.syngenio.vaadin.synergy.layout.VerticalSynergyLayoutFactory;
 import de.syngenio.vaadin.synergy.layout.AbstractSynergyLayoutFactory.Packing;
 
 @Theme("default")
+@WorldDescription(prose="", tags={"vertical", "hiearchical", "layered", "text"})
 public class WorldOfVerticalLayeredNavigationUI extends UI
 {
     @WebServlet(value = "/vertical/layered/*", asyncSupported = true)

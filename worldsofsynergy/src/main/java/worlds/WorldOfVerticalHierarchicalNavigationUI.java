@@ -25,7 +25,7 @@ import de.syngenio.vaadin.synergy.layout.AbstractSynergyLayoutFactory.Packing;
 import de.syngenio.vaadin.synergy.layout.VerticalSynergyLayoutFactory;
 
 @Theme("default")
-@WorldTags({"vertical", "hierarchical", "inline", "caption", "icon"})
+@WorldDescription(prose="demonstrates a navigation hierarchy in a vertical nested layout. Some of the text items are inlined with an icon. The synergy view has a caption (text and icon). All four different ways of packing are demonstrated side by side.", tags={"vertical", "hierarchical", "nested", "inline", "caption", "icon"})
 public class WorldOfVerticalHierarchicalNavigationUI extends UI
 {
     @WebServlet(value = "/vertical/hierarchical/*", asyncSupported = true)

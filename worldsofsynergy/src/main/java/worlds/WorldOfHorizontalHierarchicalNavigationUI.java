@@ -25,7 +25,7 @@ import de.syngenio.vaadin.synergy.layout.HorizontalSynergyLayoutFactory;
 import de.syngenio.vaadin.synergy.layout.VerticalSynergyLayoutFactory;
 
 @Theme("default")
-@WorldTags({"horizontal", "hierarchical", "text"})
+@WorldDescription(prose="demonstrates two stacked navigation levels of text items arranged horizontally.\nAll four ways of packing are demonstrated simultaneously.", tags={"horizontal", "hierarchical", "layered", "text"})
 public class WorldOfHorizontalHierarchicalNavigationUI extends UI
 {
     @WebServlet(value = "/horizontal/hierarchical/*", asyncSupported = true)
@@ -34,13 +34,15 @@ public class WorldOfHorizontalHierarchicalNavigationUI extends UI
     }
 
     private static final Logger log = LoggerFactory.getLogger(WorldOfHorizontalHierarchicalNavigationUI.class);
+    private SynergyView synergyViewH1;
+    private SynergyView synergyViewH2;
     
     @Override
     protected void init(VaadinRequest request)
     {
         VerticalLayout vlayout = new VerticalLayout();
         vlayout.setSizeFull();
-        SynergyView synergyViewH1 = new SynergyView(new HorizontalSynergyLayoutFactory(), WorldHelper.getNavigationHierarchy());
+        synergyViewH1 = new SynergyView(new HorizontalSynergyLayoutFactory(), WorldHelper.getNavigationHierarchy());
         synergyViewH1.addStyleName("h1");
         synergyViewH1.setHeightUndefined();
         synergyViewH1.setWidth("100%");
@@ -48,8 +50,8 @@ public class WorldOfHorizontalHierarchicalNavigationUI extends UI
         vlayout.addComponent(synergyViewH1);
         vlayout.setExpandRatio(synergyViewH1, 0f);
         
-        SynergyView synergyViewH2 = new SynergyView(new HorizontalSynergyLayoutFactory(), synergyViewH1);
-        synergyViewH1.addStyleName("h2");
+        synergyViewH2 = new SynergyView(new HorizontalSynergyLayoutFactory(), synergyViewH1);
+        synergyViewH2.addStyleName("h2");
         synergyViewH2.setHeightUndefined();
         synergyViewH2.setWidth("100%");
 //        synergyViewH2.setWidthUndefined();
@@ -86,11 +88,12 @@ public class WorldOfHorizontalHierarchicalNavigationUI extends UI
         getNavigator().addView("view", genericView);
     }
     
-    private static class NavigationView extends Label implements View {
+    private class NavigationView extends Label implements View {
         @Override
         public void enter(ViewChangeEvent event)
         {
             setValue(event.getParameters());
+            synergyViewH1.syncWith(event);
         }
     }
 }

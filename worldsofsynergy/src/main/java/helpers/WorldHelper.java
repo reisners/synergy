@@ -1,6 +1,7 @@
 package helpers;
 
-import java.util.Collections;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Set;
 
 import javax.servlet.annotation.WebServlet;
@@ -9,11 +10,12 @@ import org.reflections.Reflections;
 import org.reflections.scanners.SubTypesScanner;
 import org.reflections.scanners.TypeAnnotationsScanner;
 
+import worlds.WorldDescription;
+
 import com.vaadin.data.Container;
 import com.vaadin.data.Container.Indexed;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.data.util.HierarchicalContainer;
-import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.ThemeResource;
 
@@ -99,11 +101,16 @@ public class WorldHelper
 
     public static class WorldBean {
         private String name;
+        private String description;
         private String path;
         private Set<String> tags;
         public String getName()
         {
             return name;
+        }
+        public String getDescription()
+        {
+            return description;
         }
         public String getPath()
         {
@@ -124,9 +131,15 @@ public class WorldHelper
             WebServlet ws = (WebServlet) webServletClass.getAnnotation(WebServlet.class);
             String path = ws.value()[0].replaceAll("/\\*$", "");
             WorldBean bean = new WorldBean();
-            bean.name = webServletClass.getEnclosingClass().getSimpleName();
+            final Class worldClass = webServletClass.getEnclosingClass();
+            WorldDescription description = (WorldDescription) worldClass.getAnnotation(WorldDescription.class);
+            if (description == null) {
+                continue;
+            }
+            bean.name = worldClass.getSimpleName();
             bean.path = path;
-            bean.tags = Collections.emptySet();
+            bean.tags = new HashSet<String>(Arrays.asList(description.tags()));
+            bean.description = description.prose();
             indexed.addBean(bean);
         }
         return indexed;

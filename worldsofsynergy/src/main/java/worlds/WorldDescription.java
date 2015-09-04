@@ -7,6 +7,7 @@ import java.lang.annotation.Target;
 
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface WorldTags {
-    String[] value();
+public @interface WorldDescription {
+    String prose();
+    String[] tags();
 }
