@@ -1,5 +1,7 @@
 package worlds;
 
+import java.util.Optional;
+
 import helpers.WorldHelper;
 
 import javax.servlet.annotation.WebServlet;
@@ -39,7 +41,7 @@ import de.syngenio.vaadin.synergy.layout.VerticalSynergyLayoutFactory;
 
 @Theme("default")
 @WorldDescription(prose="demonstrates the dynamic nature of the navigation by letting the user add new items themselves", tags={"vertical", "hierarchical", "dynamical", "inline"})
-public class WorldOfVerticalDynamicalNavigationUI extends UI
+public class WorldOfVerticalDynamicalNavigationUI extends WorldUI
 {
     @WebServlet(value = "/vertical/dynamical/*", asyncSupported = true)
     @VaadinServletConfiguration(productionMode = false, ui = WorldOfVerticalDynamicalNavigationUI.class)
@@ -74,12 +76,14 @@ public class WorldOfVerticalDynamicalNavigationUI extends UI
             public void valueChange(ValueChangeEvent event)
             {
                 String name = propertyName.getValue();
-                log.debug("form value change: name="+name);
-                new SynergyBuilder(container, "names") {{
-                    addItem(item().withCaption(name));
-                }}.build();
+                if (!"".equals(name)) {
+                    log.debug("form value change: name="+name);
+                    new SynergyBuilder(container, "names") {{
+                        addItem(item().withCaption(name));
+                    }}.build();
+                    propertyName.setValue("");
+                }
             }
-            
         });
         
         HorizontalLayout hlayout = new HorizontalLayout();

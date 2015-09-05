@@ -35,7 +35,7 @@ import de.syngenio.vaadin.synergy.layout.AbstractSynergyLayoutFactory.Packing;
 import de.syngenio.vaadin.synergy.layout.HorizontalSynergyLayoutFactory;
 
 @Theme("default")
-public class WorldOfHorizontalImageNavigationUI extends UI
+public class WorldOfHorizontalImageNavigationUI extends WorldUI
 {
     @WebServlet(value = "/horizontal/images/*", asyncSupported = true)
     @VaadinServletConfiguration(productionMode = false, ui = WorldOfHorizontalImageNavigationUI.class)
@@ -47,6 +47,7 @@ public class WorldOfHorizontalImageNavigationUI extends UI
     @Override
     protected void init(VaadinRequest request)
     {
+        super.init(request);
         final HierarchicalContainer container = WorldHelper.getImageNavigation2();
         List<Object> itemIds = new ArrayList<Object>(container.getItemIds());
         
@@ -99,25 +100,9 @@ public class WorldOfHorizontalImageNavigationUI extends UI
             
         }
 
-        Panel panel = new Panel();
-        panel.setSizeFull();
-        panel.setId("content");
         vlayout.addComponent(panel);
         vlayout.setExpandRatio(panel, 1f);
 
         setContent(vlayout);
-        
-        setNavigator(new Navigator(this, panel));
-        final NavigationView genericView = new NavigationView();
-        getNavigator().addView("", genericView);
-        getNavigator().addView("view", genericView);
-    }
-    
-    private static class NavigationView extends Label implements View {
-        @Override
-        public void enter(ViewChangeEvent event)
-        {
-            setValue(event.getParameters());
-        }
     }
 }

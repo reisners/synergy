@@ -1,5 +1,6 @@
 package helpers;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -99,7 +100,7 @@ public class WorldHelper
         }}.build();
     }
 
-    public static class WorldBean {
+    public static class WorldBean implements Serializable {
         private String name;
         private String description;
         private String path;
