@@ -26,7 +26,7 @@ import de.syngenio.vaadin.synergy.layout.VerticalSynergyLayoutFactory;
 
 @Theme("default")
 @WorldDescription(prose="demonstrates two stacked navigation levels of text items arranged horizontally.\nAll four ways of packing are demonstrated simultaneously.", tags={"horizontal", "hierarchical", "layered", "text"})
-public class WorldOfHorizontalHierarchicalNavigationUI extends UI
+public class WorldOfHorizontalHierarchicalNavigationUI extends WorldUI
 {
     @WebServlet(value = "/horizontal/hierarchical/*", asyncSupported = true)
     @VaadinServletConfiguration(productionMode = false, ui = WorldOfHorizontalHierarchicalNavigationUI.class)
@@ -40,6 +40,7 @@ public class WorldOfHorizontalHierarchicalNavigationUI extends UI
     @Override
     protected void init(VaadinRequest request)
     {
+        super.init(request);
         VerticalLayout vlayout = new VerticalLayout();
         vlayout.setSizeFull();
         synergyViewH1 = new SynergyView(new HorizontalSynergyLayoutFactory(), WorldHelper.getNavigationHierarchy());
@@ -74,26 +75,9 @@ public class WorldOfHorizontalHierarchicalNavigationUI extends UI
         
         synergyViewH2.setSubView(synergyViewVertical);
         
-        Panel panel = new Panel();
-        panel.setSizeFull();
-        panel.setId("content");
         hlayout.addComponent(panel);
         hlayout.setExpandRatio(panel, 1f);
 
         setContent(vlayout);
-        
-        setNavigator(new Navigator(this, panel));
-        final NavigationView genericView = new NavigationView();
-        getNavigator().addView("", genericView);
-        getNavigator().addView("view", genericView);
-    }
-    
-    private class NavigationView extends Label implements View {
-        @Override
-        public void enter(ViewChangeEvent event)
-        {
-            setValue(event.getParameters());
-            synergyViewH1.syncWith(event);
-        }
     }
 }

@@ -9,16 +9,10 @@ import org.slf4j.LoggerFactory;
 
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.VaadinServletConfiguration;
-import com.vaadin.navigator.Navigator;
-import com.vaadin.navigator.View;
-import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServlet;
 import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Label;
-import com.vaadin.ui.Panel;
-import com.vaadin.ui.UI;
 
 import de.syngenio.vaadin.synergy.SynergyView;
 import de.syngenio.vaadin.synergy.layout.AbstractSynergyLayoutFactory.Packing;
@@ -26,7 +20,7 @@ import de.syngenio.vaadin.synergy.layout.VerticalSynergyLayoutFactory;
 
 @Theme("trek")
 //@WorldDescription(prose="demonstrates that each subview can be styled individually", tags={"vertical", "hierarchical", "text", "caption", "icon", "datadrivenstyle"})
-public class WorldOfVerticalDataDrivenStyleNavigationUI extends UI
+public class WorldOfVerticalDataDrivenStyleNavigationUI extends WorldUI
 {
     @WebServlet(value = "/vertical/datadrivenstyle/*", asyncSupported = true)
     @VaadinServletConfiguration(productionMode = false, ui = WorldOfVerticalDataDrivenStyleNavigationUI.class)
@@ -38,6 +32,7 @@ public class WorldOfVerticalDataDrivenStyleNavigationUI extends UI
     @Override
     protected void init(VaadinRequest request)
     {
+        super.init(request);
         HorizontalLayout hlayout = new HorizontalLayout();
         hlayout.setSizeFull();
         SynergyView synergyViewSpaceAfter = new SynergyView(new VerticalSynergyLayoutFactory(Packing.SPACE_AFTER), WorldHelper.getNavigationHierarchyWithStyle());
@@ -76,25 +71,9 @@ public class WorldOfVerticalDataDrivenStyleNavigationUI extends UI
         hlayout.addComponent(synergyViewExpand);
         hlayout.setExpandRatio(synergyViewExpand, 0f);
         
-        Panel panel = new Panel();
-        panel.setSizeFull();
-        panel.setId("content");
         hlayout.addComponent(panel);
         hlayout.setExpandRatio(panel, 1f);
 
         setContent(hlayout);
-        
-        setNavigator(new Navigator(this, panel));
-        final NavigationView genericView = new NavigationView();
-        getNavigator().addView("", genericView);
-        getNavigator().addView("view", genericView);
-    }
-    
-    private static class NavigationView extends Label implements View {
-        @Override
-        public void enter(ViewChangeEvent event)
-        {
-            setValue(event.getParameters());
-        }
     }
 }

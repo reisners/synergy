@@ -26,7 +26,7 @@ import de.syngenio.vaadin.synergy.layout.AbstractSynergyLayoutFactory.Packing;
 
 @Theme("default")
 @WorldDescription(prose="", tags={"vertical", "hiearchical", "layered", "text"})
-public class WorldOfVerticalLayeredNavigationUI extends UI
+public class WorldOfVerticalLayeredNavigationUI extends WorldUI
 {
     @WebServlet(value = "/vertical/layered/*", asyncSupported = true)
     @VaadinServletConfiguration(productionMode = false, ui = WorldOfVerticalLayeredNavigationUI.class)
@@ -38,6 +38,7 @@ public class WorldOfVerticalLayeredNavigationUI extends UI
     @Override
     protected void init(VaadinRequest request)
     {
+        super.init(request);
         HorizontalLayout hlayout = new HorizontalLayout();
         hlayout.setSizeFull();
         SynergyView synergyViewTop = new SynergyView(new VerticalFlatSynergyLayoutFactory(Packing.EXPAND), WorldHelper.getNavigationHierarchy());
@@ -51,25 +52,9 @@ public class WorldOfVerticalLayeredNavigationUI extends UI
         hlayout.addComponent(synergyViewSub);
         hlayout.setExpandRatio(synergyViewSub, 0f);
 
-        Panel panel = new Panel();
-        panel.setSizeFull();
-        panel.setId("content");
         hlayout.addComponent(panel);
         hlayout.setExpandRatio(panel, 1f);
 
         setContent(hlayout);
-        
-        setNavigator(new Navigator(this, panel));
-        final NavigationView genericView = new NavigationView();
-        getNavigator().addView("", genericView);
-        getNavigator().addView("view", genericView);
-    }
-    
-    private static class NavigationView extends Label implements View {
-        @Override
-        public void enter(ViewChangeEvent event)
-        {
-            setValue(event.getParameters());
-        }
     }
 }

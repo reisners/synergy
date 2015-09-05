@@ -29,7 +29,7 @@ import de.syngenio.vaadin.synergy.layout.VerticalSynergyLayoutFactory;
 
 @Theme("default")
 @WorldDescription(prose="demonstrates a single vertical sidebar of large navigation icons", tags={"vertical", "stacked"})
-public class WorldOfImageSidebarNavigationUI extends UI
+public class WorldOfImageSidebarNavigationUI extends WorldUI
 {
     @WebServlet(value = "/vertical/images/*", asyncSupported = true)
     @VaadinServletConfiguration(productionMode = false, ui = WorldOfImageSidebarNavigationUI.class)
@@ -41,6 +41,7 @@ public class WorldOfImageSidebarNavigationUI extends UI
     @Override
     protected void init(VaadinRequest request)
     {
+        super.init(request);
         HorizontalLayout hlayout = new HorizontalLayout();
         hlayout.setSizeFull();
         SynergyView synergyView = new SynergyView(new VerticalSynergyLayoutFactory(Packing.EXPAND), WorldHelper.getImageNavigation2());
@@ -50,34 +51,9 @@ public class WorldOfImageSidebarNavigationUI extends UI
         hlayout.addComponent(synergyView);
         hlayout.setExpandRatio(synergyView, 0f);
         
-        Panel panel = new Panel();
-        panel.setSizeFull();
-        panel.setId("content");
         hlayout.addComponent(panel);
         hlayout.setExpandRatio(panel, 1f);
 
         setContent(hlayout);
-        
-        setNavigator(new Navigator(this, panel));
-        final NavigationView genericView = new NavigationView();
-        getNavigator().addView("", genericView);
-        getNavigator().addView("view", genericView);
-    }
-    
-    private static class NavigationView extends CustomComponent implements View {
-        private Label label;
-        private Image image;
-        
-        private NavigationView() {
-            VerticalLayout vlayout = new VerticalLayout();
-            setCompositionRoot(vlayout);
-            label = new Label("(empty)");
-            vlayout.addComponent(label);
-        }
-        @Override
-        public void enter(ViewChangeEvent event)
-        {
-            label.setValue(event.getParameters());
-        }
     }
 }
