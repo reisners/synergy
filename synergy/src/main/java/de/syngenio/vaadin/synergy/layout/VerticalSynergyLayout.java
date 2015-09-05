@@ -1,5 +1,6 @@
 package de.syngenio.vaadin.synergy.layout;
 
+import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.ui.AbstractOrderedLayout;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Component;

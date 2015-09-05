@@ -106,11 +106,11 @@
 			//padding-bottom: $spacing-dim;
 		}
 
-		.v-slot-synergy-selected.v-slot-children + .v-spacing, .v-slot-synergy-selected.v-slot-wrapper + .v-spacing {
+		.v-slot-synergy-selected.v-slot-children + .v-spacing /*, .v-slot-synergy-selected.v-slot-wrapper + .v-spacing */ {
 			background-color: $selected-color;
 			width: 100% !important;
 		}
-		.v-slot-synergy-ancestor-of-selected.v-slot-children + .v-spacing, .v-slot-synergy-ancestor-of-selected.v-slot-wrapper + .v-spacing {
+		.v-slot-synergy-ancestor-of-selected.v-slot-children + .v-spacing /*, .v-slot-synergy-ancestor-of-selected.v-slot-wrapper + .v-spacing */ {
 			background-color: $aos-color;
 			width: 100% !important;
 		}

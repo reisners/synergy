@@ -1,5 +1,6 @@
 package de.syngenio.vaadin.synergy.layout;
 
+import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
@@ -42,6 +43,7 @@ public class VerticalSynergyLayoutFactory extends AbstractSynergyLayoutFactory
                 label.setWidth(indentWidth);
                 label.setHeightUndefined();
                 HorizontalLayout wrapper = new HorizontalLayout(label, subview);
+                wrapper.setMargin(new MarginInfo(false, false, true, false));
                 wrapper.addStyleName("wrapper");
                 wrapper.setWidth("100%");
                 wrapper.setHeightUndefined();
