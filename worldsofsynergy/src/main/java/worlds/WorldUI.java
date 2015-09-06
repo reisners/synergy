@@ -8,6 +8,7 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.UI;
 
+@SuppressWarnings("serial")
 public abstract class WorldUI extends UI
 {
     protected Panel panel;
