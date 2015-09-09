@@ -2,13 +2,20 @@ package worlds;
 
 import helpers.WorldHelper;
 
+
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 
 import javax.servlet.annotation.WebServlet;
 
+
+import org.eclipse.jetty.util.log.Log;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.VaadinServletConfiguration;
@@ -30,28 +37,40 @@ import com.vaadin.ui.Panel;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 
+
 import de.syngenio.vaadin.synergy.SynergyView;
 import de.syngenio.vaadin.synergy.layout.AbstractSynergyLayoutFactory.Packing;
 import de.syngenio.vaadin.synergy.layout.HorizontalSynergyLayoutFactory;
 
 @Theme("default")
+@WorldDescription(prose="demonstrates a horizontal image navigation bar.\nAll four ways of packing are demonstrated simultaneously.", tags={"horizontal", "image"})
 public class WorldOfHorizontalImageNavigationUI extends WorldUI
 {
+    private final static Logger LOG = LoggerFactory.getLogger(WorldOfHorizontalImageNavigationUI.class);
+    
     @WebServlet(value = "/horizontal/images/*", asyncSupported = true)
     @VaadinServletConfiguration(productionMode = false, ui = WorldOfHorizontalImageNavigationUI.class)
     public static class Servlet extends VaadinServlet {
     }
 
     private static final Logger log = LoggerFactory.getLogger(WorldOfHorizontalImageNavigationUI.class);
+
+    private Map<Packing, SynergyView> views = new HashMap<Packing, SynergyView>();
+
+    private ComboBox selectPacking;
+
+    private VerticalLayout vlayout;
+
+    private HierarchicalContainer container;
     
     @Override
     protected void init(VaadinRequest request)
     {
         super.init(request);
-        final HierarchicalContainer container = WorldHelper.getImageNavigation2();
+        container = WorldHelper.getImageNavigation2();
         List<Object> itemIds = new ArrayList<Object>(container.getItemIds());
         
-        VerticalLayout vlayout = new VerticalLayout();
+        vlayout = new VerticalLayout();
         vlayout.setSizeFull();
         
         ComboBox selectNumber = new ComboBox("Number of items");
@@ -79,7 +98,6 @@ public class WorldOfHorizontalImageNavigationUI extends WorldUI
                     @Override
                     public boolean appliesToProperty(Object propertyId)
                     {
-                        // TODO Auto-generated method stub
                         return false;
                     }
                     
@@ -87,22 +105,67 @@ public class WorldOfHorizontalImageNavigationUI extends WorldUI
             }
         });
         vlayout.addComponent(selectNumber);
+        vlayout.setExpandRatio(selectNumber, 0);
         
+        selectPacking = new ComboBox("Choose Packing");
+        selectPacking.setImmediate(true);
+        selectPacking.addItems(Packing.SPACE_AFTER, Packing.SPACE_AROUND, Packing.SPACE_BEFORE, Packing.EXPAND);
+        selectPacking.select(Packing.SPACE_AFTER);
+        selectPacking.addValueChangeListener(new ValueChangeListener() {
+            @Override
+            public void valueChange(ValueChangeEvent event)
+            {
+                handleVisibility();
+            }
+        });
+        vlayout.addComponent(selectPacking);
+        vlayout.setExpandRatio(selectPacking, 0);
+
         for (Packing packing : Packing.values()) {
             SynergyView synergyView = new SynergyView(new HorizontalSynergyLayoutFactory(packing), container);
             synergyView.setCaption(packing.name());
-//            synergyView.setIcon(FontAwesome.FONT);
+            FontAwesome icon = null;
+            switch (packing) {
+            case SPACE_AFTER:
+                icon = FontAwesome.ALIGN_LEFT;
+                break;
+            case SPACE_AROUND:
+                icon = FontAwesome.ALIGN_CENTER;
+                break;
+            case SPACE_BEFORE:
+                icon = FontAwesome.ALIGN_RIGHT;
+                break;
+            case EXPAND:
+                icon = FontAwesome.ALIGN_JUSTIFY;
+                break;
+            }
+            synergyView.setIcon(icon);
             synergyView.setHeightUndefined();
             synergyView.setWidth("100%");
-            vlayout.addComponent(synergyView);
-            vlayout.setComponentAlignment(synergyView, Alignment.TOP_LEFT);
-            vlayout.setExpandRatio(synergyView, 0f);
-            
+
+            views.put(packing, synergyView);
         }
 
         vlayout.addComponent(panel);
         vlayout.setExpandRatio(panel, 1f);
+        
+        handleVisibility();
 
         setContent(vlayout);
+    }
+
+    private void handleVisibility()
+    {
+        views.forEach((packing, synergyView) -> {
+            boolean visible = packing.equals(selectPacking.getValue());
+
+            if (visible) {
+                vlayout.addComponent(synergyView, vlayout.getComponentIndex(panel));
+                vlayout.setComponentAlignment(synergyView, Alignment.TOP_LEFT);
+                vlayout.setExpandRatio(synergyView, 0f);
+            } else {
+                vlayout.removeComponent(synergyView);
+            }
+        });
     }
 }

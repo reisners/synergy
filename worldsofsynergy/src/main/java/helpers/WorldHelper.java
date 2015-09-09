@@ -29,16 +29,16 @@ public class WorldHelper
         return new SynergyBuilder() {{
             addItem(item().withCaption("First"));
             addItem(
-                    group().withCaption("Resources").withChildren( 
+                    group().withCaption("Resources").withDescription("Click here for Resources navigation choices").withChildren( 
                             group().withCaption("Assets").withChildren(
-                                    item().withCaption("Machines").withIcon(FontAwesome.COGS).withTargetNavigationState("view/Machines"),
-                                    item().withCaption("Real Estate").withIcon(FontAwesome.HOME).withTargetNavigationState("view/Real Estate"),
-                                    item().withCaption("Patents").withIcon(FontAwesome.SHIELD).withTargetNavigationState("view/Patents")),
-                            item().withCaption("People").withIcon(FontAwesome.USERS).withTargetNavigationState("view/People")));
+                                    item().withCaption("Machines").withIcon(FontAwesome.COGS).withDescription("Click here to navigate to Machines view").withTargetNavigationState("view/Machines"),
+                                    item().withCaption("Real Estate").withIcon(FontAwesome.HOME).withDescription("Click here to navigate to Real Estate view").withTargetNavigationState("view/Real Estate"),
+                                    item().withCaption("Patents").withIcon(FontAwesome.SHIELD).withDescription("Click here to navigate to Patents view").withTargetNavigationState("view/Patents")),
+                            item().withCaption("People").withIcon(FontAwesome.USERS).withDescription("Click here to navigate to People view").withTargetNavigationState("view/People")));
             addItem(item().withCaption("Something"));
-            addItem(group().withCaption("Processes").withChildren(
-                    item().withCaption("Core").withTargetNavigationState("view/Core Processes"),
-                    item().withCaption("Auxiliary").withTargetNavigationState("view/Auxiliary Processes")));
+            addItem(group().withCaption("Processes").withDescription("Click here for Processes navigation choices").withChildren(
+                    item().withCaption("Core").withDescription("Click here to navigate to Core Processes view").withTargetNavigationState("view/Core Processes"),
+                    item().withCaption("Auxiliary").withDescription("Click here to navigate to Auxiliary Processes view").withTargetNavigationState("view/Auxiliary Processes")));
             addItem(item().withCaption("More"));
         }}.build();
     }

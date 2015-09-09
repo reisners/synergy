@@ -2,25 +2,24 @@ package worlds;
 
 import helpers.WorldHelper;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.servlet.annotation.WebServlet;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import worlds.WorldUI.NavigationView;
-
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.VaadinServletConfiguration;
-import com.vaadin.navigator.Navigator;
-import com.vaadin.navigator.View;
-import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
+import com.vaadin.data.Property.ValueChangeEvent;
+import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServlet;
+import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Label;
-import com.vaadin.ui.Panel;
-import com.vaadin.ui.UI;
+import com.vaadin.ui.VerticalLayout;
 
 import de.syngenio.vaadin.synergy.SynergyView;
 import de.syngenio.vaadin.synergy.layout.AbstractSynergyLayoutFactory.Packing;
@@ -36,52 +35,97 @@ public class WorldOfVerticalHierarchicalNavigationUI extends WorldUI
     }
 
     private static final Logger log = LoggerFactory.getLogger(WorldOfVerticalHierarchicalNavigationUI.class);
+
+    private Map<Packing, SynergyView> views = new HashMap<Packing, SynergyView>();
     
     @Override
     protected void init(VaadinRequest request)
     {
         super.init(request);
+        VerticalLayout vlayout = new VerticalLayout();
+        vlayout.setSizeFull();
+        ComboBox select = new ComboBox("Choose Packing");
+        select.setImmediate(true);
+        select.addItems(Packing.SPACE_AFTER, Packing.SPACE_AROUND, Packing.SPACE_BEFORE, Packing.EXPAND);
+        select.select(Packing.SPACE_AFTER);
+        select.addValueChangeListener(new ValueChangeListener() {
+            @Override
+            public void valueChange(ValueChangeEvent event)
+            {
+                views.forEach((packing, view) -> {
+                    view.setVisible(packing.equals(select.getValue()));
+                });
+            }
+        });
+        vlayout.addComponent(select);
+        vlayout.setExpandRatio(select, 0);
+        
         HorizontalLayout hlayout = new HorizontalLayout();
         hlayout.setSizeFull();
-        SynergyView synergyViewSpaceAfter = new SynergyView(new VerticalSynergyLayoutFactory(Packing.SPACE_AFTER), WorldHelper.getNavigationHierarchy());
-        synergyViewSpaceAfter.setCaption(Packing.SPACE_AFTER.name());
-        synergyViewSpaceAfter.setIcon(FontAwesome.ALIGN_LEFT);
-        synergyViewSpaceAfter.setWidthUndefined();
-        synergyViewSpaceAfter.setHeight("100%");
-//        synergyView.setWidth("30%");
-        hlayout.addComponent(synergyViewSpaceAfter);
-        hlayout.setExpandRatio(synergyViewSpaceAfter, 0f);
+        vlayout.addComponent(hlayout);
+        vlayout.setExpandRatio(hlayout, 1);
         
-        SynergyView synergyViewSpaceAround = new SynergyView(new VerticalSynergyLayoutFactory(Packing.SPACE_AROUND), WorldHelper.getNavigationHierarchy());
-        synergyViewSpaceAround.setCaption(Packing.SPACE_AROUND.name());
-        synergyViewSpaceAround.setIcon(FontAwesome.ALIGN_CENTER);
-        synergyViewSpaceAround.setWidthUndefined();
-        synergyViewSpaceAround.setHeight("100%");
-//        synergyView.setWidth("30%");
-        hlayout.addComponent(synergyViewSpaceAround);
-        hlayout.setExpandRatio(synergyViewSpaceAround, 0f);
+        for (Packing packing : Packing.values()) {
+            SynergyView synergyView = new SynergyView(new VerticalSynergyLayoutFactory(packing), WorldHelper.getNavigationHierarchy());
+            synergyView.setCaption(packing.name());
+            FontAwesome icon = null;
+            switch (packing) {
+            case SPACE_AFTER:
+                icon = FontAwesome.ALIGN_LEFT;
+                break;
+            case SPACE_AROUND:
+                icon = FontAwesome.ALIGN_CENTER;
+                break;
+            case SPACE_BEFORE:
+                icon = FontAwesome.ALIGN_RIGHT;
+                break;
+            case EXPAND:
+                icon = FontAwesome.ALIGN_JUSTIFY;
+                break;
+            }
+            synergyView.setIcon(icon);
+            synergyView.setWidthUndefined();
+            synergyView.setHeight("100%");
+    //        synergyView.setWidth("30%");
+            hlayout.addComponent(synergyView);
+            hlayout.setExpandRatio(synergyView, 0f);
+            synergyView.setVisible(packing.equals(select.getValue()));
+            views.put(packing, synergyView);
+        }
         
-        SynergyView synergyViewSpaceBefore = new SynergyView(new VerticalSynergyLayoutFactory(Packing.SPACE_BEFORE), WorldHelper.getNavigationHierarchy());
-        synergyViewSpaceBefore.setCaption(Packing.SPACE_BEFORE.name());
-        synergyViewSpaceBefore.setIcon(FontAwesome.ALIGN_RIGHT);
-        synergyViewSpaceBefore.setWidthUndefined();
-        synergyViewSpaceBefore.setHeight("100%");
-//        synergyView.setWidth("30%");
-        hlayout.addComponent(synergyViewSpaceBefore);
-        hlayout.setExpandRatio(synergyViewSpaceBefore, 0f);
+//        SynergyView synergyViewSpaceAround = new SynergyView(new VerticalSynergyLayoutFactory(Packing.SPACE_AROUND), WorldHelper.getNavigationHierarchy());
+//        synergyViewSpaceAround.setCaption(Packing.SPACE_AROUND.name());
+//        synergyViewSpaceAround.setIcon(FontAwesome.ALIGN_CENTER);
+//        synergyViewSpaceAround.setWidthUndefined();
+//        synergyViewSpaceAround.setHeight("100%");
+////        synergyView.setWidth("30%");
+//        hlayout.addComponent(synergyViewSpaceAround);
+//        hlayout.setExpandRatio(synergyViewSpaceAround, 0f);
+//        synergyViewSpaceAround.setVisible(false);
+//        
+//        SynergyView synergyViewSpaceBefore = new SynergyView(new VerticalSynergyLayoutFactory(Packing.SPACE_BEFORE), WorldHelper.getNavigationHierarchy());
+//        synergyViewSpaceBefore.setCaption(Packing.SPACE_BEFORE.name());
+//        synergyViewSpaceBefore.setIcon(FontAwesome.ALIGN_RIGHT);
+//        synergyViewSpaceBefore.setWidthUndefined();
+//        synergyViewSpaceBefore.setHeight("100%");
+////        synergyView.setWidth("30%");
+//        hlayout.addComponent(synergyViewSpaceBefore);
+//        hlayout.setExpandRatio(synergyViewSpaceBefore, 0f);
+//        synergyViewSpaceBefore.setVisible(false);
+//        
+//        SynergyView synergyViewExpand = new SynergyView(new VerticalSynergyLayoutFactory(Packing.EXPAND), WorldHelper.getNavigationHierarchy());
+//        synergyViewExpand.setCaption(Packing.EXPAND.name());
+//        synergyViewExpand.setIcon(FontAwesome.ALIGN_JUSTIFY);
+//        synergyViewExpand.setWidthUndefined();
+//        synergyViewExpand.setHeight("100%");
+////        synergyView.setWidth("30%");
+//        hlayout.addComponent(synergyViewExpand);
+//        hlayout.setExpandRatio(synergyViewExpand, 0f);
+//        synergyViewExpand.setVisible(false);
         
-        SynergyView synergyViewExpand = new SynergyView(new VerticalSynergyLayoutFactory(Packing.EXPAND), WorldHelper.getNavigationHierarchy());
-        synergyViewExpand.setCaption(Packing.EXPAND.name());
-        synergyViewExpand.setIcon(FontAwesome.ALIGN_JUSTIFY);
-        synergyViewExpand.setWidthUndefined();
-        synergyViewExpand.setHeight("100%");
-//        synergyView.setWidth("30%");
-        hlayout.addComponent(synergyViewExpand);
-        hlayout.setExpandRatio(synergyViewExpand, 0f);
-
         hlayout.addComponent(panel);
         hlayout.setExpandRatio(panel, 1f);
 
-        setContent(hlayout);
+        setContent(vlayout);
     }
 }
