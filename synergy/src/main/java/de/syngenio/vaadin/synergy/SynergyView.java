@@ -208,6 +208,13 @@ public class SynergyView extends CustomComponent
         setCompositionRoot(layout);
     }
 
+    @Override
+    public void attach()
+    {
+        super.attach();
+        visualizeItems(); // necessary in case that the container changed while we were detached (TODO why?) 
+    }
+
     private Collection<String> getImmediateChildItemIds() {
         return SynergyBuilder.getChildIdsOf(select.getContainerDataSource(), parentId);
     }
