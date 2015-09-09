@@ -51,7 +51,7 @@ public class SynergyView extends CustomComponent
 {
     public static final String DEFAULT_PRIMARY_STYLE_NAME = "synergy";
     private static final long serialVersionUID = 1L;
-    private SynergySelect select;
+    private Synergy select;
     private SynergyLayout layout;
     
     /**
@@ -91,7 +91,7 @@ public class SynergyView extends CustomComponent
     public SynergyView(SynergyLayoutFactory layoutFactory, Container dataSource)
     {
         this(layoutFactory, (SynergyView)null);
-        attachToSelect(new SynergySelect(dataSource));
+        attachToSelect(new Synergy(dataSource));
         setParentId(null);
     }
     
@@ -423,7 +423,7 @@ public class SynergyView extends CustomComponent
          * @param ss the {@code SynergySelect} (providing the item's properties)
          * @param itemId the item's id
          */
-        void setup(final SynergySelect ss, final String itemId);
+        void setup(final Synergy ss, final String itemId);
         /**
          * Render the item in the given state
          * @param state the item's {@code ItemComponent.State}
@@ -452,7 +452,7 @@ public class SynergyView extends CustomComponent
             setPrimaryStyleName(PRIMARY_STYLE_NAME);
         }
         
-        public void setup(final SynergySelect synergySelect, final String itemId)
+        public void setup(final Synergy synergy, final String itemId)
         {
             layout = new VerticalLayout();
 //            layout.setSizeFull();
@@ -464,9 +464,9 @@ public class SynergyView extends CustomComponent
             // By adding the CSS class v-align-bottom however, it works
             layout.addStyleName("v-align-bottom"); 
 
-            Property<Resource> propertyIcon = synergySelect.getContainerProperty(itemId, SynergyBuilder.PROPERTY_ITEM_ICON);
+            Property<Resource> propertyIcon = synergy.getContainerProperty(itemId, SynergyBuilder.PROPERTY_ITEM_ICON);
             source = propertyIcon.getValue();
-            Property<Resource> propertyIconSelected = synergySelect.getContainerProperty(itemId, SynergyBuilder.PROPERTY_ITEM_ICON_SELECTED);
+            Property<Resource> propertyIconSelected = synergy.getContainerProperty(itemId, SynergyBuilder.PROPERTY_ITEM_ICON_SELECTED);
             sourceSelected = propertyIconSelected.getValue();
 
             if (source instanceof FontIcon) {
@@ -475,7 +475,7 @@ public class SynergyView extends CustomComponent
                 layout.addComponent(glyph);
                 layout.setComponentAlignment(glyph, Alignment.BOTTOM_CENTER);
                 layout.setExpandRatio(glyph, 1);
-                Property<String> propertySize = synergySelect.getContainerProperty(itemId, SynergyBuilder.PROPERTY_ITEM_GLYPH_SIZE);
+                Property<String> propertySize = synergy.getContainerProperty(itemId, SynergyBuilder.PROPERTY_ITEM_GLYPH_SIZE);
                 glyphSize  = propertySize.getValue();
             } else {
                 image = new Image();
@@ -484,12 +484,12 @@ public class SynergyView extends CustomComponent
                 layout.setComponentAlignment(image, Alignment.BOTTOM_CENTER);
                 layout.setExpandRatio(image, 1);
                 
-                Property<String> propertyWidth = synergySelect.getContainerProperty(itemId, SynergyBuilder.PROPERTY_ITEM_IMAGE_WIDTH);
+                Property<String> propertyWidth = synergy.getContainerProperty(itemId, SynergyBuilder.PROPERTY_ITEM_IMAGE_WIDTH);
                 String width = propertyWidth.getValue();
                 if (width != null) {
                     image.setWidth(width);
                 }
-                Property<String> propertyHeight = synergySelect.getContainerProperty(itemId, SynergyBuilder.PROPERTY_ITEM_IMAGE_HEIGHT);
+                Property<String> propertyHeight = synergy.getContainerProperty(itemId, SynergyBuilder.PROPERTY_ITEM_IMAGE_HEIGHT);
                 String height = propertyHeight.getValue();
                 if (height != null) {
                     image.setHeight(height);
@@ -500,23 +500,28 @@ public class SynergyView extends CustomComponent
                 @Override
                 public void layoutClick(LayoutClickEvent event)
                 {
-                    Object selectedItemId = synergySelect.getValue();
+                    Object selectedItemId = synergy.getValue();
                     if (!itemId.equals(selectedItemId)) {
-                        synergySelect.select(itemId);
+                        synergy.select(itemId);
                     }
                 }
             };
             
             setSource(source);
             
-            Property<String> propertyCaption = synergySelect.getContainerProperty(itemId, SynergyBuilder.PROPERTY_ITEM_CAPTION);
+            Property<String> propertyCaption = synergy.getContainerProperty(itemId, SynergyBuilder.PROPERTY_ITEM_CAPTION);
             String captionText = propertyCaption.getValue();
             if (captionText != null) {
-                captionLabel = new Label(captionText);
+                captionLabel = new Label(synergy.i18n(captionText));
                 captionLabel.setSizeUndefined();
                 layout.addComponent(captionLabel);
                 layout.setComponentAlignment(captionLabel, Alignment.TOP_CENTER);
                 layout.setExpandRatio(captionLabel, 0);
+            }
+            Property<String> propertyDescription = synergy.getContainerProperty(itemId, SynergyBuilder.PROPERTY_ITEM_DESCRIPTION);
+            String description = propertyDescription.getValue();
+            if (description != null) {
+                setDescription(synergy.i18n(description));
             }
 
             layout.addLayoutClickListener(clickListener);
@@ -580,28 +585,35 @@ public class SynergyView extends CustomComponent
             setPrimaryStyleName(PRIMARY_STYLE_NAME);
         }
         
-        public void setup(final SynergySelect ss, final String itemId)
+        public void setup(final Synergy synergy, final String itemId)
         {
-            Property<String> propertyCaption = ss.getContainerProperty(itemId, SynergyBuilder.PROPERTY_ITEM_CAPTION);
+            Property<String> propertyCaption = synergy.getContainerProperty(itemId, SynergyBuilder.PROPERTY_ITEM_CAPTION);
             String caption = propertyCaption.getValue();
-            if (caption == null) {
-                caption = itemId;
+            if (caption != null) {
+                setCaption(synergy.i18n(caption));
             }
-            setCaption(caption);
             setImmediate(true);
 //            setSizeUndefined();
-            Property<Resource> propertyIcon = ss.getContainerProperty(itemId, SynergyBuilder.PROPERTY_ITEM_ICON);
+            Property<Resource> propertyIcon = synergy.getContainerProperty(itemId, SynergyBuilder.PROPERTY_ITEM_ICON);
             Resource iconResource = propertyIcon.getValue();
             if (iconResource != null) {
                 setIcon(iconResource);
+            }
+            if (caption == null && iconResource == null) {
+                setCaption(itemId);
+            }
+            Property<String> propertyToolTip = synergy.getContainerProperty(itemId, SynergyBuilder.PROPERTY_ITEM_DESCRIPTION);
+            String toolTip = propertyToolTip.getValue();
+            if (toolTip != null) {
+                setDescription(synergy.i18n(toolTip));
             }
             addClickListener(new ClickListener() {
                 @Override
                 public void buttonClick(ClickEvent event)
                 {
-                    Object selectedItemId = ss.getValue();
+                    Object selectedItemId = synergy.getValue();
                     if (!itemId.equals(selectedItemId)) {
-                        ss.select(itemId);
+                        synergy.select(itemId);
                     }
                 }
             });
@@ -647,7 +659,7 @@ public class SynergyView extends CustomComponent
         }
     }
 
-    protected void attachToSelect(SynergySelect s)
+    protected void attachToSelect(Synergy s)
     {
         this.select = s;
         // add the ValueChangeListener to handle view updates

@@ -108,6 +108,10 @@ public class SynergyBuilder
      */
     public static final URI PROPERTY_ITEM_SUBVIEW_STYLE = URI.create(URI_PREFIX+"/subviewStyle");
     /**
+     * Tool tip to be shown for this item (optional)  
+     */
+    public static final URI PROPERTY_ITEM_DESCRIPTION = URI.create(URI_PREFIX+"/toolTip");
+    /**
      * Action ({@code BiConsumer<com.vaadin.data.Item, com.vaadin.ui.UI>}) to perform when this item is selected (optional)
      */
     public static final URI PROPERTY_ITEM_ACTION = URI.create(URI_PREFIX+"/action");
@@ -129,6 +133,7 @@ public class SynergyBuilder
         hierarchicalContainer.addContainerProperty(PROPERTY_ITEM_HIDDEN_IF_EMPTY, Boolean.class, Boolean.FALSE);
         hierarchicalContainer.addContainerProperty(PROPERTY_ITEM_SUBVIEW_STYLE, String.class, null);
         hierarchicalContainer.addContainerProperty(PROPERTY_ITEM_ACTION, BiConsumer.class, null);
+        hierarchicalContainer.addContainerProperty(PROPERTY_ITEM_DESCRIPTION, String.class, null);
         return hierarchicalContainer;
     }
 
@@ -232,7 +237,8 @@ public class SynergyBuilder
         private Resource iconSelected = null;
         private Mode mode = null;
         private String glyphSize = null;
-        private String subviewStyle;
+        private String subviewStyle = null;
+        private String description = null;
 
         /**
          * Create a builder for an item with given id.
@@ -278,6 +284,7 @@ public class SynergyBuilder
             item.getItemProperty(PROPERTY_ITEM_IMAGE_HEIGHT).setValue(imageHeight);
             item.getItemProperty(PROPERTY_ITEM_GLYPH_SIZE).setValue(glyphSize);
             item.getItemProperty(PROPERTY_ITEM_SUBVIEW_STYLE).setValue(subviewStyle);
+            item.getItemProperty(PROPERTY_ITEM_DESCRIPTION).setValue(description);
             if (childrenBuilder != null) {
                 childrenBuilder.buildItems(hc, id);
             }
@@ -441,6 +448,12 @@ public class SynergyBuilder
                 myChildrenBuilder.addItem(childBuilder);
             }
             return withChildren(myChildrenBuilder);
+        }
+
+        public ItemBuilder withDescription(String description)
+        {
+            this.description = description;
+            return this;
         }
     }
     
