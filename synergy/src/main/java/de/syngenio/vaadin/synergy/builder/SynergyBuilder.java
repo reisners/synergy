@@ -16,6 +16,7 @@ import com.vaadin.data.Item;
 import com.vaadin.data.util.HierarchicalContainer;
 import com.vaadin.server.Resource;
 import com.vaadin.ui.Component;
+import com.vaadin.ui.UI;
 
 import de.syngenio.vaadin.synergy.SynergyView;
 import de.syngenio.vaadin.synergy.SynergyView.ItemComponentButton;
@@ -239,6 +240,7 @@ public class SynergyBuilder
         private String glyphSize = null;
         private String subviewStyle = null;
         private String description = null;
+        private BiConsumer<Item, UI> action;
 
         /**
          * Create a builder for an item with given id.
@@ -285,6 +287,7 @@ public class SynergyBuilder
             item.getItemProperty(PROPERTY_ITEM_GLYPH_SIZE).setValue(glyphSize);
             item.getItemProperty(PROPERTY_ITEM_SUBVIEW_STYLE).setValue(subviewStyle);
             item.getItemProperty(PROPERTY_ITEM_DESCRIPTION).setValue(description);
+            item.getItemProperty(PROPERTY_ITEM_ACTION).setValue(action);
             if (childrenBuilder != null) {
                 childrenBuilder.buildItems(hc, id);
             }
@@ -422,6 +425,16 @@ public class SynergyBuilder
          */
         public ItemBuilder withTargetNavigationState(String targetNavigationState) {
             this.targetNavigationState = targetNavigationState;
+            return this;
+        }
+        
+        /**
+         * Sets the ItemBuilder's action
+         * @param action
+         * @return the ItemBuilder
+         */
+        public ItemBuilder withAction(BiConsumer<Item, UI> action) {
+            this.action = action;
             return this;
         }
         
