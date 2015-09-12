@@ -43,7 +43,7 @@ import de.syngenio.vaadin.synergy.layout.AbstractSynergyLayoutFactory.Packing;
 import de.syngenio.vaadin.synergy.layout.HorizontalSynergyLayoutFactory;
 
 @Theme("default")
-@WorldDescription(prose="demonstrates a horizontal image navigation bar.\nAll four ways of packing are demonstrated simultaneously.", tags={"horizontal", "image"})
+@WorldDescription(prose="Demonstrates a horizontal image navigation bar.\nAll four ways of packing are demonstrated simultaneously.", tags={"horizontal", "image"})
 public class WorldOfHorizontalImageNavigationUI extends WorldUI
 {
     private final static Logger LOG = LoggerFactory.getLogger(WorldOfHorizontalImageNavigationUI.class);

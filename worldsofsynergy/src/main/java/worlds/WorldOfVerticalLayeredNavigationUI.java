@@ -25,7 +25,7 @@ import de.syngenio.vaadin.synergy.layout.VerticalSynergyLayoutFactory;
 import de.syngenio.vaadin.synergy.layout.AbstractSynergyLayoutFactory.Packing;
 
 @Theme("default")
-@WorldDescription(prose="", tags={"vertical", "hiearchical", "layered", "text"})
+@WorldDescription(prose="Demonstrates an alternative way to render a navigation hierarchy: levels don't nest but are layered from left to right.", tags={"vertical", "hiearchical", "layered", "text"})
 public class WorldOfVerticalLayeredNavigationUI extends WorldUI
 {
     @WebServlet(value = "/vertical/layered/*", asyncSupported = true)

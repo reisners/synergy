@@ -40,7 +40,7 @@ import de.syngenio.vaadin.synergy.layout.AbstractSynergyLayoutFactory.Packing;
 import de.syngenio.vaadin.synergy.layout.VerticalSynergyLayoutFactory;
 
 @Theme("default")
-@WorldDescription(prose="demonstrates the dynamic nature of the navigation by letting the user add new items themselves", tags={"vertical", "hierarchical", "dynamical", "inline"})
+@WorldDescription(prose="Demonstrates the dynamic nature of the navigation by letting the user add new items themselves", tags={"vertical", "hierarchical", "dynamical", "inline"})
 public class WorldOfVerticalDynamicalNavigationUI extends WorldUI
 {
     @WebServlet(value = "/vertical/dynamical/*", asyncSupported = true)

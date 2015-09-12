@@ -19,7 +19,7 @@ import de.syngenio.vaadin.synergy.layout.AbstractSynergyLayoutFactory.Packing;
 import de.syngenio.vaadin.synergy.layout.VerticalSynergyLayoutFactory;
 
 @Theme("trek")
-//@WorldDescription(prose="demonstrates that each subview can be styled individually", tags={"vertical", "hierarchical", "text", "caption", "icon", "datadrivenstyle"})
+//@WorldDescription(prose="Demonstrates that each subview can be styled individually", tags={"vertical", "hierarchical", "text", "caption", "icon", "datadrivenstyle"})
 public class WorldOfVerticalDataDrivenStyleNavigationUI extends WorldUI
 {
     @WebServlet(value = "/vertical/datadrivenstyle/*", asyncSupported = true)

@@ -17,6 +17,7 @@ import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServlet;
+import com.vaadin.ui.Alignment;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.VerticalLayout;
@@ -26,7 +27,7 @@ import de.syngenio.vaadin.synergy.layout.AbstractSynergyLayoutFactory.Packing;
 import de.syngenio.vaadin.synergy.layout.VerticalSynergyLayoutFactory;
 
 @Theme("default")
-@WorldDescription(prose="demonstrates a navigation hierarchy in a vertical nested layout. Some of the text items are inlined with an icon. The synergy view has a caption (text and icon). All four different ways of packing are demonstrated side by side.", tags={"vertical", "hierarchical", "nested", "inline", "caption", "icon"})
+@WorldDescription(prose="Demonstrates a navigation hierarchy in a vertical nested layout. Some of the text items are inlined with an icon. The synergy view has a caption (text and icon). All four different ways of packing are demonstrated side by side.", tags={"vertical", "hierarchical", "nested", "inline", "caption", "icon"})
 public class WorldOfVerticalHierarchicalNavigationUI extends WorldUI
 {
     @WebServlet(value = "/vertical/hierarchical/*", asyncSupported = true)
@@ -37,6 +38,10 @@ public class WorldOfVerticalHierarchicalNavigationUI extends WorldUI
     private static final Logger log = LoggerFactory.getLogger(WorldOfVerticalHierarchicalNavigationUI.class);
 
     private Map<Packing, SynergyView> views = new HashMap<Packing, SynergyView>();
+
+    private HorizontalLayout hlayout;
+
+    private ComboBox select;
     
     @Override
     protected void init(VaadinRequest request)
@@ -44,7 +49,7 @@ public class WorldOfVerticalHierarchicalNavigationUI extends WorldUI
         super.init(request);
         VerticalLayout vlayout = new VerticalLayout();
         vlayout.setSizeFull();
-        ComboBox select = new ComboBox("Choose Packing");
+        select = new ComboBox("Choose Packing");
         select.setImmediate(true);
         select.addItems(Packing.SPACE_AFTER, Packing.SPACE_AROUND, Packing.SPACE_BEFORE, Packing.EXPAND);
         select.select(Packing.SPACE_AFTER);
@@ -52,6 +57,7 @@ public class WorldOfVerticalHierarchicalNavigationUI extends WorldUI
             @Override
             public void valueChange(ValueChangeEvent event)
             {
+                handleVisibility();
                 views.forEach((packing, view) -> {
                     view.setVisible(packing.equals(select.getValue()));
                 });
@@ -60,7 +66,7 @@ public class WorldOfVerticalHierarchicalNavigationUI extends WorldUI
         vlayout.addComponent(select);
         vlayout.setExpandRatio(select, 0);
         
-        HorizontalLayout hlayout = new HorizontalLayout();
+        hlayout = new HorizontalLayout();
         hlayout.setSizeFull();
         vlayout.addComponent(hlayout);
         vlayout.setExpandRatio(hlayout, 1);
@@ -86,9 +92,8 @@ public class WorldOfVerticalHierarchicalNavigationUI extends WorldUI
             synergyView.setIcon(icon);
             synergyView.setWidthUndefined();
             synergyView.setHeight("100%");
-    //        synergyView.setWidth("30%");
-            hlayout.addComponent(synergyView);
-            hlayout.setExpandRatio(synergyView, 0f);
+//            hlayout.addComponent(synergyView);
+//            hlayout.setExpandRatio(synergyView, 0f);
             synergyView.setVisible(packing.equals(select.getValue()));
             views.put(packing, synergyView);
         }
@@ -126,6 +131,23 @@ public class WorldOfVerticalHierarchicalNavigationUI extends WorldUI
         hlayout.addComponent(panel);
         hlayout.setExpandRatio(panel, 1f);
 
+        handleVisibility();
+
         setContent(vlayout);
+    }
+
+    private void handleVisibility()
+    {
+        views.forEach((packing, synergyView) -> {
+            boolean visible = packing.equals(select.getValue());
+
+            if (visible) {
+                hlayout.addComponent(synergyView, hlayout.getComponentIndex(panel));
+                hlayout.setComponentAlignment(synergyView, Alignment.TOP_LEFT);
+                hlayout.setExpandRatio(synergyView, 0f);
+            } else {
+                hlayout.removeComponent(synergyView);
+            }
+        });
     }
 }

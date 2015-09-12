@@ -24,11 +24,16 @@ import com.vaadin.shared.data.sort.SortDirection;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.Panel;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.Table.ColumnGenerator;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.renderers.HtmlRenderer;
+
+import de.syngenio.vaadin.synergy.SynergyView;
+import de.syngenio.vaadin.synergy.layout.VerticalSynergyLayout;
+import de.syngenio.vaadin.synergy.layout.VerticalSynergyLayoutFactory;
 
 @Theme("default")
 public class HubUI extends UI
@@ -43,36 +48,45 @@ public class HubUI extends UI
     @Override
     protected void init(VaadinRequest request)
     {
+        Panel panel = new Panel("Worlds of Synergy");
+        
         VerticalLayout layout = new VerticalLayout();
         layout.setSizeFull();
-        setContent(layout);
-        Table table = new Table("Worlds of Synergy", WorldHelper.getWorlds());
-        table.addGeneratedColumn("description", new ColumnGenerator() {
-
-            @Override
-            public Object generateCell(Table source, Object itemId, Object columnId)
-            {
-                String text = (String) source.getContainerDataSource().getItem(itemId).getItemProperty("description").getValue();
-                return new Label(text, ContentMode.HTML);
-            }
-            
-        });
-        table.setVisibleColumns("name", "description");
-        table.setSelectable(true);
-        table.setImmediate(true);
-        table.addValueChangeListener(new ValueChangeListener() {
-        @Override
-        public void valueChange(ValueChangeEvent event)
-        {
-            WorldBean bean = ((BeanItem<WorldBean>)table.getItem(event.getProperty().getValue())).getBean();
-            if (bean.getPath() != null) {
-                String contextPath = VaadinServlet.getCurrent().getServletContext().getContextPath();
-                getPage().setLocation(contextPath+bean.getPath());
-            }
-        }
-        });
-        table.sort(new Object[] {"name"}, new boolean[] {true});
-        layout.addComponent(table);
+        
+        panel.setContent(layout);
+        
+        setContent(panel);
+        
+        SynergyView synergyView = new SynergyView(new VerticalSynergyLayoutFactory(), WorldHelper.getWorldsNavigation());
+        layout.addComponent(synergyView);
+        
+//        Table table = new Table("Worlds of Synergy", WorldHelper.getWorlds());
+//        table.addGeneratedColumn("description", new ColumnGenerator() {
+//
+//            @Override
+//            public Object generateCell(Table source, Object itemId, Object columnId)
+//            {
+//                String text = (String) source.getContainerDataSource().getItem(itemId).getItemProperty("description").getValue();
+//                return new Label(text, ContentMode.HTML);
+//            }
+//            
+//        });
+//        table.setVisibleColumns("name", "description");
+//        table.setSelectable(true);
+//        table.setImmediate(true);
+//        table.addValueChangeListener(new ValueChangeListener() {
+//        @Override
+//        public void valueChange(ValueChangeEvent event)
+//        {
+//            WorldBean bean = ((BeanItem<WorldBean>)table.getItem(event.getProperty().getValue())).getBean();
+//            if (bean.getPath() != null) {
+//                String contextPath = VaadinServlet.getCurrent().getServletContext().getContextPath();
+//                getPage().setLocation(contextPath+bean.getPath());
+//            }
+//        }
+//        });
+//        table.sort(new Object[] {"name"}, new boolean[] {true});
+//        layout.addComponent(table);
         
 //        Grid grid = new Grid("Worlds of Synergy", WorldHelper.getWorlds());
 //        grid.setColumnOrder("name", "description");

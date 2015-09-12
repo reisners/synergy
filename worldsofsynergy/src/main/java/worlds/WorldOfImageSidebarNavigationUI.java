@@ -28,7 +28,7 @@ import de.syngenio.vaadin.synergy.layout.AbstractSynergyLayoutFactory.Packing;
 import de.syngenio.vaadin.synergy.layout.VerticalSynergyLayoutFactory;
 
 @Theme("default")
-@WorldDescription(prose="demonstrates a single vertical sidebar of large navigation icons", tags={"vertical", "stacked"})
+@WorldDescription(prose="Demonstrates a single vertical sidebar of large navigation icons", tags={"vertical", "stacked"})
 public class WorldOfImageSidebarNavigationUI extends WorldUI
 {
     @WebServlet(value = "/vertical/images/*", asyncSupported = true)
