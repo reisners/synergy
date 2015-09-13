@@ -60,6 +60,17 @@
 	    font-size: $font-size;
 	}
 
+	&:after {
+		content: "";
+		position: absolute;
+		top: 0;
+		right: 0;
+		bottom: 0;
+		left: 0;
+		border-radius: inherit;
+		pointer-events: none;
+	}
+
 	@if type-of($hover-color) == color {
 	  &:hover:after {
 	    @include synergy-image-hover-style($hover-color);
