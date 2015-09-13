@@ -25,7 +25,7 @@ import de.syngenio.vaadin.synergy.layout.HorizontalSynergyLayoutFactory;
 import de.syngenio.vaadin.synergy.layout.VerticalSynergyLayoutFactory;
 
 @Theme("default")
-@WorldDescription(prose="Demonstrates two stacked navigation levels of text items arranged horizontally.\nAll four ways of packing are demonstrated simultaneously.", tags={"horizontal", "hierarchical", "layered", "text"})
+@WorldDescription(prose="Demonstrates two stacked navigation levels of text items arranged horizontally.", tags={"horizontal", "hierarchical", "layered", "text"})
 public class WorldOfHorizontalHierarchicalNavigationUI extends WorldUI
 {
     @WebServlet(value = "/horizontal/hierarchical/*", asyncSupported = true)

@@ -1,16 +1,16 @@
-@import "addons.scss";
-@import "../valo/_valo.scss";
-
 $dark-background-color: #50514e;
 $highlight-color: #f0c700;
-
-$margin-size: 6px;
-
-/* This file prefixes all rules with the theme name to avoid causing conflicts with other themes. */
-.syngenio {
 $v-focus-color: rgb(147,241,0);
 $v-background-color: $dark-background-color;
 $v-app-background-color: $dark-background-color;
+
+$margin-size: 6px;
+
+@import "addons.scss";
+@import "../valo/_valo.scss";
+
+/* This file prefixes all rules with the theme name to avoid causing conflicts with other themes. */
+.syngenio {
 
   @include synergy;
   @include valo;
