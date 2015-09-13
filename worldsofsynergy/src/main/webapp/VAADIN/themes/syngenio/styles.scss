@@ -3,6 +3,7 @@ $highlight-color: #f0c700;
 $v-focus-color: rgb(147,241,0);
 $v-background-color: $dark-background-color;
 $v-app-background-color: $dark-background-color;
+$syn-aos-color: rgb(171,140,0);
 
 $margin-size: 6px;
 
@@ -12,7 +13,7 @@ $margin-size: 6px;
 /* This file prefixes all rules with the theme name to avoid causing conflicts with other themes. */
 .syngenio {
 
-  @include synergy;
+  @include synergy($ancestor-of-selected-color: $syn-aos-color);
   @include valo;
 
   .v-label-greenbar {
