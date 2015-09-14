@@ -55,8 +55,14 @@ public abstract class VerticalSynergyLayout extends SynergyLayout
         case EXPAND:
             component.setHeight("100%");
             break;
-        default:
-            // do nothing
+        case SPACE_AFTER:
+            setComponentAlignment(component, Alignment.TOP_RIGHT);
+            break;
+        case SPACE_BEFORE:
+            setComponentAlignment(component, Alignment.BOTTOM_RIGHT);
+            break;
+        case SPACE_AROUND:
+            setComponentAlignment(component, Alignment.MIDDLE_RIGHT);
             break;
         }
     }

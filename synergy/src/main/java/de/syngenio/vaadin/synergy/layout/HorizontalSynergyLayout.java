@@ -62,8 +62,14 @@ public abstract class HorizontalSynergyLayout extends SynergyLayout
         case EXPAND:
             itemComponent.setWidth("100%");
             break;
-        default:
-            // do nothing
+        case SPACE_AFTER:
+            setComponentAlignment(itemComponent, Alignment.BOTTOM_LEFT);
+            break;
+        case SPACE_BEFORE:
+            setComponentAlignment(itemComponent, Alignment.BOTTOM_RIGHT);
+            break;
+        case SPACE_AROUND:
+            setComponentAlignment(itemComponent, Alignment.BOTTOM_CENTER);
             break;
         }
     }
