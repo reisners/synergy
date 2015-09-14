@@ -51,7 +51,7 @@ public class SynergyView extends CustomComponent
 {
     public static final String DEFAULT_PRIMARY_STYLE_NAME = "synergy";
     private static final long serialVersionUID = 1L;
-    private Synergy select;
+    private Synergy synergy;
     private SynergyLayout layout;
     
     /**
@@ -91,7 +91,9 @@ public class SynergyView extends CustomComponent
     public SynergyView(SynergyLayoutFactory layoutFactory, Container dataSource)
     {
         this(layoutFactory, (SynergyView)null);
-        attachToSelect(new Synergy(dataSource));
+        if (dataSource != null) {
+            attachToSynergy(new Synergy(dataSource));
+        }
         setParentId(null);
     }
     
@@ -143,10 +145,10 @@ public class SynergyView extends CustomComponent
             @Override
             public void valueChange(ValueChangeEvent event)
             {
-                String itemId = (String) select.getValue();
+                String itemId = (String) synergy.getValue();
                 // is it an item that this view visualizes?
-                if (SynergyBuilder.isChildOf(select.getContainerDataSource(), itemId, parentId)) {
-                    Item item = select.getContainerDataSource().getItem(itemId);
+                if (SynergyBuilder.isChildOf(synergy.getContainerDataSource(), itemId, parentId)) {
+                    Item item = synergy.getContainerDataSource().getItem(itemId);
                     UI ui = SynergyView.this.getUI();
                     if (ui != null) {
                         BiConsumer<Item, UI> selectAction = (BiConsumer<Item, UI>) item.getItemProperty(SynergyBuilder.PROPERTY_ITEM_ACTION).getValue();
@@ -162,7 +164,7 @@ public class SynergyView extends CustomComponent
         };
 
         if (this.parentView != null) {
-            attachToSelect(parentView.select);
+            attachToSynergy(parentView.synergy);
             parentView.setSubView(this);
         }
     }
@@ -170,7 +172,7 @@ public class SynergyView extends CustomComponent
     private String getSubviewStyle()
     {
         if (parentId != null && !parentId.equals(INACTIVE)) {
-            return (String) select.getContainerDataSource().getContainerProperty(parentId, SynergyBuilder.PROPERTY_ITEM_SUBVIEW_STYLE).getValue();
+            return (String) synergy.getContainerDataSource().getContainerProperty(parentId, SynergyBuilder.PROPERTY_ITEM_SUBVIEW_STYLE).getValue();
         }
         return null;
     }
@@ -183,18 +185,19 @@ public class SynergyView extends CustomComponent
 
     /**
      * Empties the layout and then calls {@code visualizeItem} on each immediate child item 
-     * Called either when the view has been moved to a new parent
-     * or upon receiving a containerItemSetChange event to update the view's item components.
+     * Called by {@code attach()}, {@code attachToSynergy(Synergy)}, and {@code setParentId(String)}.
      */
     private void visualizeItems()
     {
-        clear();
-        boolean isEmpty = true;
-        for (String itemId : getImmediateChildItemIds()) {
-            isEmpty = false;
-            visualizeItem(itemId);
+        if (synergy != null) {
+            clear();
+            boolean isEmpty = true;
+            for (String itemId : getImmediateChildItemIds()) {
+                isEmpty = false;
+                visualizeItem(itemId);
+            }
+            setVisible(!isEmpty);
         }
-        setVisible(!isEmpty);
     }
 
     /**
@@ -216,7 +219,7 @@ public class SynergyView extends CustomComponent
     }
 
     private Collection<String> getImmediateChildItemIds() {
-        return SynergyBuilder.getChildIdsOf(select.getContainerDataSource(), parentId);
+        return SynergyBuilder.getChildIdsOf(synergy.getContainerDataSource(), parentId);
     }
 
     /**
@@ -244,7 +247,7 @@ public class SynergyView extends CustomComponent
             log.debug("no item component found for id "+itemId);
             return;
         }
-        final String selectedItemId = (String) select.getValue();
+        final String selectedItemId = (String) synergy.getValue();
         if (itemId.equals(selectedItemId)) {
             itemComponent.setState(State.selected);
             replaceSubView(itemId, State.selected);
@@ -312,7 +315,7 @@ public class SynergyView extends CustomComponent
     {
         boolean hasChildren = false;
         // do we have children? 
-        Container container = select.getContainerDataSource();
+        Container container = synergy.getContainerDataSource();
         if (container instanceof HierarchicalContainer) {
             HierarchicalContainer hc = (HierarchicalContainer) container;
             hasChildren = hc.hasChildren(itemId);
@@ -359,7 +362,7 @@ public class SynergyView extends CustomComponent
      * @return true if the item identified by ancestorId is an ancestor of the item identified by descendantId
      */
     private boolean isAncestorOf(String ancestorId, String descendantId) {
-        return SynergyBuilder.isAncestorOf(select.getContainerDataSource(), ancestorId, descendantId); 
+        return SynergyBuilder.isAncestorOf(synergy.getContainerDataSource(), ancestorId, descendantId); 
     }
 
     private BiConsumer<Item, UI> defaultSelectAction = (item, ui) -> {
@@ -639,7 +642,7 @@ public class SynergyView extends CustomComponent
     private ItemComponent getItemComponent(final String itemId)
     {
         ItemComponent itemComponent = null;
-        Item item = select.getItem(itemId);
+        Item item = synergy.getItem(itemId);
         final Property<Class> property = item.getItemProperty(SynergyBuilder.PROPERTY_ITEM_COMPONENT_CLASS);
         Class<ItemComponent> itemComponentClass = property.getValue();
         try
@@ -651,7 +654,7 @@ public class SynergyView extends CustomComponent
         {
             e.printStackTrace();
         }
-        itemComponent.setup(select, itemId);
+        itemComponent.setup(synergy, itemId);
 //        itemComponent.setWidth(100, Unit.PERCENTAGE);
 //        itemComponent.setHeightUndefined();
         return itemComponent;
@@ -666,15 +669,20 @@ public class SynergyView extends CustomComponent
         }
     }
 
-    protected void attachToSelect(Synergy s)
+    /**
+     * Attaches this SynergyView to the given Synergy instance.
+     * Will immediately render the data contained in the Synergy. 
+     * @param synergy the Synergy instance to attach to
+     */
+    public void attachToSynergy(Synergy synergy)
     {
-        this.select = s;
+        this.synergy = synergy;
         // add the ValueChangeListener to handle view updates
-        this.select.addValueChangeListener(viewUpdatingListener);
+        this.synergy.addValueChangeListener(viewUpdatingListener);
         // add the ValueChangeListener to handle navigation
-        this.select.addValueChangeListener(selectListener);
+        this.synergy.addValueChangeListener(selectListener);
         
-        this.select.addItemSetChangeListener(new ItemSetChangeListener() {
+        this.synergy.addItemSetChangeListener(new ItemSetChangeListener() {
             @Override
             public void containerItemSetChange(ItemSetChangeEvent event)
             {
@@ -696,30 +704,30 @@ public class SynergyView extends CustomComponent
     }
 
     /**
-     * Removes listeners from the {@code SynergySelect}. 
+     * Removes listeners from the {@code Synergy}. 
      * Call this method before disposing the {@code SynergyView} to avoid memory leaks.
      */
-    protected void detachFromSelect() {
-        this.select.removeValueChangeListener(selectListener);
-        this.select.removeValueChangeListener(viewUpdatingListener);
+    public void detachFromSelect() {
+        this.synergy.removeValueChangeListener(selectListener);
+        this.synergy.removeValueChangeListener(viewUpdatingListener);
     }
     
     /**
      * @return this {@code SynergyView}'s item container 
      */
     public Container getContainer() {
-        return select.getContainerDataSource();
+        return synergy.getContainerDataSource();
     }
 
     private BiConsumer<SynergyView, ViewChangeEvent> syncer = SynergyView::defaultSyncer;
     
     private void defaultSyncer(ViewChangeEvent event) {
         String targetNavigationState = extractTargetNavigationState(event);
-        final Container container = select.getContainerDataSource();
+        final Container container = synergy.getContainerDataSource();
         for (Object itemId : container.getItemIds()) {
             Property<String> propertyTargetNavigationState = container.getContainerProperty(itemId, SynergyBuilder.PROPERTY_TARGET_NAVIGATION_STATE);
             if (propertyTargetNavigationState != null && targetNavigationState.equals(propertyTargetNavigationState.getValue())) {
-                select.select(itemId);
+                synergy.select(itemId);
                 return;
             }
         }
