@@ -82,6 +82,8 @@ public class SynergyView extends CustomComponent
     
     private final static Logger log = LoggerFactory.getLogger(SynergyView.class);
     private static final String HAS_CHILDREN = "children";
+    
+    private Class<? extends ItemComponent> defaultItemComponentClass = ItemComponentButton.class;
 
     public SynergyView(SynergyLayoutFactory layoutFactory)
     {
@@ -378,7 +380,7 @@ public class SynergyView extends CustomComponent
     
     /**
      * Installs a new default action to perform when an item is selected (normally by the user clicking on it).
-     * The original default action call {@code Navigator#navigateTo(String)} with the value of the item's 
+     * The initial default action call {@code Navigator#navigateTo(String)} with the value of the item's 
      * {@code SynergyBuilder#PROPERTY_TARGET_NAVIGATION_STATE} property (if set).
      * In case that the selected item has its {@code SynergyBuilder#PROPERTY_ITEM_ACTION} property set, 
      * that action will be performed instead of the defaultSelectAction.
@@ -388,6 +390,19 @@ public class SynergyView extends CustomComponent
     {
         this.defaultSelectAction = defaultSelectAction;
     }
+
+    
+    /**
+     * Sets a class implementing {@code ItemComponent} as default for visualizing items.
+     * This default is overridden by an item's {@code SynergyBuilder#PROPERTY_ITEM_COMPONENT_CLASS} property (if set).
+     * The initial default is {@code ItemComponentButton}.
+     * @param defaultItemComponentClass the new {@code ItemComponent} to use as default
+     */
+    public void setDefaultItemComponentClass(Class< ? extends ItemComponent> defaultItemComponentClass)
+    {
+        this.defaultItemComponentClass = defaultItemComponentClass;
+    }
+
 
     /**
      * Interface implemented by {@code Component}s that visualize items in a {@code SynergyView}
@@ -494,16 +509,16 @@ public class SynergyView extends CustomComponent
                 layout.setComponentAlignment(image, Alignment.BOTTOM_CENTER);
                 layout.setExpandRatio(image, 1);
                 
-                Property<String> propertyWidth = synergy.getContainerProperty(itemId, SynergyBuilder.PROPERTY_ITEM_IMAGE_WIDTH);
-                String width = propertyWidth.getValue();
-                if (width != null) {
-                    image.setWidth(width);
-                }
-                Property<String> propertyHeight = synergy.getContainerProperty(itemId, SynergyBuilder.PROPERTY_ITEM_IMAGE_HEIGHT);
-                String height = propertyHeight.getValue();
-                if (height != null) {
-                    image.setHeight(height);
-                }
+//                Property<String> propertyWidth = synergy.getContainerProperty(itemId, SynergyBuilder.PROPERTY_ITEM_IMAGE_WIDTH);
+//                String width = propertyWidth.getValue();
+//                if (width != null) {
+//                    image.setWidth(width);
+//                }
+//                Property<String> propertyHeight = synergy.getContainerProperty(itemId, SynergyBuilder.PROPERTY_ITEM_IMAGE_HEIGHT);
+//                String height = propertyHeight.getValue();
+//                if (height != null) {
+//                    image.setHeight(height);
+//                }
             }
             
             final LayoutClickListener clickListener = new LayoutClickListener() {
@@ -644,7 +659,10 @@ public class SynergyView extends CustomComponent
         ItemComponent itemComponent = null;
         Item item = synergy.getItem(itemId);
         final Property<Class> property = item.getItemProperty(SynergyBuilder.PROPERTY_ITEM_COMPONENT_CLASS);
-        Class<ItemComponent> itemComponentClass = property.getValue();
+        Class< ? extends ItemComponent> itemComponentClass = property.getValue();
+        if (itemComponentClass == null) {
+            itemComponentClass = defaultItemComponentClass;
+        }
         try
         {
             Constructor defcon = itemComponentClass.getConstructor();
@@ -652,11 +670,9 @@ public class SynergyView extends CustomComponent
         }
         catch (Exception e)
         {
-            e.printStackTrace();
+            throw new Error(e);
         }
         itemComponent.setup(synergy, itemId);
-//        itemComponent.setWidth(100, Unit.PERCENTAGE);
-//        itemComponent.setHeightUndefined();
         return itemComponent;
     }
 

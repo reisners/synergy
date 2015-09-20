@@ -54,6 +54,13 @@
 
 	$_font-color: $font-color or valo-font-color($background-color, 0.9);
 
+	img {
+		width: auto;
+		height: auto;
+		max-width: 100%;
+		max-height: 100%;	
+	}
+	
 	.v-label {
 		color: $_font-color;
 	    font-weight: $font-weight;

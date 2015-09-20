@@ -124,7 +124,7 @@ public class SynergyBuilder
     public static HierarchicalContainer createHierarchicalContainer() {
         final HierarchicalContainer hierarchicalContainer = new HierarchicalContainer();
         hierarchicalContainer.addContainerProperty(PROPERTY_TARGET_NAVIGATION_STATE, String.class, null);
-        hierarchicalContainer.addContainerProperty(PROPERTY_ITEM_COMPONENT_CLASS, Class.class, ItemComponentButton.class);
+        hierarchicalContainer.addContainerProperty(PROPERTY_ITEM_COMPONENT_CLASS, Class.class, null);
         hierarchicalContainer.addContainerProperty(PROPERTY_ITEM_CAPTION, String.class, null);
         hierarchicalContainer.addContainerProperty(PROPERTY_ITEM_ICON, Resource.class, null);
         hierarchicalContainer.addContainerProperty(PROPERTY_ITEM_ICON_SELECTED, Resource.class, null);
