@@ -26,6 +26,8 @@ import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.data.util.HierarchicalContainer;
 import com.vaadin.server.FontAwesome;
+import com.vaadin.server.FontIcon;
+import com.vaadin.server.Resource;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.server.VaadinServlet;
 
@@ -128,6 +130,63 @@ public class WorldHelper
                         .withIconSelected(new ThemeResource("img/cc_selected.png")).withTargetNavigationState("view/Credit Card"));
                 addItem(item().withCaption("Desktop").withIcon(new ThemeResource("img/desktop.png")).withImageWidth("64px").withImageHeight("64px")
                         .withIconSelected(new ThemeResource("img/desktop_selected.png")).withTargetNavigationState("view/Desktop"));
+            }
+        }.build();
+    }
+
+    private static class AlphaShapesCircles implements FontIcon {
+        private int codepoint;
+        private String fontFamily = "AlphaShapesCirclesFont";
+        /**
+         * @param codePoint
+         */
+        protected AlphaShapesCircles(int codePoint)
+        {
+            this.codepoint = codePoint;
+        }
+
+        /**
+         * Unsupported: {@link FontIcon} does not have a MIME type and is not a
+         * {@link Resource} that can be used in a context where a MIME type would be
+         * needed.
+         */
+        @Override
+        public String getMIMEType() {
+            throw new UnsupportedOperationException(FontIcon.class.getSimpleName()
+                    + " should not be used where a MIME type is needed.");
+        }
+
+        @Override
+        public String getFontFamily()
+        {
+            return fontFamily;
+        }
+
+        @Override
+        public int getCodepoint()
+        {
+            return codepoint;
+        }
+
+        @Override
+        public String getHtml()
+        {
+            return "<span class=\"v-icon\" style=\"font-family: " + fontFamily
+                    + ";\">&#x" + Integer.toHexString(codepoint) + ";</span>";
+        }
+    }
+    
+    public static HierarchicalContainer getGlyphNavigation()
+    {
+        return new SynergyBuilder() {
+            {
+                addItem(item().stacked().withIcon(new AlphaShapesCircles((int)'s')).withGlyphSize("6vh"));
+                addItem(item().stacked().withIcon(new AlphaShapesCircles((int)'y')).withGlyphSize("6vh"));
+                addItem(item().stacked().withIcon(new AlphaShapesCircles((int)'n')).withGlyphSize("6vh"));
+                addItem(item().stacked().withIcon(new AlphaShapesCircles((int)'e')).withGlyphSize("6vh"));
+                addItem(item().stacked().withIcon(new AlphaShapesCircles((int)'r')).withGlyphSize("6vh"));
+                addItem(item().stacked().withIcon(new AlphaShapesCircles((int)'g')).withGlyphSize("6vh"));
+                addItem(item().stacked().withIcon(new AlphaShapesCircles((int)'y')).withGlyphSize("6vh"));
             }
         }.build();
     }

@@ -1,8 +1,20 @@
 @import "addons.scss";
 @import "../valo/_valo.scss";
 
+@include v-font(AlphaShapesCirclesFont, '../../../../default/fonts/ascircles');
+
 /* This file prefixes all rules with the theme name to avoid causing conflicts with other themes. */
 .default {
-  @include synergy;
-  @include valo;
+	@include synergy($triangle-size: 12px);
+	@include valo;
+  
+	/* Quite little space */
+	.toggledisplay[width-range~="0-749px"] {
+	    .enoughspace    {display: none}
+	}
+	    
+	/* Plenty of space */
+	.toggledisplay[width-range~="750px-"] {
+	    .notenoughspace {display: none}
+	}
 }

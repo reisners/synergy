@@ -20,12 +20,14 @@ import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServlet;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.ComboBox;
+import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.VerticalLayout;
 
 import de.syngenio.vaadin.synergy.Synergy;
 import de.syngenio.vaadin.synergy.SynergyView;
 import de.syngenio.vaadin.synergy.layout.AbstractSynergyLayoutFactory.Packing;
 import de.syngenio.vaadin.synergy.layout.HorizontalSynergyLayoutFactory;
+import de.syngenio.vaadin.synergy.layout.VerticalSynergyLayoutFactory;
 
 @Theme("default")
 @WorldDescription(prose="Demonstrates a horizontal image navigation bar.\nThe number of items and the packing mode can be selected interactively.", tags={"horizontal", "image"})
@@ -52,6 +54,9 @@ public class WorldOfResponsiveHorizontalImageNavigationUI extends WorldUI
     protected void init(VaadinRequest request)
     {
         super.init(request);
+        
+        addStyleName("toggledisplay");
+        
         container = WorldHelper.getImageNavigation2();
         List<Object> itemIds = new ArrayList<Object>(container.getItemIds());
         
@@ -67,33 +72,22 @@ public class WorldOfResponsiveHorizontalImageNavigationUI extends WorldUI
         synergyViewEnoughSpace.addStyleName("enoughspace");
         vlayout.addComponent(synergyViewEnoughSpace);
         
-        SynergyView synergyViewNotEnoughSpace = new SynergyView(new HorizontalSynergyLayoutFactory(Packing.EXPAND), (Container)null);
+        SynergyView synergyViewNotEnoughSpace = new SynergyView(new VerticalSynergyLayoutFactory(Packing.EXPAND), (Container)null);
         synergyViewNotEnoughSpace.attachToSynergy(synergy);
-        synergyViewNotEnoughSpace.setHeightUndefined();
-        synergyViewNotEnoughSpace.setWidth("100%");
+        synergyViewNotEnoughSpace.setWidthUndefined();
+        synergyViewNotEnoughSpace.setHeight("100%");
         synergyViewNotEnoughSpace.addStyleName("notenoughspace");
-        vlayout.addComponent(synergyViewNotEnoughSpace);
         
-        vlayout.addComponent(panel);
-        vlayout.setExpandRatio(panel, 1f);
+        HorizontalLayout hlayout = new HorizontalLayout();
+        hlayout.setSizeFull();
+        hlayout.addComponent(synergyViewNotEnoughSpace);
         
-        handleVisibility();
-
+        hlayout.addComponent(panel);
+        hlayout.setExpandRatio(panel, 1f);
+        
+        vlayout.addComponent(hlayout);
+        vlayout.setExpandRatio(hlayout, 1f);
+        
         setContent(vlayout);
-    }
-
-    private void handleVisibility()
-    {
-        views.forEach((packing, synergyView) -> {
-            boolean visible = packing.equals(selectPacking.getValue());
-
-            if (visible) {
-                vlayout.addComponent(synergyView, vlayout.getComponentIndex(panel));
-                vlayout.setComponentAlignment(synergyView, Alignment.TOP_LEFT);
-                vlayout.setExpandRatio(synergyView, 0f);
-            } else {
-                vlayout.removeComponent(synergyView);
-            }
-        });
     }
 }
