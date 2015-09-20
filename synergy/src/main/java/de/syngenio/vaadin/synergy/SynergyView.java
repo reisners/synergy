@@ -479,6 +479,15 @@ public class SynergyView extends CustomComponent
         
         public void setup(final Synergy synergy, final String itemId)
         {
+            Property<Resource> propertyIcon = synergy.getContainerProperty(itemId, SynergyBuilder.PROPERTY_ITEM_ICON);
+            source = propertyIcon.getValue();
+            Property<Resource> propertyIconSelected = synergy.getContainerProperty(itemId, SynergyBuilder.PROPERTY_ITEM_ICON_SELECTED);
+            sourceSelected = propertyIconSelected.getValue();
+            
+            Property<String> propertyCaption = synergy.getContainerProperty(itemId, SynergyBuilder.PROPERTY_ITEM_CAPTION);
+            String captionText = propertyCaption.getValue();
+            Property<String> propertyDescription = synergy.getContainerProperty(itemId, SynergyBuilder.PROPERTY_ITEM_DESCRIPTION);
+
             layout = new VerticalLayout();
 //            layout.setSizeFull();
             layout.setMargin(new MarginInfo(false, true, false, true) );
@@ -486,39 +495,38 @@ public class SynergyView extends CustomComponent
             // The root cause is the behaviour of HorizontalLayout with undefined height (in a horizontal SynergyView) 
             // to set the heights of its children to undefined. We set the height of the synergy-image to 100% via CSS,
             // but it does not seem possible to vertical-align:bottom the wrapped VerticalLayout this way.
-            // By adding the CSS class v-align-bottom however, it works
+            // By adding the CSS class v-align-bottom, however, it works
             layout.addStyleName("v-align-bottom"); 
 
-            Property<Resource> propertyIcon = synergy.getContainerProperty(itemId, SynergyBuilder.PROPERTY_ITEM_ICON);
-            source = propertyIcon.getValue();
-            Property<Resource> propertyIconSelected = synergy.getContainerProperty(itemId, SynergyBuilder.PROPERTY_ITEM_ICON_SELECTED);
-            sourceSelected = propertyIconSelected.getValue();
-
-            if (source instanceof FontIcon) {
-                glyph = new Label("", ContentMode.HTML);
-                glyph.setSizeUndefined();
-                layout.addComponent(glyph);
-                layout.setComponentAlignment(glyph, Alignment.BOTTOM_CENTER);
-                layout.setExpandRatio(glyph, 1);
-                Property<String> propertySize = synergy.getContainerProperty(itemId, SynergyBuilder.PROPERTY_ITEM_GLYPH_SIZE);
-                glyphSize  = propertySize.getValue();
-            } else {
-                image = new Image();
-                image.setSizeUndefined();
-                layout.addComponent(image);
-                layout.setComponentAlignment(image, Alignment.BOTTOM_CENTER);
-                layout.setExpandRatio(image, 1);
-                
-//                Property<String> propertyWidth = synergy.getContainerProperty(itemId, SynergyBuilder.PROPERTY_ITEM_IMAGE_WIDTH);
-//                String width = propertyWidth.getValue();
-//                if (width != null) {
-//                    image.setWidth(width);
-//                }
-//                Property<String> propertyHeight = synergy.getContainerProperty(itemId, SynergyBuilder.PROPERTY_ITEM_IMAGE_HEIGHT);
-//                String height = propertyHeight.getValue();
-//                if (height != null) {
-//                    image.setHeight(height);
-//                }
+            
+            if (source != null) {
+                Alignment imageAlignment = (captionText != null ? Alignment.BOTTOM_CENTER : Alignment.MIDDLE_CENTER);
+                if (source instanceof FontIcon) {
+                    glyph = new Label("", ContentMode.HTML);
+                    glyph.setSizeUndefined();
+                    layout.addComponent(glyph);
+                    layout.setComponentAlignment(glyph, imageAlignment);
+                    layout.setExpandRatio(glyph, 1);
+                    Property<String> propertySize = synergy.getContainerProperty(itemId, SynergyBuilder.PROPERTY_ITEM_GLYPH_SIZE);
+                    glyphSize  = propertySize.getValue();
+                } else {
+                    image = new Image();
+                    image.setSizeUndefined();
+                    layout.addComponent(image);
+                    layout.setComponentAlignment(image, imageAlignment);
+                    layout.setExpandRatio(image, 1);
+                    
+    //                Property<String> propertyWidth = synergy.getContainerProperty(itemId, SynergyBuilder.PROPERTY_ITEM_IMAGE_WIDTH);
+    //                String width = propertyWidth.getValue();
+    //                if (width != null) {
+    //                    image.setWidth(width);
+    //                }
+    //                Property<String> propertyHeight = synergy.getContainerProperty(itemId, SynergyBuilder.PROPERTY_ITEM_IMAGE_HEIGHT);
+    //                String height = propertyHeight.getValue();
+    //                if (height != null) {
+    //                    image.setHeight(height);
+    //                }
+                }
             }
             
             final LayoutClickListener clickListener = new LayoutClickListener() {
@@ -534,16 +542,14 @@ public class SynergyView extends CustomComponent
             
             setSource(source);
             
-            Property<String> propertyCaption = synergy.getContainerProperty(itemId, SynergyBuilder.PROPERTY_ITEM_CAPTION);
-            String captionText = propertyCaption.getValue();
             if (captionText != null) {
+                Alignment captionAlignment = (source != null ? Alignment.TOP_CENTER : Alignment.MIDDLE_CENTER);
                 captionLabel = new Label(synergy.i18n(captionText));
                 captionLabel.setSizeUndefined();
                 layout.addComponent(captionLabel);
-                layout.setComponentAlignment(captionLabel, Alignment.TOP_CENTER);
+                layout.setComponentAlignment(captionLabel, captionAlignment);
                 layout.setExpandRatio(captionLabel, 0);
             }
-            Property<String> propertyDescription = synergy.getContainerProperty(itemId, SynergyBuilder.PROPERTY_ITEM_DESCRIPTION);
             String description = propertyDescription.getValue();
             if (description != null) {
                 setDescription(synergy.i18n(description));
