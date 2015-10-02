@@ -1,6 +1,10 @@
 package de.syngenio.vaadin.synergy.layout;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import com.vaadin.ui.AbstractOrderedLayout;
 import com.vaadin.ui.Alignment;
@@ -30,29 +34,29 @@ public abstract class SynergyLayout extends CustomComponent implements Layout, L
         return packing;
     }
     
-    private void updateItemLayout()
+    private void layoutComponents()
     {
         int componentCount = getComponentCount();
         if (componentCount > 0) {
             for (int i = 0; i < componentCount; ++i) {
-                final Component itemComponent = getComponent(i);
+                final Component component = getComponent(i);
                 if (componentCount == 1) {
-                    layoutSingularComponent(itemComponent);
+                    layoutSingularComponent(component);
                 } else if (i == 0) {
-                    layoutFirstComponent(itemComponent);
+                    layoutFirstComponent(component);
                 } else if (i == componentCount - 1) {
-                    layoutLastComponent(itemComponent);
+                    layoutLastComponent(component);
                 } else {
-                    layoutIntermediateComponent(itemComponent);
+                    layoutIntermediateComponent(component);
                 }
             }
         }
     }
     
-    abstract protected void layoutSingularComponent(Component itemComponent);
-    abstract protected void layoutFirstComponent(Component itemComponent);
-    abstract protected void layoutIntermediateComponent(Component itemComponent);
-    abstract protected void layoutLastComponent(Component itemComponent);
+    abstract protected void layoutSingularComponent(Component component);
+    abstract protected void layoutFirstComponent(Component component);
+    abstract protected void layoutIntermediateComponent(Component component);
+    abstract protected void layoutLastComponent(Component component);
     
     abstract protected AbstractOrderedLayout createLayout();
     
@@ -79,41 +83,41 @@ public abstract class SynergyLayout extends CustomComponent implements Layout, L
     public void addComponent(Component c)
     {
         layout.addComponent(c);
-        updateItemLayout();
+        layoutComponents();
     }
 
     public void addComponent(Component c, int index)
     {
         layout.addComponent(c, index);
-        updateItemLayout();
+        layoutComponents();
     }
 
     @Override
     public void addComponents(Component... components)
     {
         layout.addComponents(components);
-        updateItemLayout();
+        layoutComponents();
     }
 
     @Override
     public void removeComponent(Component c)
     {
         layout.removeComponent(c);
-        updateItemLayout();
+        layoutComponents();
     }
 
     @Override
     public void removeAllComponents()
     {
         layout.removeAllComponents();
-        updateItemLayout();
+        layoutComponents();
     }
 
     @Override
     public void replaceComponent(Component oldComponent, Component newComponent)
     {
         layout.replaceComponent(oldComponent, newComponent);
-        updateItemLayout();
+        layoutComponents();
     }
 
     @SuppressWarnings("deprecation")
@@ -127,7 +131,7 @@ public abstract class SynergyLayout extends CustomComponent implements Layout, L
     public void moveComponentsFrom(ComponentContainer source)
     {
         layout.moveComponentsFrom(source);
-        updateItemLayout();
+        layoutComponents();
     }
 
     @Deprecated

@@ -6,6 +6,7 @@ import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.VerticalLayout;
 
+import de.syngenio.vaadin.synergy.SynergyView.ItemComponent;
 import de.syngenio.vaadin.synergy.layout.AbstractSynergyLayoutFactory.Packing;
 
 public abstract class VerticalSynergyLayout extends SynergyLayout
@@ -45,24 +46,38 @@ public abstract class VerticalSynergyLayout extends SynergyLayout
         super.addItemComponent(itemComponent);
     }
 
+    private void layoutComponent(Component component, String height, float expandRatio, Alignment alignment) {
+        if (height != null) {
+            component.setHeight(height);
+        } else {
+            component.setHeightUndefined();
+        }
+        setExpandRatio(component, expandRatio);
+        setComponentAlignment(component, alignment);
+    }
+    
     @Override
     protected void layoutSingularComponent(Component component)
     {
-        component.setHeightUndefined();
-        setExpandRatio(component, 0);
-        setComponentAlignment(component, Alignment.MIDDLE_RIGHT);
+//        component.setHeightUndefined();
+//        setExpandRatio(component, 0);
         switch (getPacking()) {
         case EXPAND:
-            component.setHeight("100%");
+            layoutComponent(component, "100%", 0, Alignment.MIDDLE_RIGHT);
+//            component.setHeight("100%");
+//            setComponentAlignment(component, Alignment.MIDDLE_RIGHT);
             break;
         case SPACE_AFTER:
-            setComponentAlignment(component, Alignment.TOP_RIGHT);
+            layoutComponent(component, null, 0, Alignment.TOP_RIGHT);
+//            setComponentAlignment(component, Alignment.TOP_RIGHT);
             break;
         case SPACE_BEFORE:
-            setComponentAlignment(component, Alignment.BOTTOM_RIGHT);
+            layoutComponent(component, null, 0, Alignment.BOTTOM_RIGHT);
+//            setComponentAlignment(component, Alignment.BOTTOM_RIGHT);
             break;
         case SPACE_AROUND:
-            setComponentAlignment(component, Alignment.MIDDLE_RIGHT);
+            layoutComponent(component, null, 0, Alignment.MIDDLE_RIGHT);
+//            setComponentAlignment(component, Alignment.MIDDLE_RIGHT);
             break;
         }
     }
@@ -70,20 +85,22 @@ public abstract class VerticalSynergyLayout extends SynergyLayout
     @Override
     protected void layoutFirstComponent(Component component)
     {
-        component.setHeightUndefined();
-        setExpandRatio(component, 0);
-        setComponentAlignment(component, Alignment.MIDDLE_RIGHT);
+//        component.setHeightUndefined();
+//        setExpandRatio(component, 0);
+//        setComponentAlignment(component, Alignment.MIDDLE_RIGHT);
         switch (getPacking()) {
         case EXPAND:
-            component.setHeight("100%");
+            layoutComponent(component, "100%", 0, Alignment.MIDDLE_RIGHT);
+//            component.setHeight("100%");
             break;
         case SPACE_AROUND:
         case SPACE_BEFORE:
-            setExpandRatio(component, 1);
-            setComponentAlignment(component, Alignment.BOTTOM_RIGHT);
+            layoutComponent(component, null, 1, Alignment.BOTTOM_RIGHT);
+//            setExpandRatio(component, 1);
+//            setComponentAlignment(component, Alignment.BOTTOM_RIGHT);
             break;
-        default:
-            // do nothing
+        case SPACE_AFTER:
+            layoutComponent(component, null, 0, Alignment.MIDDLE_RIGHT);
             break;
         }
     }
@@ -91,15 +108,16 @@ public abstract class VerticalSynergyLayout extends SynergyLayout
     @Override
     protected void layoutIntermediateComponent(Component component)
     {
-        component.setHeightUndefined();
-        setExpandRatio(component, 0);
-        setComponentAlignment(component, Alignment.MIDDLE_RIGHT);
+//        component.setHeightUndefined();
+//        setExpandRatio(component, 0);
+//        setComponentAlignment(component, Alignment.MIDDLE_RIGHT);
         switch (getPacking()) {
         case EXPAND:
-            component.setHeight("100%");
+            layoutComponent(component, "100%", 0, Alignment.MIDDLE_RIGHT);
+//            component.setHeight("100%");
             break;
         default:
-            // do nothing
+            layoutComponent(component, null, 0, Alignment.MIDDLE_RIGHT);
             break;
         }
     }
@@ -107,20 +125,28 @@ public abstract class VerticalSynergyLayout extends SynergyLayout
     @Override
     protected void layoutLastComponent(Component component)
     {
-        component.setHeightUndefined();
-        setExpandRatio(component, 0);
-        setComponentAlignment(component, Alignment.MIDDLE_RIGHT);
+//        component.setHeightUndefined();
+//        setExpandRatio(component, 0);
+//        setComponentAlignment(component, Alignment.MIDDLE_RIGHT);
         switch (getPacking()) {
         case EXPAND:
-            component.setHeight("100%");
+            if (component instanceof ItemComponent) {
+                // item
+                layoutComponent(component, "100%", 0, Alignment.MIDDLE_RIGHT);
+            } else {
+                // wrapper
+                layoutComponent(component, null, 0, Alignment.MIDDLE_RIGHT);
+            }
+//            component.setHeight("100%");
             break;
         case SPACE_AFTER:
         case SPACE_AROUND:
-            setExpandRatio(component, 1);
-            setComponentAlignment(component, Alignment.TOP_RIGHT);
+            layoutComponent(component, null, 1, Alignment.TOP_RIGHT);
+//            setExpandRatio(component, 1);
+//            setComponentAlignment(component, Alignment.TOP_RIGHT);
             break;
-        default:
-            // do nothing
+        case SPACE_BEFORE:
+            layoutComponent(component, null, 0, Alignment.MIDDLE_RIGHT);
             break;
         }
     }

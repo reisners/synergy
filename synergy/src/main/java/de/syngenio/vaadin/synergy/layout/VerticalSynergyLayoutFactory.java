@@ -39,20 +39,22 @@ public class VerticalSynergyLayoutFactory extends AbstractSynergyLayoutFactory
                 if (subview.getWrapper() != null) {
                     removeComponent(subview.getWrapper());
                 }
-                Label label = new Label();
-                label.setWidth(indentWidth);
-                label.setHeightUndefined();
-                HorizontalLayout wrapper = new HorizontalLayout(label, subview);
-                wrapper.setMargin(new MarginInfo(false, false, true, false));
+//                Label label = new Label();
+//                label.setWidth(indentWidth);
+//                label.setHeightUndefined();
+                HorizontalLayout wrapper = new HorizontalLayout(subview);
+                wrapper.setMargin(new MarginInfo(false, false, true, true));
                 wrapper.addStyleName("wrapper");
                 wrapper.setWidth("100%");
                 wrapper.setHeightUndefined();
                 wrapper.setComponentAlignment(subview, Alignment.TOP_LEFT);
-                wrapper.setExpandRatio(label, 0);
-                wrapper.setExpandRatio(subview, 1);
+//                wrapper.setExpandRatio(label, 0);
+//                wrapper.setExpandRatio(subview, 1);
                 subview.setWrapper(wrapper);
+                subview.setSizeUndefined();
                 addComponent(wrapper, index);
                 setComponentAlignment(wrapper, Alignment.TOP_RIGHT);
+                setExpandRatio(wrapper, 0);
             }
         };
 
