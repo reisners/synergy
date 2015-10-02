@@ -65,6 +65,10 @@ public class WorldHelper
                                 item().withCaption("Auxiliary").withDescription("Click here to navigate to Auxiliary Processes view")
                                         .withTargetNavigationState("view/Auxiliary Processes")));
                 addItem(item().withCaption("More"));
+                addItem(group()
+                        .withCaption("Extras")
+                        .withChildren(
+                                item().withCaption("Options")));
             }
         }.build();
     }

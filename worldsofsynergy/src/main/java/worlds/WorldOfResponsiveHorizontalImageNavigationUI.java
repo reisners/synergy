@@ -74,7 +74,7 @@ public class WorldOfResponsiveHorizontalImageNavigationUI extends WorldUI
         
         SynergyView synergyViewNotEnoughSpace = new SynergyView(new VerticalSynergyLayoutFactory(Packing.EXPAND), (Container)null);
         synergyViewNotEnoughSpace.attachToSynergy(synergy);
-        synergyViewNotEnoughSpace.setWidthUndefined();
+        synergyViewNotEnoughSpace.setWidth("100px");
         synergyViewNotEnoughSpace.setHeight("100%");
         synergyViewNotEnoughSpace.addStyleName("notenoughspace");
         
