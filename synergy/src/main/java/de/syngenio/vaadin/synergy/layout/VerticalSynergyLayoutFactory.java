@@ -54,7 +54,7 @@ public class VerticalSynergyLayoutFactory extends AbstractSynergyLayoutFactory
                 subview.setSizeUndefined();
                 addComponent(wrapper, index);
                 setComponentAlignment(wrapper, Alignment.TOP_RIGHT);
-                setExpandRatio(wrapper, 0);
+//                setExpandRatio(wrapper, 0);
             }
         };
 

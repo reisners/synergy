@@ -98,12 +98,14 @@
 	
 	.#{$primary-stylename} .v-verticallayout {
 		.v-slot-wrapper.v-slot-synergy-selected {
-			background-color: $selected-color;
-			//padding-bottom: $spacing-dim;
+			& > .wrapper {
+				background-color: $selected-color;
+			}
 		}
 		.v-slot-wrapper.v-slot-synergy-ancestor-of-selected {
-			background-color: $aos-color;
-			//padding-bottom: $spacing-dim;
+			& > .wrapper {
+				background-color: $aos-color;
+			}
 		}
 
 		.v-slot-synergy-selected.v-slot-children + .v-spacing /*, .v-slot-synergy-selected.v-slot-wrapper + .v-spacing */ {

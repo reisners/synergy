@@ -1,6 +1,5 @@
 package de.syngenio.vaadin.synergy.layout;
 
-import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.ui.AbstractOrderedLayout;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Component;
@@ -63,7 +62,7 @@ public abstract class VerticalSynergyLayout extends SynergyLayout
 //        setExpandRatio(component, 0);
         switch (getPacking()) {
         case EXPAND:
-            layoutComponent(component, "100%", 0, Alignment.MIDDLE_RIGHT);
+            layoutComponent(component, "100%", 1, Alignment.MIDDLE_RIGHT);
 //            component.setHeight("100%");
 //            setComponentAlignment(component, Alignment.MIDDLE_RIGHT);
             break;
@@ -90,7 +89,7 @@ public abstract class VerticalSynergyLayout extends SynergyLayout
 //        setComponentAlignment(component, Alignment.MIDDLE_RIGHT);
         switch (getPacking()) {
         case EXPAND:
-            layoutComponent(component, "100%", 0, Alignment.MIDDLE_RIGHT);
+            layoutComponent(component, "100%", 1, Alignment.MIDDLE_RIGHT);
 //            component.setHeight("100%");
             break;
         case SPACE_AROUND:
@@ -113,7 +112,13 @@ public abstract class VerticalSynergyLayout extends SynergyLayout
 //        setComponentAlignment(component, Alignment.MIDDLE_RIGHT);
         switch (getPacking()) {
         case EXPAND:
-            layoutComponent(component, "100%", 0, Alignment.MIDDLE_RIGHT);
+            if (component instanceof ItemComponent) {
+                // item
+                layoutComponent(component, "100%", 1, Alignment.MIDDLE_RIGHT);
+            } else {
+                // wrapper
+                layoutComponent(component, null, 0, Alignment.MIDDLE_RIGHT);
+            }
 //            component.setHeight("100%");
             break;
         default:
@@ -132,7 +137,7 @@ public abstract class VerticalSynergyLayout extends SynergyLayout
         case EXPAND:
             if (component instanceof ItemComponent) {
                 // item
-                layoutComponent(component, "100%", 0, Alignment.MIDDLE_RIGHT);
+                layoutComponent(component, "100%", 1, Alignment.MIDDLE_RIGHT);
             } else {
                 // wrapper
                 layoutComponent(component, null, 0, Alignment.MIDDLE_RIGHT);
