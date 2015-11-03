@@ -58,9 +58,11 @@ public class WorldOfVerticalHierarchicalNavigationUI extends WorldUI
             public void valueChange(ValueChangeEvent event)
             {
                 handleVisibility();
-                views.forEach((packing, view) -> {
-                    view.setVisible(packing.equals(select.getValue()));
-                });
+                for (Map.Entry<Packing, SynergyView> entry : views.entrySet()) {
+                    Packing packing = entry.getKey();
+                    SynergyView synergyView = entry.getValue();
+                    synergyView.setVisible(packing.equals(select.getValue()));
+                }
             }
         });
         vlayout.addComponent(select);
@@ -138,7 +140,9 @@ public class WorldOfVerticalHierarchicalNavigationUI extends WorldUI
 
     private void handleVisibility()
     {
-        views.forEach((packing, synergyView) -> {
+        for (Map.Entry<Packing, SynergyView> entry : views.entrySet()) {
+            Packing packing = entry.getKey();
+            SynergyView synergyView = entry.getValue();
             boolean visible = packing.equals(select.getValue());
 
             if (visible) {
@@ -148,6 +152,6 @@ public class WorldOfVerticalHierarchicalNavigationUI extends WorldUI
             } else {
                 hlayout.removeComponent(synergyView);
             }
-        });
+        }
     }
 }

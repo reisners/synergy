@@ -45,7 +45,7 @@ public class WorldOfVerticalDynamicalNavigationUI extends WorldUI
     @Override
     protected void init(VaadinRequest request)
     {
-        HierarchicalContainer container = new SynergyBuilder() {{
+        final HierarchicalContainer container = new SynergyBuilder() {{
             addItem(item("names").asGroup().withCaption("Names"));
         }}.build();
         
@@ -67,7 +67,7 @@ public class WorldOfVerticalDynamicalNavigationUI extends WorldUI
             @Override
             public void valueChange(ValueChangeEvent event)
             {
-                String name = propertyName.getValue();
+                final String name = propertyName.getValue();
                 if (!"".equals(name)) {
                     log.debug("form value change: name="+name);
                     new SynergyBuilder(container, "names") {{

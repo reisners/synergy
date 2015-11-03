@@ -8,6 +8,7 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.BiConsumer;
 
 import javax.servlet.annotation.WebServlet;
 
@@ -22,6 +23,7 @@ import worlds.WorldDescription;
 
 import com.vaadin.data.Container;
 import com.vaadin.data.Container.Indexed;
+import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.data.util.HierarchicalContainer;
@@ -30,6 +32,7 @@ import com.vaadin.server.FontIcon;
 import com.vaadin.server.Resource;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.server.VaadinServlet;
+import com.vaadin.ui.UI;
 
 import de.syngenio.vaadin.synergy.Synergy;
 import de.syngenio.vaadin.synergy.builder.SynergyBuilder;
@@ -287,7 +290,7 @@ public class WorldHelper
                 {
                     WebServlet ws = (WebServlet) webServletClass.getAnnotation(WebServlet.class);
                     String path = ws.value()[0].replaceAll("/\\*$", "");
-                    WorldBean bean = new WorldBean();
+                    final WorldBean bean = new WorldBean();
                     final Class worldClass = webServletClass.getEnclosingClass();
                     WorldDescription description = (WorldDescription) worldClass.getAnnotation(WorldDescription.class);
                     if (description == null)
@@ -299,16 +302,17 @@ public class WorldHelper
                     bean.tags = new HashSet<String>(Arrays.asList(description.tags()));
                     bean.description = description.prose();
                     addItem(item().stacked().withCaption(bean.name).withIcon(FontAwesome.GLOBE).withGlyphSize("2em").withDescription(bean.description)
-                            .withTargetNavigationState(bean.path).withAction((item, ui) -> {
-                                Property<String> propertyTargetNavigationState = item.getItemProperty(Synergy.PROPERTY_TARGET_NAVIGATION_STATE);
-                                String targetNavigationState = propertyTargetNavigationState.getValue();
-                                if (targetNavigationState != null)
-                                {
-                                    String contextPath = VaadinServlet.getCurrent().getServletContext().getContextPath();
-                                    ui.getPage().setLocation(contextPath + bean.getPath());
+                            .withTargetNavigationState(bean.path).withAction(new BiConsumer<Item, UI>() {
+                                public void accept(Item item, UI ui) {
+                                    Property<String> propertyTargetNavigationState = (Property<String>)item.getItemProperty(Synergy.PROPERTY_TARGET_NAVIGATION_STATE);
+                                    String targetNavigationState = propertyTargetNavigationState.getValue();
+                                    if (targetNavigationState != null)
+                                    {
+                                        String contextPath = VaadinServlet.getCurrent().getServletContext().getContextPath();
+                                        ui.getPage().setLocation(contextPath + bean.getPath());
+                                    }
                                 }
                             }));
-
                 }
             }
         }.build();

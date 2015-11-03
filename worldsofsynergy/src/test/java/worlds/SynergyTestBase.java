@@ -94,22 +94,27 @@ public abstract class SynergyTestBase
         {
             reload();
             // check that all root items are visible
-            hierarchy.rootItemIds().forEach(rootItemId -> assertItemVisible((String) rootItemId));
+            for (Object rootItemId : hierarchy.rootItemIds()) {
+                assertItemVisible((String) rootItemId);
+            }
             // check that no other items are visible
-            hierarchy.getItemIds().forEach(itemId -> {
-                if (!hierarchy.isRoot(itemId))
-                {
+            for (Object itemId : hierarchy.getItemIds()) {
+                if (!hierarchy.isRoot(itemId)) {
                     assertItemNotVisible((String) itemId);
                 }
-            });
+            }
 
             // click on each
             final List<String> shuffledRootItemIds = new ArrayList<String>((Collection<String>) hierarchy.rootItemIds());
             Collections.shuffle(shuffledRootItemIds);
-            shuffledRootItemIds.forEach(itemId -> exerciseItem(itemId));
+            for (String itemId : shuffledRootItemIds) {
+                exerciseItem(itemId);
+            }
             
             // descend into each subhierarchy
-            shuffledRootItemIds.forEach(itemId -> exerciseItemsBelow(itemId));
+            for (String itemId : shuffledRootItemIds) {
+                exerciseItemsBelow(itemId);
+            }
         }
 
         private void exerciseItemsBelow(String parentId)
@@ -118,9 +123,13 @@ public abstract class SynergyTestBase
             click(parentId);
             List<String> shuffledChildItemIds = childrenOf(parentId);
             Collections.shuffle(shuffledChildItemIds);
-            shuffledChildItemIds.forEach(itemId -> exerciseItem(itemId));
+            for (String itemId : shuffledChildItemIds) {
+                exerciseItem(itemId);
+            }
             // descend further
-            shuffledChildItemIds.forEach(itemId -> exerciseItemsBelow(itemId));
+            for (String itemId : shuffledChildItemIds) {
+                exerciseItemsBelow(itemId);
+            }
         }
 
         private void exerciseItem(String itemId)
@@ -146,8 +155,13 @@ public abstract class SynergyTestBase
 
         private List<String> childrenOf(final String parentId)
         {
-            return (List<String>) hierarchy.getItemIds().stream().filter(itemId -> equals((String) hierarchy.getParent(itemId), parentId))
-                    .collect(Collectors.toList());
+            List<String> children = new ArrayList<String>();
+            for (Object itemId : hierarchy.getItemIds()) {
+                if (equals((String) hierarchy.getParent(itemId), parentId)) {
+                    children.add((String) itemId);
+                }
+            }
+            return children;
         }
 
         private boolean equals(String id1, String id2)
@@ -166,18 +180,22 @@ public abstract class SynergyTestBase
         assertWithinTimeout("css class suffix " + cssClassSuffix + " not found on item "+itemId, itemId, predicateHasCssClassSuffix(cssClassSuffix));
     }
 
-    private Predicate<String> predicateHasCssClassSuffix(String cssClassSuffix)
+    private Predicate<String> predicateHasCssClassSuffix(final String cssClassSuffix)
     {
-        return itemId -> {
-            try
+        return new Predicate<String>() {
+            @Override
+            public boolean test(String itemId)
             {
-                final WebElement item = driver.findElement(By.id(itemId));
-                final String cssClass = item.getAttribute("class");
-                return cssClass.matches(".*\\b" + cssClassSuffix + "\\b.*");
-            }
-            catch (NoSuchElementException e)
-            {
-                return false;
+                try
+                {
+                    final WebElement item = driver.findElement(By.id(itemId));
+                    final String cssClass = item.getAttribute("class");
+                    return cssClass.matches(".*\\b" + cssClassSuffix + "\\b.*");
+                }
+                catch (NoSuchElementException e)
+                {
+                    return false;
+                }
             }
         };
     }

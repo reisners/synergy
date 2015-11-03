@@ -56,12 +56,12 @@ public class WorldOfHorizontalImageNavigationUI extends WorldUI
     {
         super.init(request);
         container = WorldHelper.getImageNavigation2();
-        List<Object> itemIds = new ArrayList<Object>(container.getItemIds());
+        final List<Object> itemIds = new ArrayList<Object>(container.getItemIds());
         
         vlayout = new VerticalLayout();
         vlayout.setSizeFull();
         
-        ComboBox selectNumber = new ComboBox("Number of items");
+        final ComboBox selectNumber = new ComboBox("Number of items");
         selectNumber.addItem(1);
         selectNumber.addItem(2);
         selectNumber.addItem(3);
@@ -73,7 +73,7 @@ public class WorldOfHorizontalImageNavigationUI extends WorldUI
             @Override
             public void valueChange(ValueChangeEvent event)
             {
-                final int number = (int) selectNumber.getValue();
+                final int number = (Integer) selectNumber.getValue();
                 container.removeAllContainerFilters();
                 container.addContainerFilter(new Filter() {
 
@@ -144,7 +144,9 @@ public class WorldOfHorizontalImageNavigationUI extends WorldUI
 
     private void handleVisibility()
     {
-        views.forEach((packing, synergyView) -> {
+        for (Map.Entry<Packing, SynergyView> entry : views.entrySet()) {
+            Packing packing = entry.getKey();
+            SynergyView synergyView = entry.getValue();
             boolean visible = packing.equals(selectPacking.getValue());
 
             if (visible) {
@@ -154,6 +156,6 @@ public class WorldOfHorizontalImageNavigationUI extends WorldUI
             } else {
                 vlayout.removeComponent(synergyView);
             }
-        });
+        }
     }
 }

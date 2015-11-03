@@ -1,6 +1,5 @@
 package de.syngenio.vaadin.synergy;
 
-import java.io.Serializable;
 import java.lang.reflect.Constructor;
 import java.util.Collection;
 import java.util.HashMap;
@@ -27,7 +26,6 @@ import com.vaadin.navigator.Navigator;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.server.ExternalResource;
 import com.vaadin.server.FontIcon;
-import com.vaadin.server.Page;
 import com.vaadin.server.Resource;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.shared.ui.MarginInfo;
@@ -37,7 +35,6 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.Image;
-import com.vaadin.ui.JavaScript;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
@@ -72,7 +69,6 @@ public class SynergyView extends CustomComponent
         this.wrapper = wrapper;
     }
 
-    @SuppressWarnings("unused")
     private SynergyView parentView = null;
     private SynergyView subView = null;
     private Map<String, ItemComponent> itemComponents = null;
@@ -107,6 +103,7 @@ public class SynergyView extends CustomComponent
      * @param layoutFactory
      * @param parentView
      */
+    @SuppressWarnings("serial")
     public SynergyView(SynergyLayoutFactory layoutFactory, SynergyView parentView)
     {
         setPrimaryStyleName(DEFAULT_PRIMARY_STYLE_NAME);
@@ -153,6 +150,7 @@ public class SynergyView extends CustomComponent
                     Item item = synergy.getContainerDataSource().getItem(itemId);
                     UI ui = SynergyView.this.getUI();
                     if (ui != null) {
+                        @SuppressWarnings("unchecked")
                         BiConsumer<Item, UI> selectAction = (BiConsumer<Item, UI>) item.getItemProperty(Synergy.PROPERTY_ITEM_ACTION).getValue();
                         if (selectAction == null) {
                             selectAction = defaultSelectAction;
@@ -171,6 +169,7 @@ public class SynergyView extends CustomComponent
         }
     }
     
+    @SuppressWarnings("unused")
     private String getSubviewStyle()
     {
         if (parentId != null && !parentId.equals(INACTIVE)) {
@@ -334,6 +333,7 @@ public class SynergyView extends CustomComponent
         }
     }
 
+    @SuppressWarnings("unused")
     private static void setStateStyleOn(Component component, State state)
     {
         for (State value : State.values()) {
@@ -367,13 +367,15 @@ public class SynergyView extends CustomComponent
         return SynergyBuilder.isAncestorOf(synergy.getContainerDataSource(), ancestorId, descendantId); 
     }
 
-    private BiConsumer<Item, UI> defaultSelectAction = (item, ui) -> {
-        String targetNavigationState = (String) item.getItemProperty(Synergy.PROPERTY_TARGET_NAVIGATION_STATE).getValue();
-        log.debug("selected item with targetNavigationState="+targetNavigationState);
-        if (targetNavigationState != null) {
-            Navigator navigator = ui.getNavigator();
-            if (navigator != null) {
-                navigator.navigateTo(targetNavigationState);
+    private BiConsumer<Item, UI> defaultSelectAction = new BiConsumer<Item, UI>() { 
+        public void accept(Item item, UI ui) {
+            String targetNavigationState = (String) item.getItemProperty(Synergy.PROPERTY_TARGET_NAVIGATION_STATE).getValue();
+            log.debug("selected item with targetNavigationState="+targetNavigationState);
+            if (targetNavigationState != null) {
+                Navigator navigator = ui.getNavigator();
+                if (navigator != null) {
+                    navigator.navigateTo(targetNavigationState);
+                }
             }
         }
     };
@@ -462,6 +464,7 @@ public class SynergyView extends CustomComponent
      * Depending on the type of the source {@code Resource}, the graphical component is either an
      * {@code Image} or a {@code Label}.  
      */
+    @SuppressWarnings("serial")
     public static class ItemComponentImage extends CustomComponent implements ItemComponent {
         private static final String PRIMARY_STYLE_NAME = "synergy-image";
         private VerticalLayout layout;
@@ -479,14 +482,18 @@ public class SynergyView extends CustomComponent
         
         public void setup(final Synergy synergy, final String itemId)
         {
-            Property<Resource> propertyIcon = synergy.getContainerProperty(itemId, Synergy.PROPERTY_ITEM_ICON);
+            @SuppressWarnings("unchecked")
+            Property<Resource> propertyIcon = (Property<Resource>)synergy.getContainerProperty(itemId, Synergy.PROPERTY_ITEM_ICON);
             source = propertyIcon.getValue();
-            Property<Resource> propertyIconSelected = synergy.getContainerProperty(itemId, Synergy.PROPERTY_ITEM_ICON_SELECTED);
+            @SuppressWarnings("unchecked")
+            Property<Resource> propertyIconSelected = (Property<Resource>)synergy.getContainerProperty(itemId, Synergy.PROPERTY_ITEM_ICON_SELECTED);
             sourceSelected = propertyIconSelected.getValue();
             
-            Property<String> propertyCaption = synergy.getContainerProperty(itemId, Synergy.PROPERTY_ITEM_CAPTION);
+            @SuppressWarnings("unchecked")
+            Property<String> propertyCaption = (Property<String>)synergy.getContainerProperty(itemId, Synergy.PROPERTY_ITEM_CAPTION);
             String captionText = propertyCaption.getValue();
-            Property<String> propertyDescription = synergy.getContainerProperty(itemId, Synergy.PROPERTY_ITEM_DESCRIPTION);
+            @SuppressWarnings("unchecked")
+            Property<String> propertyDescription = (Property<String>)synergy.getContainerProperty(itemId, Synergy.PROPERTY_ITEM_DESCRIPTION);
 
             layout = new VerticalLayout();
 //            layout.setSizeFull();
@@ -507,7 +514,8 @@ public class SynergyView extends CustomComponent
                     layout.addComponent(glyph);
                     layout.setComponentAlignment(glyph, imageAlignment);
                     layout.setExpandRatio(glyph, 1);
-                    Property<String> propertySize = synergy.getContainerProperty(itemId, Synergy.PROPERTY_ITEM_GLYPH_SIZE);
+                    @SuppressWarnings("unchecked")
+                    Property<String> propertySize = (Property<String>)synergy.getContainerProperty(itemId, Synergy.PROPERTY_ITEM_GLYPH_SIZE);
                     glyphSize  = propertySize.getValue();
                 } else {
                     image = new Image();
@@ -515,17 +523,6 @@ public class SynergyView extends CustomComponent
                     layout.addComponent(image);
                     layout.setComponentAlignment(image, imageAlignment);
                     layout.setExpandRatio(image, 1);
-                    
-    //                Property<String> propertyWidth = synergy.getContainerProperty(itemId, SynergyBuilder.PROPERTY_ITEM_IMAGE_WIDTH);
-    //                String width = propertyWidth.getValue();
-    //                if (width != null) {
-    //                    image.setWidth(width);
-    //                }
-    //                Property<String> propertyHeight = synergy.getContainerProperty(itemId, SynergyBuilder.PROPERTY_ITEM_IMAGE_HEIGHT);
-    //                String height = propertyHeight.getValue();
-    //                if (height != null) {
-    //                    image.setHeight(height);
-    //                }
                 }
             }
             
@@ -608,6 +605,7 @@ public class SynergyView extends CustomComponent
      * Implementation of {@code ItemComponent} that visualizes items as a button with optional
      * caption and icon
      */
+    @SuppressWarnings("serial")
     public static class ItemComponentButton extends Button implements ItemComponent {
         private static final String PRIMARY_STYLE_NAME = "synergy-button";
 
@@ -618,14 +616,16 @@ public class SynergyView extends CustomComponent
         
         public void setup(final Synergy synergy, final String itemId)
         {
-            Property<String> propertyCaption = synergy.getContainerProperty(itemId, Synergy.PROPERTY_ITEM_CAPTION);
+            @SuppressWarnings("unchecked")
+            Property<String> propertyCaption = (Property<String>)synergy.getContainerProperty(itemId, Synergy.PROPERTY_ITEM_CAPTION);
             String caption = propertyCaption.getValue();
             if (caption != null) {
                 setCaption(synergy.i18n(caption));
             }
             setImmediate(true);
 //            setSizeUndefined();
-            Property<Resource> propertyIcon = synergy.getContainerProperty(itemId, Synergy.PROPERTY_ITEM_ICON);
+            @SuppressWarnings("unchecked")
+            Property<Resource> propertyIcon = (Property<Resource>)synergy.getContainerProperty(itemId, Synergy.PROPERTY_ITEM_ICON);
             Resource iconResource = propertyIcon.getValue();
             if (iconResource != null) {
                 setIcon(iconResource);
@@ -633,7 +633,8 @@ public class SynergyView extends CustomComponent
             if (caption == null && iconResource == null) {
                 setCaption(itemId);
             }
-            Property<String> propertyToolTip = synergy.getContainerProperty(itemId, Synergy.PROPERTY_ITEM_DESCRIPTION);
+            @SuppressWarnings("unchecked")
+            Property<String> propertyToolTip = (Property<String>)synergy.getContainerProperty(itemId, Synergy.PROPERTY_ITEM_DESCRIPTION);
             String toolTip = propertyToolTip.getValue();
             if (toolTip != null) {
                 setDescription(synergy.i18n(toolTip));
@@ -664,14 +665,15 @@ public class SynergyView extends CustomComponent
     {
         ItemComponent itemComponent = null;
         Item item = synergy.getItem(itemId);
-        final Property<Class> property = item.getItemProperty(Synergy.PROPERTY_ITEM_COMPONENT_CLASS);
+        @SuppressWarnings("unchecked")
+        final Property<Class<? extends ItemComponent>> property = (Property<Class<? extends ItemComponent>>)item.getItemProperty(Synergy.PROPERTY_ITEM_COMPONENT_CLASS);
         Class< ? extends ItemComponent> itemComponentClass = property.getValue();
         if (itemComponentClass == null) {
             itemComponentClass = defaultItemComponentClass;
         }
         try
         {
-            Constructor defcon = itemComponentClass.getConstructor();
+            Constructor<? extends ItemComponent> defcon = itemComponentClass.getConstructor();
             itemComponent = (ItemComponent) defcon.newInstance();
         }
         catch (Exception e)
@@ -696,6 +698,7 @@ public class SynergyView extends CustomComponent
      * Will immediately render the data contained in the Synergy. 
      * @param synergy the Synergy instance to attach to
      */
+    @SuppressWarnings("serial")
     public void attachToSynergy(Synergy synergy)
     {
         this.synergy = synergy;
@@ -726,7 +729,7 @@ public class SynergyView extends CustomComponent
     }
 
     /**
-     * Removes listeners from the {@code Synergy}. 
+     * Removes listeners from the {@link Synergy}. 
      * Call this method before disposing the {@code SynergyView} to avoid memory leaks.
      */
     public void detachFromSelect() {
@@ -741,20 +744,27 @@ public class SynergyView extends CustomComponent
         return synergy.getContainerDataSource();
     }
 
-    private BiConsumer<SynergyView, ViewChangeEvent> syncer = SynergyView::defaultSyncer;
+    private BiConsumer<SynergyView, ViewChangeEvent> syncer = new BiConsumer<SynergyView, ViewChangeEvent>() {
+        @Override
+        public void accept(SynergyView synergyView, ViewChangeEvent event)
+        {
+            synergyView.defaultSyncer(event);
+        }
+    };
     
     private void defaultSyncer(ViewChangeEvent event) {
         String targetNavigationState = extractTargetNavigationState(event);
         final Container container = synergy.getContainerDataSource();
         for (Object itemId : container.getItemIds()) {
-            Property<String> propertyTargetNavigationState = container.getContainerProperty(itemId, Synergy.PROPERTY_TARGET_NAVIGATION_STATE);
+            @SuppressWarnings("unchecked")
+            Property<String> propertyTargetNavigationState = (Property<String>)container.getContainerProperty(itemId, Synergy.PROPERTY_TARGET_NAVIGATION_STATE);
             if (propertyTargetNavigationState != null && targetNavigationState.equals(propertyTargetNavigationState.getValue())) {
                 synergy.select(itemId);
                 return;
             }
         }
-    }
-
+    };
+    
     private String extractTargetNavigationState(ViewChangeEvent event)
     {
         return event.getViewName() + "/" + event.getParameters();
@@ -771,10 +781,10 @@ public class SynergyView extends CustomComponent
     }
 
     /**
-     * Passes a {@code ViewChangeEvent} to the view's syncer.
+     * Passes a {@link ViewChangeEvent} to the view's syncer.
      * The default syncer will look for an item in the view's container with
      * matching targetNavigationState and select it. 
-     * The default syncer can be replaced using
+     * The default syncer can be replaced using {@link #setSyncer(Syncer)}
      * @param event
      */
     public void syncWith(ViewChangeEvent event)
