@@ -23,8 +23,8 @@ import org.slf4j.LoggerFactory;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.HierarchicalContainer;
 
+import de.syngenio.vaadin.synergy.Synergy;
 import de.syngenio.vaadin.synergy.SynergyView.ItemComponent.State;
-import de.syngenio.vaadin.synergy.builder.SynergyBuilder;
 
 public abstract class SynergyTestBase
 {
@@ -130,7 +130,7 @@ public abstract class SynergyTestBase
             click(itemId);
             assertItemState(itemId, State.selected);
             // if the item has a target navigation state check that the view is visible
-            String targetNavigationState = ((Property<String>) hierarchy.getContainerProperty(itemId, SynergyBuilder.PROPERTY_TARGET_NAVIGATION_STATE)).getValue();
+            String targetNavigationState = ((Property<String>) hierarchy.getContainerProperty(itemId, Synergy.PROPERTY_TARGET_NAVIGATION_STATE)).getValue();
             if (targetNavigationState != null) {
                 String name = targetNavigationState.split("/")[1];
                 assertTrue("content should display "+name, driver.findElement(By.id("content")).getText().contains(name));

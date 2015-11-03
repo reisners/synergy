@@ -153,7 +153,7 @@ public class SynergyView extends CustomComponent
                     Item item = synergy.getContainerDataSource().getItem(itemId);
                     UI ui = SynergyView.this.getUI();
                     if (ui != null) {
-                        BiConsumer<Item, UI> selectAction = (BiConsumer<Item, UI>) item.getItemProperty(SynergyBuilder.PROPERTY_ITEM_ACTION).getValue();
+                        BiConsumer<Item, UI> selectAction = (BiConsumer<Item, UI>) item.getItemProperty(Synergy.PROPERTY_ITEM_ACTION).getValue();
                         if (selectAction == null) {
                             selectAction = defaultSelectAction;
                         }
@@ -174,7 +174,7 @@ public class SynergyView extends CustomComponent
     private String getSubviewStyle()
     {
         if (parentId != null && !parentId.equals(INACTIVE)) {
-            return (String) synergy.getContainerDataSource().getContainerProperty(parentId, SynergyBuilder.PROPERTY_ITEM_SUBVIEW_STYLE).getValue();
+            return (String) synergy.getContainerDataSource().getContainerProperty(parentId, Synergy.PROPERTY_ITEM_SUBVIEW_STYLE).getValue();
         }
         return null;
     }
@@ -368,7 +368,7 @@ public class SynergyView extends CustomComponent
     }
 
     private BiConsumer<Item, UI> defaultSelectAction = (item, ui) -> {
-        String targetNavigationState = (String) item.getItemProperty(SynergyBuilder.PROPERTY_TARGET_NAVIGATION_STATE).getValue();
+        String targetNavigationState = (String) item.getItemProperty(Synergy.PROPERTY_TARGET_NAVIGATION_STATE).getValue();
         log.debug("selected item with targetNavigationState="+targetNavigationState);
         if (targetNavigationState != null) {
             Navigator navigator = ui.getNavigator();
@@ -479,14 +479,14 @@ public class SynergyView extends CustomComponent
         
         public void setup(final Synergy synergy, final String itemId)
         {
-            Property<Resource> propertyIcon = synergy.getContainerProperty(itemId, SynergyBuilder.PROPERTY_ITEM_ICON);
+            Property<Resource> propertyIcon = synergy.getContainerProperty(itemId, Synergy.PROPERTY_ITEM_ICON);
             source = propertyIcon.getValue();
-            Property<Resource> propertyIconSelected = synergy.getContainerProperty(itemId, SynergyBuilder.PROPERTY_ITEM_ICON_SELECTED);
+            Property<Resource> propertyIconSelected = synergy.getContainerProperty(itemId, Synergy.PROPERTY_ITEM_ICON_SELECTED);
             sourceSelected = propertyIconSelected.getValue();
             
-            Property<String> propertyCaption = synergy.getContainerProperty(itemId, SynergyBuilder.PROPERTY_ITEM_CAPTION);
+            Property<String> propertyCaption = synergy.getContainerProperty(itemId, Synergy.PROPERTY_ITEM_CAPTION);
             String captionText = propertyCaption.getValue();
-            Property<String> propertyDescription = synergy.getContainerProperty(itemId, SynergyBuilder.PROPERTY_ITEM_DESCRIPTION);
+            Property<String> propertyDescription = synergy.getContainerProperty(itemId, Synergy.PROPERTY_ITEM_DESCRIPTION);
 
             layout = new VerticalLayout();
 //            layout.setSizeFull();
@@ -507,7 +507,7 @@ public class SynergyView extends CustomComponent
                     layout.addComponent(glyph);
                     layout.setComponentAlignment(glyph, imageAlignment);
                     layout.setExpandRatio(glyph, 1);
-                    Property<String> propertySize = synergy.getContainerProperty(itemId, SynergyBuilder.PROPERTY_ITEM_GLYPH_SIZE);
+                    Property<String> propertySize = synergy.getContainerProperty(itemId, Synergy.PROPERTY_ITEM_GLYPH_SIZE);
                     glyphSize  = propertySize.getValue();
                 } else {
                     image = new Image();
@@ -618,14 +618,14 @@ public class SynergyView extends CustomComponent
         
         public void setup(final Synergy synergy, final String itemId)
         {
-            Property<String> propertyCaption = synergy.getContainerProperty(itemId, SynergyBuilder.PROPERTY_ITEM_CAPTION);
+            Property<String> propertyCaption = synergy.getContainerProperty(itemId, Synergy.PROPERTY_ITEM_CAPTION);
             String caption = propertyCaption.getValue();
             if (caption != null) {
                 setCaption(synergy.i18n(caption));
             }
             setImmediate(true);
 //            setSizeUndefined();
-            Property<Resource> propertyIcon = synergy.getContainerProperty(itemId, SynergyBuilder.PROPERTY_ITEM_ICON);
+            Property<Resource> propertyIcon = synergy.getContainerProperty(itemId, Synergy.PROPERTY_ITEM_ICON);
             Resource iconResource = propertyIcon.getValue();
             if (iconResource != null) {
                 setIcon(iconResource);
@@ -633,7 +633,7 @@ public class SynergyView extends CustomComponent
             if (caption == null && iconResource == null) {
                 setCaption(itemId);
             }
-            Property<String> propertyToolTip = synergy.getContainerProperty(itemId, SynergyBuilder.PROPERTY_ITEM_DESCRIPTION);
+            Property<String> propertyToolTip = synergy.getContainerProperty(itemId, Synergy.PROPERTY_ITEM_DESCRIPTION);
             String toolTip = propertyToolTip.getValue();
             if (toolTip != null) {
                 setDescription(synergy.i18n(toolTip));
@@ -664,7 +664,7 @@ public class SynergyView extends CustomComponent
     {
         ItemComponent itemComponent = null;
         Item item = synergy.getItem(itemId);
-        final Property<Class> property = item.getItemProperty(SynergyBuilder.PROPERTY_ITEM_COMPONENT_CLASS);
+        final Property<Class> property = item.getItemProperty(Synergy.PROPERTY_ITEM_COMPONENT_CLASS);
         Class< ? extends ItemComponent> itemComponentClass = property.getValue();
         if (itemComponentClass == null) {
             itemComponentClass = defaultItemComponentClass;
@@ -747,7 +747,7 @@ public class SynergyView extends CustomComponent
         String targetNavigationState = extractTargetNavigationState(event);
         final Container container = synergy.getContainerDataSource();
         for (Object itemId : container.getItemIds()) {
-            Property<String> propertyTargetNavigationState = container.getContainerProperty(itemId, SynergyBuilder.PROPERTY_TARGET_NAVIGATION_STATE);
+            Property<String> propertyTargetNavigationState = container.getContainerProperty(itemId, Synergy.PROPERTY_TARGET_NAVIGATION_STATE);
             if (propertyTargetNavigationState != null && targetNavigationState.equals(propertyTargetNavigationState.getValue())) {
                 synergy.select(itemId);
                 return;

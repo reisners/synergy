@@ -31,6 +31,7 @@ import com.vaadin.server.Resource;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.server.VaadinServlet;
 
+import de.syngenio.vaadin.synergy.Synergy;
 import de.syngenio.vaadin.synergy.builder.SynergyBuilder;
 
 public class WorldHelper
@@ -299,7 +300,7 @@ public class WorldHelper
                     bean.description = description.prose();
                     addItem(item().stacked().withCaption(bean.name).withIcon(FontAwesome.GLOBE).withGlyphSize("2em").withDescription(bean.description)
                             .withTargetNavigationState(bean.path).withAction((item, ui) -> {
-                                Property<String> propertyTargetNavigationState = item.getItemProperty(SynergyBuilder.PROPERTY_TARGET_NAVIGATION_STATE);
+                                Property<String> propertyTargetNavigationState = item.getItemProperty(Synergy.PROPERTY_TARGET_NAVIGATION_STATE);
                                 String targetNavigationState = propertyTargetNavigationState.getValue();
                                 if (targetNavigationState != null)
                                 {

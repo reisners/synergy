@@ -75,12 +75,12 @@ public class TestSynergyBuilder
 
     @Test
     public void testBuilderCaptionDefaulting() {
-        assertEquals("MappingCases", navigationHierarchy.getItem("|Tools|Specification|MappingCases").getItemProperty(SynergyBuilder.PROPERTY_ITEM_CAPTION).getValue());
+        assertEquals("MappingCases", navigationHierarchy.getItem("|Tools|Specification|MappingCases").getItemProperty(Synergy.PROPERTY_ITEM_CAPTION).getValue());
     }
     
     @Test
     public void testParentNoTargetNavigationState() {
-        assertNull(navigationHierarchy.getItem("|Tools|Specification").getItemProperty(SynergyBuilder.PROPERTY_TARGET_NAVIGATION_STATE).getValue());
+        assertNull(navigationHierarchy.getItem("|Tools|Specification").getItemProperty(Synergy.PROPERTY_TARGET_NAVIGATION_STATE).getValue());
     }
     
     @Test
@@ -95,7 +95,7 @@ public class TestSynergyBuilder
             {
                 final boolean contains = allowedIds.contains(itemId);
                 final boolean hasChildren = !SynergyBuilder.getChildIdsOf(navigationHierarchy, (String) itemId).isEmpty();
-                final boolean visibleIfEmpty = !((Boolean)item.getItemProperty(SynergyBuilder.PROPERTY_ITEM_HIDDEN_IF_EMPTY).getValue());
+                final boolean visibleIfEmpty = !((Boolean)item.getItemProperty(Synergy.PROPERTY_ITEM_HIDDEN_IF_EMPTY).getValue());
                 log.debug("itemId="+itemId+" --> contains="+contains+", hasChildren="+hasChildren+", visibleIfEmpty="+visibleIfEmpty);
                 return contains
                         || hasChildren
