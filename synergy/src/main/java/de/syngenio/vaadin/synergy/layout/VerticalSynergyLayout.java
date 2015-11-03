@@ -1,10 +1,13 @@
 package de.syngenio.vaadin.synergy.layout;
 
+import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.ui.AbstractOrderedLayout;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Component;
+import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.VerticalLayout;
 
+import de.syngenio.vaadin.synergy.SynergyView;
 import de.syngenio.vaadin.synergy.SynergyView.ItemComponent;
 import de.syngenio.vaadin.synergy.layout.AbstractSynergyLayoutFactory.Packing;
 
@@ -155,4 +158,98 @@ public abstract class VerticalSynergyLayout extends SynergyLayout
             break;
         }
     }
+
+    public static class FlatFactory extends AbstractSynergyLayoutFactory
+    {
+        public FlatFactory() {
+            super();
+        }
+        
+        /**
+         * @param packing 
+         */
+        public FlatFactory(Packing packing)
+        {
+            super(packing);
+        }
+        
+        @Override
+        public SynergyLayout generateLayout()
+        {
+            SynergyLayout layout = new VerticalSynergyLayout(getPacking()) {
+                @Override
+                public void addSubview(SynergyView subview, int index)
+                {
+                    // do nothing
+                }
+            };
+
+            layout.setSizeFull();
+            
+            return layout;
+        }
+
+        @Override
+        public SynergyLayoutFactory getSubitemLayoutFactory()
+        {
+            return this;
+        }
+    }
+
+    public static class NestedFactory extends AbstractSynergyLayoutFactory
+    {
+        public NestedFactory() {
+            super();
+        }
+        
+        /**
+         * @param packing 
+         */
+        public NestedFactory(Packing packing)
+        {
+            super(packing);
+        }
+        
+        @Override
+        public SynergyLayout generateLayout()
+        {
+            SynergyLayout layout = new VerticalSynergyLayout(getPacking()) {
+                @Override
+                public void addSubview(SynergyView subview, int index)
+                {
+                    // if it has been added to this layout before, remove the subview (along with its wrapper) first 
+                    if (subview.getWrapper() != null) {
+                        removeComponent(subview.getWrapper());
+                    }
+//                    Label label = new Label();
+//                    label.setWidth(indentWidth);
+//                    label.setHeightUndefined();
+                    HorizontalLayout wrapper = new HorizontalLayout(subview);
+                    wrapper.setMargin(new MarginInfo(false, false, true, true));
+                    wrapper.addStyleName("wrapper");
+                    wrapper.setWidth("100%");
+                    wrapper.setHeightUndefined();
+                    wrapper.setComponentAlignment(subview, Alignment.TOP_LEFT);
+//                    wrapper.setExpandRatio(label, 0);
+//                    wrapper.setExpandRatio(subview, 1);
+                    subview.setWrapper(wrapper);
+                    subview.setSizeUndefined();
+                    addComponent(wrapper, index);
+                    setComponentAlignment(wrapper, Alignment.TOP_RIGHT);
+//                    setExpandRatio(wrapper, 0);
+                }
+            };
+
+            layout.setSizeFull();
+            
+            return layout;
+        }
+
+        @Override
+        public SynergyLayoutFactory getSubitemLayoutFactory()
+        {
+            return this;
+        }
+    }
+
 }

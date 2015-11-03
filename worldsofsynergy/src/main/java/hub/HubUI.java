@@ -2,38 +2,22 @@ package hub;
 
 
 import helpers.WorldHelper;
-import helpers.WorldHelper.WorldBean;
 
 import javax.servlet.annotation.WebServlet;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.Lists;
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.VaadinServletConfiguration;
-import com.vaadin.data.Property.ValueChangeEvent;
-import com.vaadin.data.Property.ValueChangeListener;
-import com.vaadin.data.sort.SortOrder;
-import com.vaadin.data.util.BeanItem;
-import com.vaadin.event.SelectionEvent;
-import com.vaadin.event.SelectionEvent.SelectionListener;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServlet;
-import com.vaadin.shared.data.sort.SortDirection;
-import com.vaadin.shared.ui.label.ContentMode;
-import com.vaadin.ui.Grid;
-import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
-import com.vaadin.ui.Table;
-import com.vaadin.ui.Table.ColumnGenerator;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.renderers.HtmlRenderer;
 
 import de.syngenio.vaadin.synergy.SynergyView;
 import de.syngenio.vaadin.synergy.layout.VerticalSynergyLayout;
-import de.syngenio.vaadin.synergy.layout.VerticalSynergyLayoutFactory;
 
 @Theme("default")
 public class HubUI extends UI
@@ -57,7 +41,7 @@ public class HubUI extends UI
         
         setContent(panel);
         
-        SynergyView synergyView = new SynergyView(new VerticalSynergyLayoutFactory(), WorldHelper.getWorldsNavigation());
+        SynergyView synergyView = new SynergyView(new VerticalSynergyLayout.NestedFactory(), WorldHelper.getWorldsNavigation());
         layout.addComponent(synergyView);
         
 //        Table table = new Table("Worlds of Synergy", WorldHelper.getWorlds());

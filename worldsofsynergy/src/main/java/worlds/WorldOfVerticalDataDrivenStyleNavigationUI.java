@@ -16,7 +16,7 @@ import com.vaadin.ui.HorizontalLayout;
 
 import de.syngenio.vaadin.synergy.SynergyView;
 import de.syngenio.vaadin.synergy.layout.AbstractSynergyLayoutFactory.Packing;
-import de.syngenio.vaadin.synergy.layout.VerticalSynergyLayoutFactory;
+import de.syngenio.vaadin.synergy.layout.VerticalSynergyLayout;
 
 @Theme("trek")
 //@WorldDescription(prose="Demonstrates that each subview can be styled individually", tags={"vertical", "hierarchical", "text", "caption", "icon", "datadrivenstyle"})
@@ -35,7 +35,7 @@ public class WorldOfVerticalDataDrivenStyleNavigationUI extends WorldUI
         super.init(request);
         HorizontalLayout hlayout = new HorizontalLayout();
         hlayout.setSizeFull();
-        SynergyView synergyViewSpaceAfter = new SynergyView(new VerticalSynergyLayoutFactory(Packing.SPACE_AFTER), WorldHelper.getNavigationHierarchyWithStyle());
+        SynergyView synergyViewSpaceAfter = new SynergyView(new VerticalSynergyLayout.NestedFactory(Packing.SPACE_AFTER), WorldHelper.getNavigationHierarchyWithStyle());
         synergyViewSpaceAfter.setCaption(Packing.SPACE_AFTER.name());
         synergyViewSpaceAfter.setIcon(FontAwesome.ALIGN_LEFT);
         synergyViewSpaceAfter.setWidthUndefined();
@@ -44,7 +44,7 @@ public class WorldOfVerticalDataDrivenStyleNavigationUI extends WorldUI
         hlayout.addComponent(synergyViewSpaceAfter);
         hlayout.setExpandRatio(synergyViewSpaceAfter, 0f);
         
-        SynergyView synergyViewSpaceAround = new SynergyView(new VerticalSynergyLayoutFactory(Packing.SPACE_AROUND), WorldHelper.getNavigationHierarchy());
+        SynergyView synergyViewSpaceAround = new SynergyView(new VerticalSynergyLayout.NestedFactory(Packing.SPACE_AROUND), WorldHelper.getNavigationHierarchy());
         synergyViewSpaceAround.setCaption(Packing.SPACE_AROUND.name());
         synergyViewSpaceAround.setIcon(FontAwesome.ALIGN_CENTER);
         synergyViewSpaceAround.setWidthUndefined();
@@ -53,7 +53,7 @@ public class WorldOfVerticalDataDrivenStyleNavigationUI extends WorldUI
         hlayout.addComponent(synergyViewSpaceAround);
         hlayout.setExpandRatio(synergyViewSpaceAround, 0f);
         
-        SynergyView synergyViewSpaceBefore = new SynergyView(new VerticalSynergyLayoutFactory(Packing.SPACE_BEFORE), WorldHelper.getNavigationHierarchy());
+        SynergyView synergyViewSpaceBefore = new SynergyView(new VerticalSynergyLayout.NestedFactory(Packing.SPACE_BEFORE), WorldHelper.getNavigationHierarchy());
         synergyViewSpaceBefore.setCaption(Packing.SPACE_BEFORE.name());
         synergyViewSpaceBefore.setIcon(FontAwesome.ALIGN_RIGHT);
         synergyViewSpaceBefore.setWidthUndefined();
@@ -62,7 +62,7 @@ public class WorldOfVerticalDataDrivenStyleNavigationUI extends WorldUI
         hlayout.addComponent(synergyViewSpaceBefore);
         hlayout.setExpandRatio(synergyViewSpaceBefore, 0f);
         
-        SynergyView synergyViewExpand = new SynergyView(new VerticalSynergyLayoutFactory(Packing.EXPAND), WorldHelper.getNavigationHierarchy());
+        SynergyView synergyViewExpand = new SynergyView(new VerticalSynergyLayout.NestedFactory(Packing.EXPAND), WorldHelper.getNavigationHierarchy());
         synergyViewExpand.setCaption(Packing.EXPAND.name());
         synergyViewExpand.setIcon(FontAwesome.ALIGN_JUSTIFY);
         synergyViewExpand.setWidthUndefined();

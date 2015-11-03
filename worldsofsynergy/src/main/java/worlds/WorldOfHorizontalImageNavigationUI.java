@@ -2,20 +2,15 @@ package worlds;
 
 import helpers.WorldHelper;
 
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-
 import javax.servlet.annotation.WebServlet;
 
-
-import org.eclipse.jetty.util.log.Log;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.VaadinServletConfiguration;
@@ -24,23 +19,16 @@ import com.vaadin.data.Item;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.data.util.HierarchicalContainer;
-import com.vaadin.navigator.Navigator;
-import com.vaadin.navigator.View;
-import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServlet;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.ComboBox;
-import com.vaadin.ui.Label;
-import com.vaadin.ui.Panel;
-import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
-
 
 import de.syngenio.vaadin.synergy.SynergyView;
 import de.syngenio.vaadin.synergy.layout.AbstractSynergyLayoutFactory.Packing;
-import de.syngenio.vaadin.synergy.layout.HorizontalSynergyLayoutFactory;
+import de.syngenio.vaadin.synergy.layout.HorizontalSynergyLayout;
 
 @Theme("default")
 @WorldDescription(prose="Demonstrates a horizontal image navigation bar.\nThe number of items and the packing mode can be selected interactively.", tags={"horizontal", "image"})
@@ -122,7 +110,7 @@ public class WorldOfHorizontalImageNavigationUI extends WorldUI
         vlayout.setExpandRatio(selectPacking, 0);
 
         for (Packing packing : Packing.values()) {
-            SynergyView synergyView = new SynergyView(new HorizontalSynergyLayoutFactory(packing), container);
+            SynergyView synergyView = new SynergyView(new HorizontalSynergyLayout.Factory(packing), container);
             synergyView.setCaption(packing.name());
             FontAwesome icon = null;
             switch (packing) {

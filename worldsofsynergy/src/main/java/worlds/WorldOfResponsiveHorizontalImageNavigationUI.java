@@ -18,7 +18,6 @@ import com.vaadin.data.Container;
 import com.vaadin.data.util.HierarchicalContainer;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServlet;
-import com.vaadin.ui.Alignment;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.VerticalLayout;
@@ -26,8 +25,8 @@ import com.vaadin.ui.VerticalLayout;
 import de.syngenio.vaadin.synergy.Synergy;
 import de.syngenio.vaadin.synergy.SynergyView;
 import de.syngenio.vaadin.synergy.layout.AbstractSynergyLayoutFactory.Packing;
-import de.syngenio.vaadin.synergy.layout.HorizontalSynergyLayoutFactory;
-import de.syngenio.vaadin.synergy.layout.VerticalSynergyLayoutFactory;
+import de.syngenio.vaadin.synergy.layout.HorizontalSynergyLayout;
+import de.syngenio.vaadin.synergy.layout.VerticalSynergyLayout;
 
 @Theme("default")
 @WorldDescription(prose="Demonstrates a horizontal image navigation bar.\nThe number of items and the packing mode can be selected interactively.", tags={"horizontal", "image"})
@@ -65,14 +64,14 @@ public class WorldOfResponsiveHorizontalImageNavigationUI extends WorldUI
         
         Synergy synergy = new Synergy(container);
         
-        SynergyView synergyViewEnoughSpace = new SynergyView(new HorizontalSynergyLayoutFactory(Packing.EXPAND), (Container)null);
+        SynergyView synergyViewEnoughSpace = new SynergyView(new HorizontalSynergyLayout.Factory(Packing.EXPAND), (Container)null);
         synergyViewEnoughSpace.attachToSynergy(synergy);
         synergyViewEnoughSpace.setHeightUndefined();
         synergyViewEnoughSpace.setWidth("100%");
         synergyViewEnoughSpace.addStyleName("enoughspace");
         vlayout.addComponent(synergyViewEnoughSpace);
         
-        SynergyView synergyViewNotEnoughSpace = new SynergyView(new VerticalSynergyLayoutFactory(Packing.EXPAND), (Container)null);
+        SynergyView synergyViewNotEnoughSpace = new SynergyView(new VerticalSynergyLayout.NestedFactory(Packing.EXPAND), (Container)null);
         synergyViewNotEnoughSpace.attachToSynergy(synergy);
         synergyViewNotEnoughSpace.setWidth("100px");
         synergyViewNotEnoughSpace.setHeight("100%");

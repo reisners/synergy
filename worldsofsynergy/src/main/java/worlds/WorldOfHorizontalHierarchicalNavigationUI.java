@@ -9,20 +9,14 @@ import org.slf4j.LoggerFactory;
 
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.VaadinServletConfiguration;
-import com.vaadin.navigator.Navigator;
-import com.vaadin.navigator.View;
-import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServlet;
 import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Label;
-import com.vaadin.ui.Panel;
-import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 
 import de.syngenio.vaadin.synergy.SynergyView;
-import de.syngenio.vaadin.synergy.layout.HorizontalSynergyLayoutFactory;
-import de.syngenio.vaadin.synergy.layout.VerticalSynergyLayoutFactory;
+import de.syngenio.vaadin.synergy.layout.HorizontalSynergyLayout;
+import de.syngenio.vaadin.synergy.layout.VerticalSynergyLayout;
 
 @Theme("default")
 @WorldDescription(prose="Demonstrates two stacked navigation levels of text items arranged horizontally.", tags={"horizontal", "hierarchical", "layered", "text"})
@@ -43,7 +37,7 @@ public class WorldOfHorizontalHierarchicalNavigationUI extends WorldUI
         super.init(request);
         VerticalLayout vlayout = new VerticalLayout();
         vlayout.setSizeFull();
-        synergyViewH1 = new SynergyView(new HorizontalSynergyLayoutFactory(), WorldHelper.getNavigationHierarchy());
+        synergyViewH1 = new SynergyView(new HorizontalSynergyLayout.Factory(), WorldHelper.getNavigationHierarchy());
         synergyViewH1.addStyleName("h1");
         synergyViewH1.setHeightUndefined();
         synergyViewH1.setWidth("100%");
@@ -51,7 +45,7 @@ public class WorldOfHorizontalHierarchicalNavigationUI extends WorldUI
         vlayout.addComponent(synergyViewH1);
         vlayout.setExpandRatio(synergyViewH1, 0f);
         
-        synergyViewH2 = new SynergyView(new HorizontalSynergyLayoutFactory(), synergyViewH1);
+        synergyViewH2 = new SynergyView(new HorizontalSynergyLayout.Factory(), synergyViewH1);
         synergyViewH2.addStyleName("h2");
         synergyViewH2.setHeightUndefined();
         synergyViewH2.setWidth("100%");
@@ -63,7 +57,7 @@ public class WorldOfHorizontalHierarchicalNavigationUI extends WorldUI
         
         HorizontalLayout hlayout = new HorizontalLayout();
         hlayout.setSizeFull();
-        SynergyView synergyViewVertical = new SynergyView(new VerticalSynergyLayoutFactory(), synergyViewH2);
+        SynergyView synergyViewVertical = new SynergyView(new VerticalSynergyLayout.NestedFactory(), synergyViewH2);
         synergyViewVertical.setWidthUndefined();
         synergyViewVertical.setHeight("100%");
 //        synergyView.setWidth("30%");

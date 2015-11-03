@@ -131,4 +131,34 @@ public abstract class HorizontalSynergyLayout extends SynergyLayout
             break;
         }
     }
+
+    public static class Factory extends AbstractSynergyLayoutFactory
+    {
+        public Factory()
+        {
+            super();
+        }
+
+        public Factory(Packing packing)
+        {
+            super(packing);
+        }
+
+        @Override
+        public SynergyLayout generateLayout()
+        {
+            SynergyLayout layout = new HorizontalSynergyLayout(getPacking()) {
+                @Override
+                public void addSubview(SynergyView subview, int index)
+                {
+                    // do nothing
+                }
+            };
+            
+            layout.setSizeFull();
+            
+            return layout;
+        }
+    }
+
 }
