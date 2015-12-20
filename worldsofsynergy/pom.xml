@@ -175,6 +175,7 @@
 				<version>1.1</version>
 				<executions>
 					<execution>
+						<id>antrun-debug-parameters</id>
 						<phase>validate</phase>
 						<goals>
 							<goal>run</goal>
@@ -239,8 +240,7 @@
 			<activation>
 				<!-- activate this profile only if tests are not skipped -->
 				<property>
-					<name>maven.test.skip</name>
-					<value>false</value>
+					<name>!maven.test.skip</name>
 				</property>
 			</activation>
 			<build>
