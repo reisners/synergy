@@ -3,3 +3,5 @@ pom.xml.tag
 pom.xml.releaseBackup
 pom.xml.next
 release.properties
+worldsofsynergy/src/main/webapp/VAADIN/themes/default/addons.scss
+worldsofsynergy/src/main/webapp/VAADIN/themes/syngenio/addons.scss
