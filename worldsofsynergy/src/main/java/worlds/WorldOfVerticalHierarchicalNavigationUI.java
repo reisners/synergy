@@ -20,6 +20,7 @@ import com.vaadin.server.VaadinServlet;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
 
 import de.syngenio.vaadin.synergy.SynergyView;
@@ -42,6 +43,8 @@ public class WorldOfVerticalHierarchicalNavigationUI extends WorldUI
     private HorizontalLayout hlayout;
 
     private ComboBox select;
+
+    private Panel navbar;
     
     @Override
     protected void init(VaadinRequest request)
@@ -50,8 +53,9 @@ public class WorldOfVerticalHierarchicalNavigationUI extends WorldUI
         VerticalLayout vlayout = new VerticalLayout();
         vlayout.setSizeFull();
         select = new ComboBox("Choose Packing");
+        select.setNullSelectionAllowed(false);
         select.setImmediate(true);
-        select.addItems(Packing.SPACE_AFTER, Packing.SPACE_AROUND, Packing.SPACE_BEFORE, Packing.EXPAND);
+        select.addItems(Packing.SPACE_AFTER, Packing.SPACE_AROUND, Packing.SPACE_BEFORE, Packing.EXPAND, Packing.DENSE);
         select.select(Packing.SPACE_AFTER);
         select.addValueChangeListener(new ValueChangeListener() {
             @Override
@@ -90,46 +94,23 @@ public class WorldOfVerticalHierarchicalNavigationUI extends WorldUI
             case EXPAND:
                 icon = FontAwesome.ALIGN_JUSTIFY;
                 break;
+            case DENSE:
+                icon = FontAwesome.SQUARE;
+                break;
             }
             synergyView.setIcon(icon);
             synergyView.setWidthUndefined();
-            synergyView.setHeight("100%");
-//            hlayout.addComponent(synergyView);
-//            hlayout.setExpandRatio(synergyView, 0f);
+            synergyView.setHeightUndefined();
             synergyView.setVisible(packing.equals(select.getValue()));
             views.put(packing, synergyView);
         }
         
-//        SynergyView synergyViewSpaceAround = new SynergyView(new VerticalSynergyLayoutFactory(Packing.SPACE_AROUND), WorldHelper.getNavigationHierarchy());
-//        synergyViewSpaceAround.setCaption(Packing.SPACE_AROUND.name());
-//        synergyViewSpaceAround.setIcon(FontAwesome.ALIGN_CENTER);
-//        synergyViewSpaceAround.setWidthUndefined();
-//        synergyViewSpaceAround.setHeight("100%");
-////        synergyView.setWidth("30%");
-//        hlayout.addComponent(synergyViewSpaceAround);
-//        hlayout.setExpandRatio(synergyViewSpaceAround, 0f);
-//        synergyViewSpaceAround.setVisible(false);
-//        
-//        SynergyView synergyViewSpaceBefore = new SynergyView(new VerticalSynergyLayoutFactory(Packing.SPACE_BEFORE), WorldHelper.getNavigationHierarchy());
-//        synergyViewSpaceBefore.setCaption(Packing.SPACE_BEFORE.name());
-//        synergyViewSpaceBefore.setIcon(FontAwesome.ALIGN_RIGHT);
-//        synergyViewSpaceBefore.setWidthUndefined();
-//        synergyViewSpaceBefore.setHeight("100%");
-////        synergyView.setWidth("30%");
-//        hlayout.addComponent(synergyViewSpaceBefore);
-//        hlayout.setExpandRatio(synergyViewSpaceBefore, 0f);
-//        synergyViewSpaceBefore.setVisible(false);
-//        
-//        SynergyView synergyViewExpand = new SynergyView(new VerticalSynergyLayoutFactory(Packing.EXPAND), WorldHelper.getNavigationHierarchy());
-//        synergyViewExpand.setCaption(Packing.EXPAND.name());
-//        synergyViewExpand.setIcon(FontAwesome.ALIGN_JUSTIFY);
-//        synergyViewExpand.setWidthUndefined();
-//        synergyViewExpand.setHeight("100%");
-////        synergyView.setWidth("30%");
-//        hlayout.addComponent(synergyViewExpand);
-//        hlayout.setExpandRatio(synergyViewExpand, 0f);
-//        synergyViewExpand.setVisible(false);
-        
+        navbar = new Panel("Navigation");
+        navbar.setHeight("100%");
+        navbar.setWidthUndefined();
+        hlayout.addComponent(navbar);
+        hlayout.setComponentAlignment(navbar, Alignment.TOP_LEFT);
+        hlayout.setExpandRatio(navbar, 0f);
         hlayout.addComponent(panel);
         hlayout.setExpandRatio(panel, 1f);
 
@@ -146,11 +127,7 @@ public class WorldOfVerticalHierarchicalNavigationUI extends WorldUI
             boolean visible = packing.equals(select.getValue());
 
             if (visible) {
-                hlayout.addComponent(synergyView, hlayout.getComponentIndex(panel));
-                hlayout.setComponentAlignment(synergyView, Alignment.TOP_LEFT);
-                hlayout.setExpandRatio(synergyView, 0f);
-            } else {
-                hlayout.removeComponent(synergyView);
+                navbar.setContent(synergyView);
             }
         }
     }
