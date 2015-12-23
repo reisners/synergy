@@ -71,6 +71,9 @@ public abstract class HorizontalSynergyLayout extends SynergyLayout
         case SPACE_AROUND:
             setComponentAlignment(itemComponent, Alignment.BOTTOM_CENTER);
             break;
+        case DENSE:
+            // do nothing
+            break;
         }
     }
 

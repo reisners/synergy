@@ -4,7 +4,7 @@ import de.syngenio.vaadin.synergy.SynergyView;
 
 public abstract class AbstractSynergyLayoutFactory implements SynergyLayoutFactory
 {
-    public enum Packing { SPACE_AFTER, SPACE_BEFORE, SPACE_AROUND, EXPAND }
+    public enum Packing { SPACE_AFTER, SPACE_BEFORE, SPACE_AROUND, EXPAND, DENSE }
     
     private SynergyLayoutFactory subitemLayoutFactory = this;
     private Packing packing = Packing.SPACE_AFTER;

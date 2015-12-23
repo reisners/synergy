@@ -78,6 +78,7 @@ public abstract class VerticalSynergyLayout extends SynergyLayout
 //            setComponentAlignment(component, Alignment.BOTTOM_RIGHT);
             break;
         case SPACE_AROUND:
+        case DENSE:
             layoutComponent(component, null, 0, Alignment.MIDDLE_RIGHT);
 //            setComponentAlignment(component, Alignment.MIDDLE_RIGHT);
             break;
@@ -102,6 +103,7 @@ public abstract class VerticalSynergyLayout extends SynergyLayout
 //            setComponentAlignment(component, Alignment.BOTTOM_RIGHT);
             break;
         case SPACE_AFTER:
+        case DENSE:
             layoutComponent(component, null, 0, Alignment.MIDDLE_RIGHT);
             break;
         }
@@ -154,6 +156,7 @@ public abstract class VerticalSynergyLayout extends SynergyLayout
 //            setComponentAlignment(component, Alignment.TOP_RIGHT);
             break;
         case SPACE_BEFORE:
+        case DENSE:
             layoutComponent(component, null, 0, Alignment.MIDDLE_RIGHT);
             break;
         }
