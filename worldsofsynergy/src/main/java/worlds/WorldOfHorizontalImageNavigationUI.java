@@ -97,8 +97,9 @@ public class WorldOfHorizontalImageNavigationUI extends WorldUI
         
         selectPacking = new ComboBox("Choose Packing");
         selectPacking.setImmediate(true);
-        selectPacking.addItems(Packing.SPACE_AFTER, Packing.SPACE_AROUND, Packing.SPACE_BEFORE, Packing.EXPAND);
-        selectPacking.select(Packing.SPACE_AFTER);
+        selectPacking.setNullSelectionAllowed(false);
+        selectPacking.addItems(Packing.values());
+        selectPacking.select(packing);
         selectPacking.addValueChangeListener(new ValueChangeListener() {
             @Override
             public void valueChange(ValueChangeEvent event)
@@ -125,6 +126,9 @@ public class WorldOfHorizontalImageNavigationUI extends WorldUI
                 break;
             case EXPAND:
                 icon = FontAwesome.ALIGN_JUSTIFY;
+                break;
+            case DENSE:
+                icon = FontAwesome.SQUARE;
                 break;
             }
             synergyView.setIcon(icon);

@@ -188,13 +188,13 @@ public class WorldHelper
     {
         return new SynergyBuilder() {
             {
-                addItem(item().stacked().withIcon(new AlphaShapesCircles((int)'s')).withGlyphSize("6vh"));
-                addItem(item().stacked().withIcon(new AlphaShapesCircles((int)'y')).withGlyphSize("6vh"));
-                addItem(item().stacked().withIcon(new AlphaShapesCircles((int)'n')).withGlyphSize("6vh"));
-                addItem(item().stacked().withIcon(new AlphaShapesCircles((int)'e')).withGlyphSize("6vh"));
-                addItem(item().stacked().withIcon(new AlphaShapesCircles((int)'r')).withGlyphSize("6vh"));
-                addItem(item().stacked().withIcon(new AlphaShapesCircles((int)'g')).withGlyphSize("6vh"));
-                addItem(item().stacked().withIcon(new AlphaShapesCircles((int)'y')).withGlyphSize("6vh"));
+                addItem(item().stacked().withIcon(new AlphaShapesCircles((int)'s')).withGlyphSize("6vh").withDescription("letter \"s\""));
+                addItem(item().stacked().withIcon(new AlphaShapesCircles((int)'y')).withGlyphSize("6vh").withDescription("letter \"y\""));
+                addItem(item().stacked().withIcon(new AlphaShapesCircles((int)'n')).withGlyphSize("6vh").withDescription("letter \"n\""));
+                addItem(item().stacked().withIcon(new AlphaShapesCircles((int)'e')).withGlyphSize("6vh").withDescription("letter \"e\""));
+                addItem(item().stacked().withIcon(new AlphaShapesCircles((int)'r')).withGlyphSize("6vh").withDescription("letter \"r\""));
+                addItem(item().stacked().withIcon(new AlphaShapesCircles((int)'g')).withGlyphSize("6vh").withDescription("letter \"g\""));
+                addItem(item().stacked().withIcon(new AlphaShapesCircles((int)'y')).withGlyphSize("6vh").withDescription("letter \"y\""));
             }
         }.build();
     }

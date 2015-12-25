@@ -21,7 +21,7 @@ import de.syngenio.vaadin.synergy.layout.AbstractSynergyLayoutFactory.Packing;
 import de.syngenio.vaadin.synergy.layout.VerticalSynergyLayout;
 
 @Theme("default")
-@WorldDescription(prose="Demonstrates a single vertical sidebar of large navigation glyphs", tags={"vertical", "stacked", "glyph"})
+@WorldDescription(prose="Demonstrates a single vertical sidebar of large navigation glyphs [alpha]", tags={"vertical", "stacked", "glyph", "alpha"})
 public class WorldOfGlyphSidebarNavigationUI extends WorldUI
 {
     @WebServlet(value = "/vertical/glyphs/*", asyncSupported = true)
@@ -37,7 +37,7 @@ public class WorldOfGlyphSidebarNavigationUI extends WorldUI
         super.init(request);
         HorizontalLayout hlayout = new HorizontalLayout();
         hlayout.setSizeFull();
-        SynergyView synergyView = new SynergyView(new VerticalSynergyLayout.NestedFactory(Packing.EXPAND), WorldHelper.getGlyphNavigation());
+        SynergyView synergyView = new SynergyView(new VerticalSynergyLayout.NestedFactory(packing), WorldHelper.getGlyphNavigation());
 //        synergyView.setSizeUndefined();
         synergyView.setWidth("200px");
         synergyView.setHeight("100%");
