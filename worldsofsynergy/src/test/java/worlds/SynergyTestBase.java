@@ -2,12 +2,14 @@ package worlds;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -25,9 +27,12 @@ import com.vaadin.data.util.HierarchicalContainer;
 
 import de.syngenio.vaadin.synergy.Synergy;
 import de.syngenio.vaadin.synergy.SynergyView.ItemComponent.State;
+import de.syngenio.vaadin.synergy.builder.SynergyBuilder;
 
 public abstract class SynergyTestBase
 {
+    private static final int IMPLICIT_WAIT_SECONDS = 10;
+
     private WebDriver driver;
 
     private String baseUrl;
@@ -39,6 +44,7 @@ public abstract class SynergyTestBase
     {
         setupFirefox();
 //        setupPhantomJs();
+        turnOnImplicitWait();
     }
 
     private void setupFirefox()
@@ -53,6 +59,16 @@ public abstract class SynergyTestBase
         dCaps.setCapability("takesScreenshot", true);
         dCaps.setCapability("phantomjs.binary.path", "D:/Users/sre/Documents/Technologie/phantomjs-2.0.0-windows/bin/phantomjs.exe");
         driver = new PhantomJSDriver(dCaps);
+    }
+
+    private void turnOnImplicitWait()
+    {
+        driver.manage().timeouts().implicitlyWait(IMPLICIT_WAIT_SECONDS, TimeUnit.SECONDS);
+    }
+
+    private void turnOffImplicitWait()
+    {
+        driver.manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
     }
 
     public WebDriver getDriver()
@@ -94,6 +110,7 @@ public abstract class SynergyTestBase
         {
             reload();
             // check that all root items are visible
+            log.info("root items: "+hierarchy.rootItemIds());
             for (Object rootItemId : hierarchy.rootItemIds()) {
                 assertItemVisible((String) rootItemId);
             }
@@ -119,9 +136,13 @@ public abstract class SynergyTestBase
 
         private void exerciseItemsBelow(String parentId)
         {
+            List<String> shuffledChildItemIds = childrenOf(parentId);
+            if (shuffledChildItemIds.isEmpty()) {
+                return;
+            }
             log.info("exercising children of "+parentId);
             click(parentId);
-            List<String> shuffledChildItemIds = childrenOf(parentId);
+            assertItemState(parentId, State.selected);
             Collections.shuffle(shuffledChildItemIds);
             for (String itemId : shuffledChildItemIds) {
                 exerciseItem(itemId);
@@ -144,6 +165,17 @@ public abstract class SynergyTestBase
                 String name = targetNavigationState.split("/")[1];
                 assertTrue("content should display "+name, driver.findElement(By.id("content")).getText().contains(name));
             }
+            // make sure that all "nephews" (children of siblings) of item are invisible
+            List<String> siblings = childrenOf((String) hierarchy.getParent(itemId));
+            for (String siblingId : siblings) {
+                if (!itemId.equals(siblingId)) {
+                    assertItemState(siblingId, State.unselected);
+                    for (String nephewId : childrenOf(siblingId)) {
+                        assertItemNotVisible(nephewId);
+                    }
+                }
+            }
+
         }
 
 
@@ -226,12 +258,17 @@ public abstract class SynergyTestBase
     
     private void assertItemNotVisible(String itemId)
     {
-        assertTrue("item " + itemId + " should not be visible", driver.findElements(By.id(itemId)).isEmpty());
+        turnOffImplicitWait();
+        try {
+            assertTrue("item " + itemId + " should not exist", driver.findElements(By.id(itemId)).isEmpty());
+        } finally {
+            turnOnImplicitWait();
+        }
     }
 
     private void assertItemVisible(String itemId)
     {
-        assertNotNull("item " + itemId + " should be visible", driver.findElement(By.id(itemId)));
+        assertEquals("item " + itemId + " should exist", 1, driver.findElements(By.id(itemId)).size());
         checkVisuals(itemId);
     }
 

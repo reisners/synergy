@@ -10,4 +10,5 @@ import java.lang.annotation.Target;
 public @interface WorldDescription {
     String prose();
     String[] tags();
+    boolean include() default true;
 }

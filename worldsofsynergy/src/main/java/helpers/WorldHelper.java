@@ -45,34 +45,34 @@ public class WorldHelper
     {
         return new SynergyBuilder() {
             {
-                addItem(item().withCaption("First"));
-                addItem(group()
+                addItem(item("1").withCaption("First"));
+                addItem(group("2")
                         .withCaption("Resources")
                         .withDescription("Click here for Resources navigation choices")
                         .withChildren(
-                                group().withCaption("Assets").withChildren(
-                                        item().withCaption("Machines").withIcon(FontAwesome.COGS).withDescription("Click here to navigate to Machines view")
+                                group("2.1").withCaption("Assets").withChildren(
+                                        item("2.1.1").withCaption("Machines").withIcon(FontAwesome.COGS).withDescription("Click here to navigate to Machines view")
                                                 .withTargetNavigationState("view/Machines"),
-                                        item().withCaption("Real Estate").withIcon(FontAwesome.HOME)
+                                        item("2.1.2").withCaption("Real Estate").withIcon(FontAwesome.HOME)
                                                 .withDescription("Click here to navigate to Real Estate view").withTargetNavigationState("view/Real Estate"),
-                                        item().withCaption("Patents").withIcon(FontAwesome.SHIELD).withDescription("Click here to navigate to Patents view")
+                                        item("2.1.3").withCaption("Patents").withIcon(FontAwesome.SHIELD).withDescription("Click here to navigate to Patents view")
                                                 .withTargetNavigationState("view/Patents")),
-                                item().withCaption("People").withIcon(FontAwesome.USERS).withDescription("Click here to navigate to People view")
+                                item("2.2").withCaption("People").withIcon(FontAwesome.USERS).withDescription("Click here to navigate to People view")
                                         .withTargetNavigationState("view/People")));
-                addItem(item().withCaption("Something"));
-                addItem(group()
+                addItem(item("3").withCaption("Something"));
+                addItem(group("4")
                         .withCaption("Processes")
                         .withDescription("Click here for Processes navigation choices")
                         .withChildren(
-                                item().withCaption("Core").withDescription("Click here to navigate to Core Processes view")
+                                item("4.1").withCaption("Core").withDescription("Click here to navigate to Core Processes view")
                                         .withTargetNavigationState("view/Core Processes"),
-                                item().withCaption("Auxiliary").withDescription("Click here to navigate to Auxiliary Processes view")
+                                item("4.2").withCaption("Auxiliary").withDescription("Click here to navigate to Auxiliary Processes view")
                                         .withTargetNavigationState("view/Auxiliary Processes")));
-                addItem(item().withCaption("More"));
-                addItem(group()
+                addItem(item("5").withCaption("More"));
+                addItem(group("6")
                         .withCaption("Extras")
                         .withChildren(
-                                item().withCaption("Options")));
+                                item("6.1").withCaption("Options")));
             }
         }.build();
     }
@@ -295,6 +295,9 @@ public class WorldHelper
                     WorldDescription description = (WorldDescription) worldClass.getAnnotation(WorldDescription.class);
                     if (description == null)
                     {
+                        continue;
+                    }
+                    if (!description.include()) {
                         continue;
                     }
                     bean.name = StringUtils.join(StringUtils.splitByCharacterTypeCamelCase(worldClass.getSimpleName().replaceAll("UI$", "")), ' ');

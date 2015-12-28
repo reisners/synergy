@@ -29,7 +29,7 @@ import de.syngenio.vaadin.synergy.layout.HorizontalSynergyLayout;
 import de.syngenio.vaadin.synergy.layout.VerticalSynergyLayout;
 
 @Theme("default")
-@WorldDescription(prose="Demonstrates a horizontal image navigation bar.\nThe number of items and the packing mode can be selected interactively.", tags={"horizontal", "image"})
+@WorldDescription(prose="Demonstrates a horizontal image navigation bar.\nThe number of items and the packing mode can be selected interactively. [broken]", tags={"horizontal", "image", "responsive", "broken"}, include=false)
 public class WorldOfResponsiveHorizontalImageNavigationUI extends WorldUI
 {
     private final static Logger LOG = LoggerFactory.getLogger(WorldOfResponsiveHorizontalImageNavigationUI.class);

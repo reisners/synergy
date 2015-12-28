@@ -93,9 +93,6 @@ public class WorldOfVerticalDynamicalNavigationUI extends WorldUI
         hlayout.addComponent(navpnl);
         hlayout.setExpandRatio(navpnl, 0f);
         
-        Panel panel = new Panel();
-        panel.setSizeFull();
-        panel.setId("content");
         hlayout.addComponent(panel);
         hlayout.setExpandRatio(panel, 1f);
 
