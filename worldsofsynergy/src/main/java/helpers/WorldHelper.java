@@ -288,6 +288,7 @@ public class WorldHelper
                 });
                 for (Class webServletClass : classes)
                 {
+                    LOG.info("found WebServlet "+webServletClass.getCanonicalName());
                     WebServlet ws = (WebServlet) webServletClass.getAnnotation(WebServlet.class);
                     String path = ws.value()[0].replaceAll("/\\*$", "");
                     final WorldBean bean = new WorldBean();
@@ -316,6 +317,7 @@ public class WorldHelper
                                     }
                                 }
                             }));
+                    LOG.info("added "+bean.name+" ("+bean.path+") to the list");
                 }
             }
         }.build();
