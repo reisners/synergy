@@ -275,7 +275,6 @@ public class WorldHelper
     {
         return new SynergyBuilder() {
             {
-                LOG.info("testing reflections: "+new Reflections(worlds.PackageTag.class.getPackage().getName()).getAllTypes());
                 LOG.info("looking for WebServlets");
                 // find World UIs
                 Reflections reflections = new Reflections(worlds.PackageTag.class.getPackage().getName(), new SubTypesScanner(), new TypeAnnotationsScanner());
