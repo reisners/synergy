@@ -23,6 +23,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import worlds.WorldDescription;
+import worlds.WorldOfGlyphSidebarNavigationUI;
+import worlds.WorldOfHorizontalHierarchicalNavigationUI;
+import worlds.WorldOfHorizontalImageNavigationUI;
+import worlds.WorldOfImageSidebarNavigationUI;
+import worlds.WorldOfVerticalDynamicalNavigationUI;
+import worlds.WorldOfVerticalHierarchicalNavigationUI;
+import worlds.WorldOfVerticalLayeredNavigationUI;
 
 import com.vaadin.data.Container;
 import com.vaadin.data.Container.Indexed;
@@ -278,23 +285,20 @@ public class WorldHelper
     {
         return new SynergyBuilder() {
             {
-                final String packageName = worlds.PackageTag.class.getPackage().getName();
-                Collection<URL> urls = ClasspathHelper.forPackage(packageName);
-                
-                LOG.info("looking for WebServlets in "+urls);
-                // find World UIs
-                Reflections reflections = new Reflections(packageName, new SubTypesScanner(), new TypeAnnotationsScanner());
-                List<Class< ? >> classes = new ArrayList<Class< ? >>(reflections.getTypesAnnotatedWith(WebServlet.class));
-                Collections.sort(classes, new Comparator<Class< ? >>() {
-                    @Override
-                    public int compare(Class< ? > o1, Class< ? > o2)
-                    {
-                        return o1.getEnclosingClass().getSimpleName().compareTo(o2.getEnclosingClass().getSimpleName());
-                    }
-                });
+                Class< ? >[] classes;
+//                classes = findWebServletClasses(); // does not work with webapp-runner (heroku)
+                classes = new Class<?>[] {
+                    WorldOfGlyphSidebarNavigationUI.Servlet.class,
+                    WorldOfHorizontalHierarchicalNavigationUI.Servlet.class,
+                    WorldOfHorizontalImageNavigationUI.Servlet.class,
+                    WorldOfImageSidebarNavigationUI.Servlet.class,
+                    WorldOfVerticalDynamicalNavigationUI.Servlet.class,
+                    WorldOfVerticalHierarchicalNavigationUI.Servlet.class,
+                    WorldOfVerticalLayeredNavigationUI.Servlet.class
+                };
                 for (Class webServletClass : classes)
                 {
-                    LOG.info("found WebServlet "+webServletClass.getCanonicalName());
+                    LOG.debug("found WebServlet "+webServletClass.getCanonicalName());
                     WebServlet ws = (WebServlet) webServletClass.getAnnotation(WebServlet.class);
                     String path = ws.value()[0].replaceAll("/\\*$", "");
                     final WorldBean bean = new WorldBean();
@@ -325,6 +329,25 @@ public class WorldHelper
                             }));
                     LOG.info("added "+bean.name+" ("+bean.path+") to the list");
                 }
+            }
+
+            private Class< ? >[] findWebServletClasses()
+            {
+                final String packageName = worlds.PackageTag.class.getPackage().getName();
+                Collection<URL> urls = ClasspathHelper.forPackage(packageName);
+                
+                LOG.info("looking for WebServlets in "+urls);
+                // find World UIs
+                Reflections reflections = new Reflections(packageName, new SubTypesScanner(), new TypeAnnotationsScanner());
+                List<Class< ? >> classes = new ArrayList<Class< ? >>(reflections.getTypesAnnotatedWith(WebServlet.class));
+                Collections.sort(classes, new Comparator<Class< ? >>() {
+                    @Override
+                    public int compare(Class< ? > o1, Class< ? > o2)
+                    {
+                        return o1.getEnclosingClass().getSimpleName().compareTo(o2.getEnclosingClass().getSimpleName());
+                    }
+                });
+                return classes.toArray(new Class<?>[] {});
             }
         }.build();
     }
