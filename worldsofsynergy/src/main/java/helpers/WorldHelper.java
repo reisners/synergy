@@ -1,8 +1,10 @@
 package helpers;
 
 import java.io.Serializable;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -16,6 +18,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.reflections.Reflections;
 import org.reflections.scanners.SubTypesScanner;
 import org.reflections.scanners.TypeAnnotationsScanner;
+import org.reflections.util.ClasspathHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -275,9 +278,12 @@ public class WorldHelper
     {
         return new SynergyBuilder() {
             {
-                LOG.info("looking for WebServlets");
+                final String packageName = worlds.PackageTag.class.getPackage().getName();
+                Collection<URL> urls = ClasspathHelper.forPackage(packageName);
+                
+                LOG.info("looking for WebServlets in "+urls);
                 // find World UIs
-                Reflections reflections = new Reflections(worlds.PackageTag.class.getPackage().getName(), new SubTypesScanner(), new TypeAnnotationsScanner());
+                Reflections reflections = new Reflections(packageName, new SubTypesScanner(), new TypeAnnotationsScanner());
                 List<Class< ? >> classes = new ArrayList<Class< ? >>(reflections.getTypesAnnotatedWith(WebServlet.class));
                 Collections.sort(classes, new Comparator<Class< ? >>() {
                     @Override
