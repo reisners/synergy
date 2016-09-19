@@ -15,7 +15,7 @@
 		<vaadin.plugin.version>${vaadin.version}</vaadin.plugin.version>
 		<selenium.version>0.9.7376</selenium.version>
 		<tomcat.port>8080</tomcat.port>
-		<webdriver.firefox.bin>D:\Programme\Mozilla Firefox\firefox.exe</webdriver.firefox.bin>
+		<webdriver.firefox.bin>C:\Program Files (x86)\Mozilla Firefox</webdriver.firefox.bin>
 		<webdriver.firefox.profile>WebDriver</webdriver.firefox.profile>
 		<webdriver.firefox.version>2.48.0</webdriver.firefox.version>
 	</properties>
