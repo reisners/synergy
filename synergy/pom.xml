@@ -125,6 +125,6 @@
 		<Vaadin-Addon>Synergy-${project.version}.jar</Vaadin-Addon>
 		<Vaadin-License-Title>Apache License 2.0</Vaadin-License-Title>
 		<Implementation-Vendor>SYNGENIO AG</Implementation-Vendor>
-		<java.version>1.6</java.version>
+		<java.version>1.7</java.version>
 	</properties>
 </project>
