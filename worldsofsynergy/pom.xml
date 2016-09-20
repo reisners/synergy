@@ -18,6 +18,7 @@
 		<webdriver.firefox.bin>C:\Program Files (x86)\Mozilla Firefox</webdriver.firefox.bin>
 		<webdriver.firefox.profile>WebDriver</webdriver.firefox.profile>
 		<webdriver.firefox.version>2.48.0</webdriver.firefox.version>
+		<webdriver.phantomjs.bin>/usr/local/phantomjs/bin/phantomjs</webdriver.phantomjs.bin>
 	</properties>
 
 	<dependencies>
@@ -150,6 +151,7 @@
 					<systemPropertyVariables>
 						<webdriver.firefox.bin>${webdriver.firefox.bin}</webdriver.firefox.bin>
 						<webdriver.firefox.profile>${webdriver.firefox.profile}</webdriver.firefox.profile>
+						<webdriver.phantomjs.bin>${webdriver.phantomjs.bin}</webdriver.phantomjs.bin>
 					</systemPropertyVariables>
 				</configuration>
 				<executions>

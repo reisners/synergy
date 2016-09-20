@@ -18,6 +18,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.phantomjs.PhantomJSDriver;
+import org.openqa.selenium.phantomjs.PhantomJSDriverService;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,8 +43,8 @@ public abstract class SynergyTestBase
 
     protected SynergyTestBase()
     {
-        setupFirefox();
-//        setupPhantomJs();
+//        setupFirefox();
+        setupPhantomJs();
         turnOnImplicitWait();
     }
 
@@ -54,10 +55,11 @@ public abstract class SynergyTestBase
 
     private void setupPhantomJs()
     {
+    	String phantomJsExecutablePath = System.getProperty("webdriver.phantomjs.bin");
         DesiredCapabilities dCaps = new DesiredCapabilities();
         dCaps.setJavascriptEnabled(true);
         dCaps.setCapability("takesScreenshot", true);
-        dCaps.setCapability("phantomjs.binary.path", "D:/Users/sre/Documents/Technologie/phantomjs-2.0.0-windows/bin/phantomjs.exe");
+        dCaps.setCapability(PhantomJSDriverService.PHANTOMJS_EXECUTABLE_PATH_PROPERTY, phantomJsExecutablePath);
         driver = new PhantomJSDriver(dCaps);
     }
 
