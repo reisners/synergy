@@ -32,6 +32,8 @@ import de.syngenio.vaadin.synergy.builder.SynergyBuilder;
 
 public abstract class SynergyTestBase
 {
+	private static final Logger log = LoggerFactory.getLogger(SynergyTestBase.class);
+	
     private static final int IMPLICIT_WAIT_SECONDS = 10;
 
     private WebDriver driver;
@@ -61,6 +63,7 @@ public abstract class SynergyTestBase
         dCaps.setCapability("takesScreenshot", true);
         dCaps.setCapability(PhantomJSDriverService.PHANTOMJS_EXECUTABLE_PATH_PROPERTY, phantomJsExecutablePath);
         driver = new PhantomJSDriver(dCaps);
+        log.info("web driver started");
     }
 
     private void turnOnImplicitWait()
