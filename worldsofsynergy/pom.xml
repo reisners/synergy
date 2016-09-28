@@ -17,7 +17,7 @@
 		<tomcat.port>8080</tomcat.port>
 		<webdriver.firefox.bin>C:\Program Files (x86)\Mozilla Firefox</webdriver.firefox.bin>
 		<webdriver.firefox.profile>WebDriver</webdriver.firefox.profile>
-		<webdriver.firefox.version>2.48.0</webdriver.firefox.version>
+		<webdriver.firefox.version>2.53.0</webdriver.firefox.version>
 		<webdriver.phantomjs.bin>/usr/local/phantomjs/bin/phantomjs</webdriver.phantomjs.bin>
 	</properties>
 
@@ -92,6 +92,11 @@
 			<groupId>org.reflections</groupId>
 			<artifactId>reflections</artifactId>
 			<version>0.9.10</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.seleniumhq.selenium</groupId>
+		    <artifactId>selenium-remote-driver</artifactId>
+		    <version>2.53.0</version>
 		</dependency>
 	</dependencies>
 
@@ -314,6 +319,10 @@
 		<repository>
 			<id>vaadin-addons</id>
 			<url>http://maven.vaadin.com/vaadin-addons</url>
+		</repository>
+		<repository>
+			<id>selenium</id>
+			<url>https://mvnrepository.com/artifact/org.seleniumhq.selenium/selenium-remote-driver</url>
 		</repository>
 	</repositories>
 </project>
