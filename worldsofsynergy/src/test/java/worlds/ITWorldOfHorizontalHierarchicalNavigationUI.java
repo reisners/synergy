@@ -46,5 +46,6 @@ public class ITWorldOfHorizontalHierarchicalNavigationUI extends SynergyTestBase
         }
         getDriver().close();
         System.out.println("windows remaining: "+getDriver().getWindowHandles());
+        getDriver().quit();
     }
 }
