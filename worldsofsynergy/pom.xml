@@ -11,7 +11,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<java.version>1.7</java.version>
-		<vaadin.version>7.3.0</vaadin.version>
+		<vaadin.version>7.7.3</vaadin.version>
 		<vaadin.plugin.version>${vaadin.version}</vaadin.plugin.version>
 		<selenium.version>0.9.7376</selenium.version>
 		<tomcat.port>8080</tomcat.port>
@@ -239,7 +239,7 @@
 											vaadin-maven-plugin
 										</artifactId>
 										<versionRange>
-											[7.4.2,)
+											[${vaadin.plugin.version},)
 										</versionRange>
 										<goals>
 											<goal>
@@ -281,7 +281,6 @@
 						<artifactId>tomcat7-maven-plugin</artifactId>
 						<version>2.2</version>
 						<configuration>
-							<path>/</path>
 							<contextFile>${basedir}/src/test/resources/tomcat/context.xml</contextFile>
 							<useTestClasspath>true</useTestClasspath>
 						</configuration>
