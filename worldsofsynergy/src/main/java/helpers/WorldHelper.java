@@ -300,7 +300,7 @@ public class WorldHelper
                 {
                     LOG.debug("found WebServlet "+webServletClass.getCanonicalName());
                     WebServlet ws = (WebServlet) webServletClass.getAnnotation(WebServlet.class);
-                    String path = ws.value()[0].replaceAll("/\\*$", "");
+                    String path = ws.value()[0].replaceAll("^/\\*", "").replaceAll("/\\*$", "");
                     final WorldBean bean = new WorldBean();
                     final Class worldClass = webServletClass.getEnclosingClass();
                     WorldDescription description = (WorldDescription) worldClass.getAnnotation(WorldDescription.class);
