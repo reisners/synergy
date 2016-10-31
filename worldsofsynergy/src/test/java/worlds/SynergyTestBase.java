@@ -1,19 +1,25 @@
 package worlds;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
+import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
+import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Dimension;
+import org.openqa.selenium.OutputType;
+import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
@@ -23,12 +29,12 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Strings;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.HierarchicalContainer;
 
 import de.syngenio.vaadin.synergy.Synergy;
 import de.syngenio.vaadin.synergy.SynergyView.ItemComponent.State;
-import de.syngenio.vaadin.synergy.builder.SynergyBuilder;
 
 public abstract class SynergyTestBase
 {
@@ -47,10 +53,11 @@ public abstract class SynergyTestBase
     {
 //        setupFirefox();
         setupPhantomJs();
+        log.info("web driver started");
         turnOnImplicitWait();
     }
 
-    private void setupFirefox()
+	private void setupFirefox()
     {
         driver = new FirefoxDriver();
     }
@@ -63,7 +70,7 @@ public abstract class SynergyTestBase
         dCaps.setCapability("takesScreenshot", true);
         dCaps.setCapability(PhantomJSDriverService.PHANTOMJS_EXECUTABLE_PATH_PROPERTY, phantomJsExecutablePath);
         driver = new PhantomJSDriver(dCaps);
-        log.info("web driver started");
+        driver.manage().window().setSize(new Dimension(1400,1000));
     }
 
     private void turnOnImplicitWait()
@@ -109,11 +116,36 @@ public abstract class SynergyTestBase
         HierarchyExercise(HierarchicalContainer hierarchy)
         {
             this.hierarchy = hierarchy;
+            dumpHierarchy(hierarchy);
         }
 
-        protected void exercise()
+        private void dumpHierarchy(HierarchicalContainer hierarchy) {
+        	for (Object itemId : hierarchy.rootItemIds()) {
+        		dumpHierarchyItem(hierarchy, 0, itemId);
+        	}
+		}
+
+        private void dumpHierarchy(HierarchicalContainer hierarchy, Object parentId, int level) {
+        	Collection<?> children = hierarchy.getChildren(parentId);
+        	if (children != null) {
+				for (Object itemId : children) {
+	        		dumpHierarchyItem(hierarchy, level, itemId);
+	        	}
+        	}
+		}
+
+		private void dumpHierarchyItem(HierarchicalContainer hierarchy, int level, Object itemId) {
+			log.info(Strings.repeat(" ", level)+itemId);
+			dumpHierarchy(hierarchy, itemId, level+1);
+		}
+
+		protected void exercise()
         {
             reload();
+            sleep(2000);
+            String windowHandle = driver.getWindowHandles().iterator().next();
+            driver.switchTo().window(windowHandle);
+            screenshot();
             // check that all root items are visible
             log.info("root items: "+hierarchy.rootItemIds());
             for (Object rootItemId : hierarchy.rootItemIds()) {
@@ -137,6 +169,8 @@ public abstract class SynergyTestBase
             for (String itemId : shuffledRootItemIds) {
                 exerciseItemsBelow(itemId);
             }
+            
+            screenshot();
         }
 
         private void exerciseItemsBelow(String parentId)
@@ -146,6 +180,7 @@ public abstract class SynergyTestBase
                 return;
             }
             log.info("exercising children of "+parentId);
+            screenshot();
             click(parentId);
             assertItemState(parentId, State.selected);
             Collections.shuffle(shuffledChildItemIds);
@@ -162,6 +197,7 @@ public abstract class SynergyTestBase
         {
             log.info("exercising item "+itemId);
             assertItemState(itemId, State.unselected);
+            screenshot();
             click(itemId);
             assertItemState(itemId, State.selected);
             // if the item has a target navigation state check that the view is visible
@@ -212,7 +248,20 @@ public abstract class SynergyTestBase
         assertCssClassSuffix(itemId, state.getCssClassSuffix());
     }
     
-    private void assertCssClassSuffix(String itemId, String cssClassSuffix)
+    public void screenshot() {
+    	try {
+    		File scrFile = ((TakesScreenshot)driver).getScreenshotAs(OutputType.FILE);
+    		File screenshotDir = new File("screenshots");
+    		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd-HHmmss");
+    		File screenshot = new File(screenshotDir, sdf.format(new Date())+".jpg");
+			FileUtils.copyFile(scrFile, screenshot);
+			log.info("screenshot saved to "+screenshot.getAbsolutePath());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}		
+	}
+
+	private void assertCssClassSuffix(String itemId, String cssClassSuffix)
     {
         assertWithinTimeout("css class suffix " + cssClassSuffix + " not found on item "+itemId, itemId, predicateHasCssClassSuffix(cssClassSuffix));
     }
@@ -273,6 +322,10 @@ public abstract class SynergyTestBase
 
     private void assertItemVisible(String itemId)
     {
+    	System.out.println("assertItemVisible("+itemId+")");
+    	for (WebElement element : driver.findElements(By.xpath("//*"))) {
+    		System.out.println(element.getAttribute("id"));
+    	}
         assertEquals("item " + itemId + " should exist", 1, driver.findElements(By.id(itemId)).size());
         checkVisuals(itemId);
     }
